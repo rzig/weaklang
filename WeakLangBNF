@@ -1,0 +1,44 @@
+declaration := funDeclaration
+|opDeclaration
+|varDeclaration
+|statement
+
+funDeclaration := "f" IDENTIFIER "(" parameters? ")" block
+opDeclaration := "o" IDENTIFIER "(" parameters? ")" block
+varDeclaration := "a" IDENTIFIER ( "=" expression )? ";"
+parameters := IDENTIFIER ( "," IDENTIFIER )*
+arguments := expression ( "," expression )*
+
+statement := exprStatement
+           | ifStatement
+           | printStatement
+           | returnStatement
+           | whileStatement
+           | block
+
+block := "{" declaration* "}";
+
+exprStatement := expression ";"
+ifStatement := "i" "(" expression ")" block
+printStatement := "p" expression ";"
+returnStatement := "r" expression? ";"
+whileStatement := "while" "(" expression ")" block
+
+expression := assignment
+assignment := IDENTIFIER "=" assignment | logic_or;
+logic_or = logic_and ( "or" logic_and )*
+logic_and = equality ( "and" equality )*
+equality := comparison( ("!=" | "==") comparison*
+comparison := term ( ( ">" | "<") term *
+term := factor ( ( "-" | "+" ) factor )*
+factor := unary ( ( "/" | "*" ) unary )*
+
+unary := ( "!" | "-" ) unary
+call := primary ( "(" arguments? ")" | "." IDENTIFIER )*
+primary := "T"|"F"|"N"|NUMBER|STRING|IDENTIFIER|"(" expression ")"
+
+NUMBER := DIGIT+ ( "." DIGIT+ )?
+STRING := "\"" <any not "\"">* "\""
+IDENTIFIER := ALPHA ( ALPHA | DIGIT )*
+ALPHA := "a" ... "z" | "A" ... "Z" | "_"
+DIGIT := "0" ... "9"
