@@ -8,6 +8,7 @@ enum TokenType {
     MINUS,
     STAR,
     SLASH,
+    EXP,
     COMMA,
     DOT,
     SEMI,
