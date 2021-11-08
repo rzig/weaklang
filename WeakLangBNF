@@ -4,7 +4,7 @@ declaration := funDeclaration
 |statement
 
 funDeclaration := "f" IDENTIFIER "(" parameters? ")" block
-opDeclaration := "o" IDENTIFIER "(" parameters? ")" block
+opDeclaration := "o" IDENTIFIER "(" IDENTIFIER, IDENTIFIER ")" block
 varDeclaration := "a" IDENTIFIER ( "=" expression )? ";"
 parameters := IDENTIFIER ( "," IDENTIFIER )*
 arguments := expression ( "," expression )*

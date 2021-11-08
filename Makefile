@@ -3,11 +3,13 @@ CXXFLAGS=-std=c++20 -g -fstandalone-debug -Wall -Wextra -Werror -pedantic -Iincl
 
 weak: bin/weak
 
-bin/weak: bin/main.o bin/lexer.o
+bin/weak: bin/main.o bin/lexer.o bin/token.o
 	$(CXX) $(CXXFLAGS) $^ -o $@
 bin/main.o: src/main.cpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 bin/lexer.o: src/lexer.cpp include/lexer.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+bin/token.o: src/token.cpp include/token.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
 .DEFAULT_GOAL := weak
