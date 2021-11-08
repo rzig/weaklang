@@ -51,7 +51,13 @@ void Lexer::lex(const std::string &to_lex) {
                 }
                 else tokens.push_back(Token(LESSER, to_lex.substr(start, 1), making_token_line, making_token_col));
                 break;
-            default: had_error = true;
+            // TODO add alphanumeric for identifier
+            // TODO string implementation
+            // ignore whitespace
+            case ' ': case '\r': case '\t': break; 
+            default:
+                std::cout << start_token_c << std::endl; 
+                had_error = true;
         }
     }
     tokens.push_back(Token(END, "", making_token_line, making_token_col));

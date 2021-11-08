@@ -14,6 +14,7 @@ public:
 private:
     bool had_error = false;
 
+    
 };
 
 #endif // LEXER_H_
