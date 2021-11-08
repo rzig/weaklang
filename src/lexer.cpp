@@ -6,7 +6,12 @@ void Lexer::lex(const std::string &to_lex) {
     std::vector<Token> tokens;
     while (current < to_lex.size()) {
         start = current;
-        char start_token_c = to_lex.at(current++);
+        std::cout << "current is " << current << std::endl;
+        std::cout << "to lex size is " << to_lex.size() << std::endl;
+        size_t next = current++;
+        std::cout << "next is " << next << std::endl;
+        char start_token_c = to_lex.at(next);
+        std::cout << "good here " << std::endl;
         switch (start_token_c) {
             case '+': tokens.push_back(Token(PLUS, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case '-': tokens.push_back(Token(MINUS, to_lex.substr(start, 1), making_token_line, making_token_col));break;
@@ -51,14 +56,27 @@ void Lexer::lex(const std::string &to_lex) {
                 }
                 else tokens.push_back(Token(LESSER, to_lex.substr(start, 1), making_token_line, making_token_col));
                 break;
+            case '"':
+                current++;
+                while(current < to_lex.size() && to_lex.at(current) != '\n' && to_lex.at(current) != '"') current++;
+                if(current == to_lex.size() || to_lex.at(current) == '\n') {
+                    had_error = true;
+                }
+                current++;
+                tokens.push_back(Token(STRING, to_lex.substr(start+1, current-start-2), making_token_line, making_token_col));
+                break;
+            case '\n':
+                making_token_col = -1;
+                making_token_line++;
+                break;
             // TODO add alphanumeric for identifier
-            // TODO string implementation
             // ignore whitespace
             case ' ': case '\r': case '\t': break; 
             default:
                 std::cout << start_token_c << std::endl; 
                 had_error = true;
         }
+        making_token_col++;
     }
     tokens.push_back(Token(END, "", making_token_line, making_token_col));
     std::cout << to_lex << std::endl;
