@@ -15,7 +15,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-void had_error(std::string str){
+void no_error(std::string str){
     Lexer lex; 
     lex.lex(str); 
     REQUIRE(!lex.has_had_error());
@@ -23,41 +23,44 @@ void had_error(std::string str){
 
 TEST_CASE("Simplistic tokens", "[lexer]"){
     SECTION("Simple math"){
-      had_error("+");
-      had_error("-");
-      had_error("*"); 
-      had_error("/"); 
-      had_error("^"); 
+      no_error("+");
+      no_error("-");
+      no_error("*"); 
+      no_error("/"); 
+      no_error("^"); 
     }
     SECTION("Punctuation"){
-      had_error(","); 
-      had_error("."); 
-      had_error(";"); 
+      no_error(","); 
+      no_error("."); 
+      no_error(";"); 
     }
     SECTION("Comments"){
-      had_error("#"); 
+      no_error("#"); 
     }
     SECTION("Parentheses"){
-      had_error("("); 
-      had_error(")"); 
+      no_error("("); 
+      no_error(")"); 
     }
     SECTION("Block"){
-      had_error("{"); 
-      had_error("}"); 
+      no_error("{"); 
+      no_error("}"); 
     }
     SECTION("Brackets"){
-      had_error("["); 
-      had_error("]"); 
+      no_error("["); 
+      no_error("]"); 
     }
     SECTION("Assignment"){
-      had_error("=");
+      no_error("=");
     }
     SECTION("Boolean"){
-      had_error("!"); 
-      had_error("=="); 
-      had_error(">"); 
-      had_error("<");
-      had_error(">=");
-      had_error("<=");
+      no_error("!"); 
+      no_error("=="); 
+      no_error(">"); 
+      no_error("<");
+      no_error(">=");
+      no_error("<=");
+    }
+    SECTION("String literals") {
+      no_error("\"Hello world\"");
     }
 }

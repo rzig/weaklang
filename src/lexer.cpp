@@ -6,12 +6,8 @@ void Lexer::lex(const std::string &to_lex) {
     std::vector<Token> tokens;
     while (current < to_lex.size()) {
         start = current;
-        std::cout << "current is " << current << std::endl;
-        std::cout << "to lex size is " << to_lex.size() << std::endl;
         size_t next = current++;
-        std::cout << "next is " << next << std::endl;
         char start_token_c = to_lex.at(next);
-        std::cout << "good here " << std::endl;
         switch (start_token_c) {
             case '+': tokens.push_back(Token(PLUS, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case '-': tokens.push_back(Token(MINUS, to_lex.substr(start, 1), making_token_line, making_token_col));break;
