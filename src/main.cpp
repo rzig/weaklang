@@ -4,7 +4,7 @@
 
 int main(/*int argc, char *argv[]*/) {
     Lexer lexer;
-    lexer.lex("1 + (5 +3 / (3 ^1));");
+    lexer.lex("1.44 + (abc +3 / (3711.01 ^1)); (5 + 1) == (3 - 2) >= 7 != cba #Comment + - * /\n(5 + 3)");
 
     return 0;
 }

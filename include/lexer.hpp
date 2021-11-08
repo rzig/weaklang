@@ -10,6 +10,9 @@ class Lexer {
 
 public:
     void lex(const std::string &to_lex);
+    bool has_had_error();
+private:
+    bool had_error = false;
 
 };
 
