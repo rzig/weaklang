@@ -17,7 +17,12 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
             case ',': tokens.push_back(Token(COMMA, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case '.': tokens.push_back(Token(DOT, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case ';': tokens.push_back(Token(SEMI, to_lex.substr(start, 1), making_token_line, making_token_col));break;
-            case '#': while (current < to_lex.size() && to_lex.at(current++) != '\n');break;
+            case '#': {
+                while (current < to_lex.size() && to_lex.at(current++) != '\n');
+                making_token_line++;
+                making_token_col = start - current;
+                break;
+            }
             case '(': tokens.push_back(Token(LEFT_PAREN, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case ')': tokens.push_back(Token(RIGHT_PAREN, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case '{': tokens.push_back(Token(LEFT_BRACE, to_lex.substr(start, 1), making_token_line, making_token_col));break;
@@ -56,13 +61,15 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
                 current++;
                 while(current < to_lex.size() && to_lex.at(current) != '\n' && to_lex.at(current) != '"') current++;
                 if(current == to_lex.size() || to_lex.at(current) == '\n') {
+                    making_token_line++;
+                    making_token_col = 0;
                     had_error = true;
                 }
                 current++;
-                tokens.push_back(Token(STRING, to_lex.substr(start+1, current-start-2), making_token_line, making_token_col));
+                tokens.push_back(Token(STRING, to_lex.substr(start + 1, current - start - 2), making_token_line, making_token_col));
                 break;
             case '\n':
-                making_token_col = -1;
+                making_token_col = start - current;
                 making_token_line++;
                 break;
             // TODO add alphanumeric for identifier
@@ -72,12 +79,12 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
                 std::cout << start_token_c << std::endl; 
                 had_error = true;
         }
-        making_token_col++;
+        making_token_col += current - start;
     }
     tokens.push_back(Token(END, "", making_token_line, making_token_col));
     std::cout << to_lex << std::endl;
     for (auto t : tokens) {
-        std::cout << t.type << " " << t.lexeme << std::endl;
+        std::cout << t.type << " " << t.lexeme << " " << t.line << " " << t.col << std::endl;
     }
     std::cout << (has_had_error() ? "true" : "false") << std::endl;
     return tokens;
