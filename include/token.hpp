@@ -3,7 +3,7 @@
 
 #include <string>
 
-enum class TokenType {
+enum TokenType {
     PLUS,
     MINUS,
     STAR,
