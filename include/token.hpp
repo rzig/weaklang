@@ -3,11 +3,12 @@
 
 #include <string>
 
-enum class TokenType {
+enum TokenType {
     PLUS,
     MINUS,
     STAR,
     SLASH,
+    EXP,
     COMMA,
     DOT,
     SEMI,
