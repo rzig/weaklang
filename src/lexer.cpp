@@ -1,6 +1,6 @@
 #include "lexer.hpp"
 
-void Lexer::lex(const std::string &to_lex) {
+std::vector<Token> Lexer::lex(const std::string &to_lex) {
     size_t making_token_line = 0, making_token_col = 0; // For tracking position of tokens for better syntax error reporting
     size_t start = 0, current = 0; // For tracking interpretation of tokens
     std::vector<Token> tokens;
@@ -80,6 +80,7 @@ void Lexer::lex(const std::string &to_lex) {
         std::cout << t.type << " " << t.lexeme << std::endl;
     }
     std::cout << (has_had_error() ? "true" : "false") << std::endl;
+    return tokens;
 }
 
 bool Lexer::has_had_error() {
