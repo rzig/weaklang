@@ -15,7 +15,6 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
             case '/': tokens.push_back(Token(SLASH, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case '^': tokens.push_back(Token(EXP, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case ',': tokens.push_back(Token(COMMA, to_lex.substr(start, 1), making_token_line, making_token_col));break;
-            case '.': tokens.push_back(Token(DOT, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case ';': tokens.push_back(Token(SEMI, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case '#': {
                 while (current < to_lex.size() && to_lex.at(current++) != '\n');
@@ -66,7 +65,7 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
                     had_error = true;
                 }
                 current++;
-                tokens.push_back(Token(STRING, to_lex.substr(start + 1, current - start - 2), making_token_line, making_token_col));
+                tokens.push_back(Token(STRING, to_lex.substr(start + 1, current - start - 2), making_token_line, making_token_col, to_lex.substr(start + 1, current - start - 2)));
                 break;
             case '\n':
                 making_token_col = start - current;
@@ -76,15 +75,26 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
             // ignore whitespace
             case ' ': case '\r': case '\t': break; 
             default:
-                std::cout << start_token_c << std::endl; 
-                had_error = true;
+                if (is_digit(start_token_c)) {
+                    while (current < to_lex.size() && is_digit(to_lex.at(current))) current++;
+                    if (current == to_lex.size()) {
+                        tokens.push_back(Token(NUMBER, to_lex.substr(start, current - start), making_token_line, making_token_col, stod(to_lex.substr(start, current - start))));
+                        break;
+                    }
+                    if (to_lex.at(current) == '.') {
+                        current++;
+                        while (current < to_lex.size() && is_digit(to_lex.at(current))) current++;
+                    }
+                    tokens.push_back(Token(NUMBER, to_lex.substr(start, current - start), making_token_line, making_token_col, stod(to_lex.substr(start, current - start))));
+                }
+                else had_error = true;
         }
         making_token_col += current - start;
     }
     tokens.push_back(Token(END, "", making_token_line, making_token_col));
     std::cout << to_lex << std::endl;
     for (auto t : tokens) {
-        std::cout << t.type << " " << t.lexeme << " " << t.line << " " << t.col << std::endl;
+        std::cout << t.lexeme << "                      " << t.line << " " << t.col << std::endl;
     }
     std::cout << (has_had_error() ? "true" : "false") << std::endl;
     return tokens;
@@ -92,4 +102,16 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
 
 bool Lexer::has_had_error() {
     return had_error;
+}
+
+bool Lexer::is_digit(char c) {
+    return c <= '9' && c >= '0';
+}
+
+bool Lexer::is_alpha(char c) {
+    return c == '_' || (c <= 'Z' && c >= 'A') || (c <= 'z' && c >= 'a');
+}
+
+bool Lexer::is_alpha_digit(char c) {
+    return is_alpha(c) || is_digit(c);
 }

@@ -10,7 +10,6 @@ enum TokenType {
     SLASH,
     EXP,
     COMMA,
-    DOT,
     SEMI,
     LEFT_PAREN,
     RIGHT_PAREN,
