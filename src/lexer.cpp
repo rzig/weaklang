@@ -87,6 +87,11 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
                     }
                     tokens.push_back(Token(NUMBER, to_lex.substr(start, current - start), making_token_line, making_token_col, stod(to_lex.substr(start, current - start))));
                 }
+                else if (is_alpha(start_token_c)) {
+                    while(current < to_lex.size() && (is_alpha(to_lex.at(current)) || is_digit(to_lex.at(current)))) current++;
+                    if(current == to_lex.size() || to_lex.at(current) == '\n' || to_lex.at(current) == '\r') had_error = true;
+                    tokens.push_back(Token(IDENTIFIER, to_lex.substr(start, current-start), making_token_line, making_token_col));
+                }
                 else had_error = true;
         }
         making_token_col += current - start;
