@@ -42,6 +42,8 @@ enum TokenType {
     NUMBER,
     BOOLEAN,
     STRING,
+    SHAPE,
+    AS_SHAPE,
 };
 
 struct Token {

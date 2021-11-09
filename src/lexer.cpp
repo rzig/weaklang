@@ -89,7 +89,22 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
                 }
                 else if (is_alpha(start_token_c)) {
                     while(current < to_lex.size() && (is_alpha(to_lex.at(current)) || is_digit(to_lex.at(current)))) current++;
-                    tokens.push_back(Token(IDENTIFIER, to_lex.substr(start, current-start), making_token_line, making_token_col));
+                    std::string lexeme_check = to_lex.substr(start, current - start);
+                    if (lexeme_check == "A") tokens.push_back(Token(AND, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "O") tokens.push_back(Token(OR, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "T") tokens.push_back(Token(TRUE, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "F") tokens.push_back(Token(FALSE, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "f") tokens.push_back(Token(FUNCTION, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "o") tokens.push_back(Token(OPERATOR, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "N") tokens.push_back(Token(NIL, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "i") tokens.push_back(Token(IF, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "p") tokens.push_back(Token(PRINT, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "r") tokens.push_back(Token(RETURN, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "a") tokens.push_back(Token(LET, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "w") tokens.push_back(Token(WHILE, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "s") tokens.push_back(Token(SHAPE, lexeme_check, making_token_line, making_token_col));
+                    else if (lexeme_check == "sa") tokens.push_back(Token(AS_SHAPE, lexeme_check, making_token_line, making_token_col));
+                    else tokens.push_back(Token(IDENTIFIER, lexeme_check, making_token_line, making_token_col));
                 }
                 else had_error = true;
         }
