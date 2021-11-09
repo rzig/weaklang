@@ -22,18 +22,18 @@ exprStatement := expression ";"
 ifStatement := "i" "(" expression ")" block
 printStatement := "p" expression ";"
 returnStatement := "r" expression? ";"
-whileStatement := "while" "(" expression ")" block
+whileStatement := "w" "(" expression ")" block
 
 expression := assignment
 assignment := IDENTIFIER "=" assignment | logicOr;
-logicOr = logicAnd ( "or" logicAnd )*
-logicAnd = equality ( "and" equality )*
+logicOr = logicAnd ( "O" logicAnd )*
+logicAnd = equality ( "A" equality )*
 equality := comparison( ("!=" | "==") comparison*
 comparison := term ( ( ">" | "<") term *
 term := factor ( ( "-" | "+" ) factor )*
-factor := unary ( ( "/" | "*" ) unary )*
+factor := unary ( ( "/" | "*" | "sa" ) unary )*
 
-unary := ( "!" | "-" ) unary
+unary := ( "!" | "-" | "s" ) unary | primary
 primary := "T" | "F" | "N" | NUMBER | STRING | IDENTIFIER | "(" expression ")" | "[]" | "[" NUMBER ( "," NUMBER )* "]"
 
 NUMBER := DIGIT+ ( "." DIGIT+ )?
