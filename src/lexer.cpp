@@ -116,7 +116,3 @@ bool Lexer::is_digit(char c) {
 bool Lexer::is_alpha(char c) {
     return c == '_' || (c <= 'Z' && c >= 'A') || (c <= 'z' && c >= 'a');
 }
-
-bool Lexer::is_alpha_digit(char c) {
-    return is_alpha(c) || is_digit(c);
-}

@@ -14,7 +14,6 @@ public:
 private:
     bool is_digit(char c);
     bool is_alpha(char c);
-    bool is_alpha_digit(char c);
     bool had_error = false;
 };
 
