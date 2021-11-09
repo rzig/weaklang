@@ -62,4 +62,6 @@ struct Token {
     Token(TokenType type_in, std::string lexeme_in, size_t line_in, size_t col_in, std::string literal_string_in);
 };
 
+std::string print_token_type(TokenType type);
+
 #endif // TOKEN_H_
