@@ -49,8 +49,6 @@ TEST_CASE("Simplistic tokens", "[lexer]"){
     SECTION("Punctuation"){
       no_error(","); 
       only_returns_token(",", COMMA);
-      no_error("."); 
-      only_returns_token(".", DOT);
       no_error(";"); 
       only_returns_token(";", SEMI);
     }
