@@ -21,6 +21,12 @@ void no_error(std::string str){
     REQUIRE(!lex.has_had_error());
 }
 
+void error(std::string str) {
+  Lexer lex;
+  lex.lex(str);
+  REQUIRE(lex.has_had_error());
+}
+
 std::vector<Token> getTokens(std::string str) {
     Lexer lex;
     return lex.lex(str);
@@ -148,5 +154,35 @@ TEST_CASE("Single-line strings", "[lexer]") {
       REQUIRE(tokens[0].type == LEFT_PAREN);
       REQUIRE(tokens[1].type == RIGHT_PAREN);
       REQUIRE(tokens[2].type == END);
+    }
+}
+
+TEST_CASE("Identifiers", "[lexer]") {
+    SECTION("Accepts alpha characters") {
+      no_error("abc;");
+      std::vector<Token> tokens = getTokens("abc;");
+      REQUIRE(tokens.size() == 3);
+      REQUIRE(tokens[0].type == IDENTIFIER);
+      REQUIRE(tokens[0].lexeme == "abc");
+      REQUIRE(tokens[1].type == SEMI);
+      REQUIRE(tokens[2].type == END);
+    }
+
+    SECTION("Accepts alpha followed by alphanumeric and underscore") {
+      no_error("abc_def = 1");
+      std::vector<Token> tokens = getTokens("abc_def = 1");
+      REQUIRE(tokens.size() == 4);
+      REQUIRE(tokens[0].type == IDENTIFIER);
+      REQUIRE(tokens[0].lexeme == "abc_def");
+      REQUIRE(tokens[1].type == EQUALS);
+      REQUIRE(tokens[2].type == NUMBER);
+      REQUIRE(tokens[3].type == END);
+    }
+
+    SECTION("Errors on termination by newline, return, EOF, or tab") {
+      error("abc_d\tef");
+      error("abc\n");
+      error("x;abc");
+      error("ab\r;");
     }
 }
