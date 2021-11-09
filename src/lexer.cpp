@@ -113,8 +113,9 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
     tokens.push_back(Token(END, "", making_token_line, making_token_col));
     std::cout << to_lex << std::endl;
     for (auto t : tokens) {
-        std::cout << t.lexeme << "                      " << t.line << " " << t.col << std::endl;
+        std::cout << t.lexeme << " ";
     }
+    std::cout << std::endl;
     std::cout << (has_had_error() ? "true" : "false") << std::endl;
     return tokens;
 }

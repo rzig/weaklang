@@ -1,0 +1,6 @@
+f foo(arg1, arg2) {
+  a sum = arg1 + arg2;
+  r sum ^ 2;
+}
+
+p foo([5, 2], [3, 4]);
