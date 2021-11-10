@@ -53,12 +53,10 @@ struct Token {
     const size_t col;
 
     const double literal_double = 0;
-    const bool literal_boolean = false;
     const std::string literal_string = "";
 
     Token(TokenType type_in, std::string lexeme_in, size_t line_in, size_t col_in);
     Token(TokenType type_in, std::string lexeme_in, size_t line_in, size_t col_in, double literal_double_in);
-    Token(TokenType type_in, std::string lexeme_in, size_t line_in, size_t col_in, bool literal_boolean_in);
     Token(TokenType type_in, std::string lexeme_in, size_t line_in, size_t col_in, std::string literal_string_in);
 };
 

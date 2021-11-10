@@ -6,9 +6,9 @@ tests: bin/tests
 
 bin/weak: bin/main.o bin/lexer.o bin/token.o
 	$(CXX) $(CXXFLAGS) $^ -o $@
-bin/main.o: src/main.cpp
+bin/main.o: src/main.cpp include/lexer.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
-bin/lexer.o: src/lexer.cpp include/lexer.hpp
+bin/lexer.o: src/lexer.cpp include/lexer.hpp include/token.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 bin/token.o: src/token.cpp include/token.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
