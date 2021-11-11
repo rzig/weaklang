@@ -1,3 +1,5 @@
+program := declaration* EOF
+
 declaration := funDeclaration
 |opDeclaration
 |varDeclaration
@@ -25,7 +27,7 @@ returnStatement := "r" expression? ";"
 whileStatement := "w" "(" expression ")" block
 
 expression := assignment
-assignment := IDENTIFIER "=" assignment | logicOr;
+assignment := IDENTIFIER "=" assignment | logicOr
 logicOr = logicAnd ( "O" logicAnd )*
 logicAnd = equality ( "A" equality )*
 equality := comparison( ("!=" | "==") comparison*

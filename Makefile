@@ -12,9 +12,11 @@ bin/lexer.o: src/lexer.cpp include/lexer.hpp include/token.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 bin/token.o: src/token.cpp include/token.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
-bin/expr.o: src/expr.cpp include/expr.hpp
+bin/stmt.o: src/stmt.cpp include/stmt.hpp include/token.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
-bin/parser.o: src/parser.cpp include/parser.hpp
+bin/expr.o: src/expr.cpp include/expr.hpp include/token.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+bin/parser.o: src/parser.cpp include/parser.hpp include/token.hpp include/stmt.hpp include/expr.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
 bin/tests: bin/catch.o tests/tests.cc src/lexer.cpp src/token.cpp
