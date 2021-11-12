@@ -26,14 +26,16 @@ printStatement := "p" expression ";"
 returnStatement := "r" expression? ";"
 whileStatement := "w" "(" expression ")" block
 
-expression := assignment
+expression := function
+function := IDENTIFIER "(" function ")" | operation
+operation := assignment ( IDENTIFIER assignment )*
 assignment := IDENTIFIER "=" assignment | logicOr
 logicOr = logicAnd ( "O" logicAnd )*
 logicAnd = equality ( "A" equality )*
 equality := comparison( ("!=" | "==") comparison*
 comparison := term ( ( ">" | "<") term *
 term := factor ( ( "-" | "+" ) factor )*
-factor := unary ( ( "/" | "*" | "sa" ) unary )*
+factor := unary ( ( "/" | "*" | "@" | "sa" ) unary )*
 
 unary := ( "!" | "-" | "s" ) unary | primary
 primary := "T" | "F" | "N" | NUMBER | STRING | IDENTIFIER | "(" expression ")" | "[]" | "[" NUMBER ( "," NUMBER )* "]"

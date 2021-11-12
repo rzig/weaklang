@@ -1,9 +1,25 @@
 #include "expr.hpp"
 
-Assign::Assign(Token name, Expr value): name(name), value(value) {}
+Logical::Logical(Expr left, Token op, Expr right): left(left), op(op), right(right) {}
+
+Assign::Assign(Token name, Expr value): name(name), value(value){}
 
 Binary::Binary(Expr left, Token op, Expr right): left(left), op(op), right(right) {}
 
-Literal::Literal(std::string val): val(val) {}
+Func::Func(Token func, Token paren, std::vector<Expr> args): func(func), paren(paren), args(args) {}
 
-Logical::Logical(Expr left, Token op, Expr right): left(left), op(op), right(right) {} 
+Group::Group(Expr expr): expr(expr) {}
+
+Literal::Literal(std::string val): string_val(val) {}
+
+Literal::Literal(double val): double_val(val) {}
+
+Literal::Literal(bool val): bool_val(val) {}
+
+Logical::Logical(Expr left, Token op, Expr right): left(left), op(op), right(right) {}
+
+Op::Op(Token op, Token paren, std::vector<Expr> args): op(op), paren(paren), args(args) {}
+
+Unary::Unary(Token op, Expr right): op(op), right(right) {}
+
+Var::Var(Token name): name(name) {}
