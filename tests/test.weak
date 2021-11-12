@@ -1,10 +1,31 @@
-f foo(arg1, arg2) {
-  a sum = arg1 + arg2;
-  r sum ^ 2;
+# DO NOT DELETE OR MODIFY THIS FILE! IT IS USED IN tests.cc
+o x (b, c) {
+  r b ^ (c*2);
 }
 
-p foo([5, 2], [3, 4]);
-m1 = [1, 0, 0, 1] sa [2, 2]
-m2 = [1, 5, 3, -2] sa [2, 2]
-m3 = m1 @ m2
-p m3
+o z (b, c) {
+  r (s b) + (s c);
+}
+
+f y (b, c, d) {
+  a i = 0;
+  a mat = [b,c,b,c] sa [b, c];
+  w (i < d) {
+    mat = mat x mat;
+    i = i + 1;
+  }
+  i (mat[0][1] != 1) {
+    r T;
+  }
+  r F;
+}
+
+p f(1,2,3);
+p "Hello";
+p N;
+p f(1,2,3) O f(2,3,4);
+p 1 > 2;
+p 1 >= 2;
+p 2 < 1;
+p 2 <= 1;
+p 1 + 2 - 3 * 4 / 2;
