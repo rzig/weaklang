@@ -9,6 +9,7 @@ enum TokenType {
     STAR,
     SLASH,
     EXP,
+    AT,
     COMMA,
     SEMI,
     LEFT_PAREN,

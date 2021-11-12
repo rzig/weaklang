@@ -14,6 +14,7 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
             case '*': tokens.push_back(Token(STAR, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case '/': tokens.push_back(Token(SLASH, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case '^': tokens.push_back(Token(EXP, to_lex.substr(start, 1), making_token_line, making_token_col));break;
+            case '@': tokens.push_back(Token(AT, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case ',': tokens.push_back(Token(COMMA, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case ';': tokens.push_back(Token(SEMI, to_lex.substr(start, 1), making_token_line, making_token_col));break;
             case '#': {

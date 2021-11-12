@@ -13,6 +13,7 @@ std::string print_token_type(TokenType type) {
         case STAR: return std::string("STAR");
         case SLASH: return std::string("SLASH");
         case EXP: return std::string("EXP");
+        case AT: return std::string("AT");
         case COMMA: return std::string("COMMA");
         case SEMI: return std::string("SEMI");
         case LEFT_PAREN: return std::string("LEFT_PAREN");
