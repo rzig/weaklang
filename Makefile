@@ -1,5 +1,5 @@
 CXX=clang++
-CXXFLAGS=-std=c++20 -g -fstandalone-debug -Wall -Wextra -Werror -pedantic -Iinclude/
+CXXFLAGS=-std=c++20 -g -fstandalone-debug -Iinclude/
 
 weak: bin/weak
 tests: bin/tests

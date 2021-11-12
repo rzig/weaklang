@@ -5,39 +5,46 @@
 
 #include "token.hpp"
 
-class Expr {};
+class Expr {
+public:
+    virtual ~Expr();
+};
 
 class Assign : public Expr {
 public:
-    Assign(Token name, Expr value); 
+    Assign(Token name, Expr* value);
+    ~Assign();
 private:
     Token name; 
-    Expr value; 
+    Expr* value;
 };
 
 class Binary : public Expr {
 public:
-    Binary(Expr left, Token op, Expr right);
+    Binary(Expr* left, Token op, Expr* right);
+    ~Binary();
 private:
-    Expr left; 
+    Expr* left;
     Token op; 
-    Expr right; 
+    Expr* right;
 };
 
 class Func : public Expr {
 public:
-    Func(Token func, Token paren, std::vector<Expr> args);
+    Func(Token func, Token paren, std::vector<Expr*> args);
+    ~Func();
 private:
     Token func;
     Token paren;
-    std::vector<Expr> args;
+    std::vector<Expr*> args;
 };
 
 class Group : public Expr {
 public:
-    Group(Expr expr);
+    Group(Expr* expr);
+    ~Group();
 private:
-    Expr expr;
+    Expr* expr;
 };
 
 class Literal : public Expr {
@@ -45,6 +52,7 @@ public:
     Literal(std::string val);
     Literal(double val);
     Literal(bool val);
+    ~Literal();
 private:
     std::string string_val;
     double double_val;
@@ -53,33 +61,37 @@ private:
 
 class Logical : public Expr {
 public:
-    Logical(Expr left, Token op, Expr right); 
+    Logical(Expr* left, Token op, Expr* right);
+    ~Logical();
 private:
-    Expr left; 
+    Expr* left;
     Token op;
-    Expr right; 
+    Expr* right;
 };
 
 class Op : public Expr {
 public:
-    Op(Token op, Token paren, std::vector<Expr> args);
+    Op(Token op, Token paren, std::vector<Expr*> args);
+    ~Op();
 private:
     Token op;
     Token paren;
-    std::vector<Expr> args;
+    std::vector<Expr*> args;
 };
 
 class Unary : public Expr {
 public:
-    Unary(Token op, Expr right);
+    Unary(Token op, Expr* right);
+    ~Unary();
 private:
     Token op;
-    Expr right;
+    Expr* right;
 };
 
 class Var : public Expr {
 public:
     Var(Token name);
+    ~Var();
 private:
     Token name;
 };
