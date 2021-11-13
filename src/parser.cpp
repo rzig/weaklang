@@ -52,6 +52,10 @@ Stmt* Parser::funDeclaration() {
         }
     }
     consume(RIGHT_PAREN, "Expected ')' after parameters of function");
+
+    consume(LEFT_BRACE, "Expected '{' before function body");
+    std::vector<Stmt*> body = block();
+    return new FuncDecl(name, params, body);
 }
 
 Stmt* Parser::opDeclaration() {
@@ -72,7 +76,7 @@ Stmt* Parser::statement() {
 
 }
 
-Stmt* Parser::block() {
+std::vector<Stmt*> Parser::block() {
 
 }
 

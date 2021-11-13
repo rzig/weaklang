@@ -27,7 +27,7 @@ private:
     Stmt* opDeclaration();
     Stmt* varDeclaration();
     Stmt* statement();
-    Stmt* block();
+    std::vector<Stmt*> block();
 
     Stmt* exprStatement();
     Stmt* ifStatement();

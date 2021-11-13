@@ -2,8 +2,6 @@
 
 Stmt::~Stmt() {}
 
-Block::Block(std::vector<Stmt*> stmts): stmts(stmts) {}
-
 ExprStmt::ExprStmt(Expr* expr): expr(expr) {}
 
 FuncDecl::FuncDecl(Token name, std::vector<Token> params, std::vector<Stmt*> stmts): name(name), params(params), stmts(stmts) {}
@@ -19,10 +17,6 @@ Return::Return(Token return_keyword, Expr* expr): return_keyword(return_keyword)
 VarDecl::VarDecl(Token name, Expr* expr): name(name), expr(expr) {}
 
 While::While(Expr* cond, Stmt* body): cond(cond), body(body) {}
-
-Block::~Block() {
-    for (auto stmt : stmts) delete stmt;
-}
 
 ExprStmt::~ExprStmt() {
     delete expr;

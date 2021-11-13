@@ -11,14 +11,6 @@ public:
     virtual ~Stmt();
 };
 
-class Block : public Stmt {
-public:
-    Block(std::vector<Stmt*> stmts);
-    ~Block();
-private:
-    std::vector<Stmt*> stmts;
-};
-
 class ExprStmt : public Stmt {
 public:
     ExprStmt(Expr* expr);
