@@ -15,6 +15,8 @@ private:
     std::vector<Token> tokens;
     size_t cur_index = 0;
 
+    bool match(TokenType type);
+
     Stmt* declaration();
     Stmt* funDeclaration();
     Stmt* opDeclaration();
