@@ -4,7 +4,7 @@ CXXFLAGS=-std=c++20 -g -fstandalone-debug -Iinclude/
 weak: bin/weak
 tests: bin/tests
 
-bin/weak: bin/main.o bin/lexer.o bin/token.o bin/expr.o bin/parser.o
+bin/weak: bin/main.o bin/lexer.o bin/token.o bin/stmt.o bin/expr.o bin/parser.o
 	$(CXX) $(CXXFLAGS) $^ -o $@
 bin/main.o: src/main.cpp include/lexer.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@

@@ -5,7 +5,10 @@
 #include "stmt.hpp"
 #include "expr.hpp"
 
+#include <stdexcept>
 #include <vector>
+
+#define MAX_ARGS 64
 
 class Parser {
 public:
@@ -16,6 +19,8 @@ private:
     size_t cur_index = 0;
 
     bool match(TokenType type);
+    Token consume(TokenType type, std::string message);
+    std::string create_error(Token token, std::string message);
 
     Stmt* declaration();
     Stmt* funDeclaration();

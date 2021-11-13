@@ -1,6 +1,6 @@
-#include "stmt.h"
+#include "stmt.hpp"
 
-Stmt::~Stmt();
+Stmt::~Stmt() {}
 
 Block::Block(std::vector<Stmt*> stmts): stmts(stmts) {}
 

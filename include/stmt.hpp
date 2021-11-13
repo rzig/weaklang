@@ -11,7 +11,7 @@ public:
     virtual ~Stmt();
 };
 
-class Block : Stmt {
+class Block : public Stmt {
 public:
     Block(std::vector<Stmt*> stmts);
     ~Block();
@@ -19,7 +19,7 @@ private:
     std::vector<Stmt*> stmts;
 };
 
-class ExprStmt : Stmt {
+class ExprStmt : public Stmt {
 public:
     ExprStmt(Expr* expr);
     ~ExprStmt();
@@ -27,7 +27,7 @@ private:
     Expr* expr;
 };
 
-class FuncDecl : Stmt {
+class FuncDecl : public Stmt {
 public:
     FuncDecl(Token name, std::vector<Token> params, std::vector<Stmt*> stmts);
     ~FuncDecl();
@@ -37,7 +37,7 @@ private:
     std::vector<Stmt*> stmts;
 };
 
-class If : Stmt {
+class If : public Stmt {
 public:
     If(Expr* cond, Stmt* pos_branch, Stmt* neg_branch);
     ~If();
@@ -47,7 +47,7 @@ private:
     Stmt* neg_branch;
 };
 
-class OpDecl : Stmt {
+class OpDecl : public Stmt {
 public:
     OpDecl(Token name, Token left, Token right, std::vector<Stmt*> stmts);
     ~OpDecl();
@@ -58,7 +58,7 @@ private:
     std::vector<Stmt*> stmts;
 };
 
-class Print : Stmt {
+class Print : public Stmt {
 public:
     Print(Expr* expr);
     ~Print();
@@ -66,16 +66,16 @@ private:
     Expr* expr;
 };
 
-class Return : Stmt {
+class Return : public Stmt {
 public:
     Return(Token return_keyword, Expr* expr);
     ~Return();
 private:
-    Token return_keryword;
+    Token return_keyword;
     Expr* expr;
 };
 
-class VarDecl : Stmt {
+class VarDecl : public Stmt {
 public:
     VarDecl(Token name, Expr* expr);
     ~VarDecl();
@@ -84,7 +84,7 @@ private:
     Expr* expr;
 };
 
-class While : Stmt {
+class While : public Stmt {
 public:
     While(Expr* cond, Stmt* body);
     ~While();
