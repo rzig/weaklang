@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 #include "token.hpp"
 
@@ -14,7 +15,9 @@ public:
 private:
     bool is_digit(char c);
     bool is_alpha(char c);
+    bool is_keyword(std::string str);
     bool had_error = false;
+    static const std::unordered_map<std::string, TokenType> keywords;
 };
 
 #endif // LEXER_H_

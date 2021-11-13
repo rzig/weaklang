@@ -1,5 +1,22 @@
 #include "lexer.hpp"
 
+const std::unordered_map<std::string, TokenType> Lexer::keywords = {
+    {"A", AND},
+    {"O", OR},
+    {"T", TRUE},
+    {"F", FALSE},
+    {"f", FUNCTION},
+    {"o", OPERATOR},
+    {"N", NIL},
+    {"i", IF},
+    {"p", PRINT},
+    {"r", RETURN},
+    {"a", LET},
+    {"w", WHILE},
+    {"s", SHAPE},
+    {"sa", AS_SHAPE}
+};
+
 std::vector<Token> Lexer::lex(const std::string &to_lex) {
     size_t making_token_line = 0, making_token_col = 0; // For tracking position of tokens for better syntax error reporting
     size_t start = 0, current = 0; // For tracking interpretation of tokens
@@ -91,21 +108,11 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
                 else if (is_alpha(start_token_c)) {
                     while(current < to_lex.size() && (is_alpha(to_lex.at(current)) || is_digit(to_lex.at(current)))) current++;
                     std::string lexeme_check = to_lex.substr(start, current - start);
-                    if (lexeme_check == "A") tokens.push_back(Token(AND, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "O") tokens.push_back(Token(OR, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "T") tokens.push_back(Token(TRUE, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "F") tokens.push_back(Token(FALSE, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "f") tokens.push_back(Token(FUNCTION, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "o") tokens.push_back(Token(OPERATOR, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "N") tokens.push_back(Token(NIL, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "i") tokens.push_back(Token(IF, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "p") tokens.push_back(Token(PRINT, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "r") tokens.push_back(Token(RETURN, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "a") tokens.push_back(Token(LET, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "w") tokens.push_back(Token(WHILE, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "s") tokens.push_back(Token(SHAPE, lexeme_check, making_token_line, making_token_col));
-                    else if (lexeme_check == "sa") tokens.push_back(Token(AS_SHAPE, lexeme_check, making_token_line, making_token_col));
-                    else tokens.push_back(Token(IDENTIFIER, lexeme_check, making_token_line, making_token_col));
+                    if(is_keyword(lexeme_check)) {
+                        tokens.push_back(Token(keywords.at(lexeme_check), lexeme_check, making_token_line, making_token_col));
+                    } else {
+                        tokens.push_back(Token(IDENTIFIER, lexeme_check, making_token_line, making_token_col));
+                    }
                 }
                 else had_error = true;
         }
@@ -131,4 +138,8 @@ bool Lexer::is_digit(char c) {
 
 bool Lexer::is_alpha(char c) {
     return c == '_' || (c <= 'Z' && c >= 'A') || (c <= 'z' && c >= 'a');
+}
+
+bool Lexer::is_keyword(std::string str) {
+    return keywords.find(str) != keywords.end();
 }
