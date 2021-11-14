@@ -1,10 +1,12 @@
 #include "token.hpp"
 
-Token::Token(TokenType type_in, std::string lexeme_in, size_t line_in, size_t col_in): type(type_in), lexeme(lexeme_in), line(line_in), col(col_in) {}
-
-Token::Token(TokenType type_in, std::string lexeme_in, size_t line_in, size_t col_in, double literal_double_in): type(type_in), lexeme(lexeme_in), line(line_in), col(col_in), literal_double(literal_double_in) {}
-
-Token::Token(TokenType type_in, std::string lexeme_in, size_t line_in, size_t col_in, std::string literal_string_in): type(type_in), lexeme(lexeme_in), line(line_in), col(col_in), literal_string(literal_string_in) {}
+Token::Token(TokenType type_in, std::string lexeme_in, size_t line_in, size_t col_in) :
+    type(type_in),
+    lexeme(lexeme_in),
+    line(line_in),
+    col(col_in),
+    literal_double(type_in == NUMBER ? std::stod(lexeme_in) : 0),
+    literal_string(type_in == STRING ? lexeme_in : "") {}
 
 std::string print_token_type(TokenType type) {
     switch (type) {
@@ -49,6 +51,7 @@ std::string print_token_type(TokenType type) {
         case STRING: return std::string("STRING");
         case SHAPE: return std::string("SHAPE");
         case AS_SHAPE: return std::string("AS_SHAPE");
+        case EMPTY: return std::string("EMPTY");
     }
     return "";
 }

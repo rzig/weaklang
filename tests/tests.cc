@@ -239,9 +239,33 @@ TEST_CASE("Complex input", "[lexer]") {
     // (doing so for all nearly 200 would be excessive)
     std::vector<Token> tokens = getTokens(file_str);
     REQUIRE(tokens[50].line == 10);
-    REQUIRE(tokens[50].col == 6);
+    REQUIRE(tokens[50].col == 7);
     REQUIRE(tokens[100].line == 16);
-    REQUIRE(tokens[100].col == 13);
+    REQUIRE(tokens[100].col == 14);
     REQUIRE(tokens[150].line == 26);
-    REQUIRE(tokens[150].col == 4);
+    REQUIRE(tokens[150].col == 5);
+}
+
+TEST_CASE("Errors", "[lexer]") {
+    // It's kind of hard to add non-ascii symbols, so no test
+    // for that for the time being.
+    SECTION("string end of file") {
+        Lexer lex;
+        lex.lex("\"hello w");
+        REQUIRE(lex.has_had_error());
+        REQUIRE(lex.get_errors().size() == 1);
+        REQUIRE(lex.get_errors()[0].message == "Unexpected string termination");
+        REQUIRE(lex.get_errors()[0].line == 0);
+        REQUIRE(lex.get_errors()[0].column == 8);
+    }
+
+    SECTION("string newline") {
+        Lexer lex;
+        lex.lex("\"hello w\n");
+        REQUIRE(lex.has_had_error());
+        REQUIRE(lex.get_errors().size() == 1);
+        REQUIRE(lex.get_errors()[0].message == "Unexpected string termination");
+        REQUIRE(lex.get_errors()[0].line == 0);
+        REQUIRE(lex.get_errors()[0].column == 8);
+    }
 }
