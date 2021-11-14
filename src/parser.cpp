@@ -73,7 +73,12 @@ Stmt* Parser::varDeclaration() {
 }
 
 Stmt* Parser::statement() {
-
+    if (match(IF)) return ifStatement();
+    if (match(PRINT)) return printStatement();
+    if (match(RETURN)) return returnStatement();
+    if (match(WHILE)) return whileStatement();
+    // if (match(LEFT_BRACE)) return new std::vector stmt.block();
+    return exprStatement();
 }
 
 std::vector<Stmt*> Parser::block() {
