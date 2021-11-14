@@ -77,7 +77,7 @@ Stmt* Parser::statement() {
     if (match(PRINT)) return printStatement();
     if (match(RETURN)) return returnStatement();
     if (match(WHILE)) return whileStatement();
-    // if (match(LEFT_BRACE)) return new std::vector stmt.block();
+    // if (match(LEFT_BRACE)) return new std::vector<Stmt*> stmt.block();
     return exprStatement();
 }
 
