@@ -1,4 +1,5 @@
 #include "lexer.hpp"
+#include "error.hpp"
 
 /**
  * Builds a set containing the first character of each key in the provided map.
@@ -130,9 +131,9 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
                              // capture the contents of the string
             while(current_index < to_lex.size() && not is_newline(to_lex.at(current_index)) && to_lex.at(current_index) != QUOTE_CHAR) current_index++;
             if(current_index == to_lex.size() or is_newline(to_lex.at(current_index))) {
+                errors.push_back(Error("Unexpected string termination", line, column + current_index - start_index));
                 line++;
                 column = 0;
-                had_error = true;
             }
             current_index++; // move past the last quotation mark
             token_type = STRING;
@@ -159,7 +160,7 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
                 token_type = IDENTIFIER;
             }
         } else {
-            had_error = true;
+            errors.push_back(Error("Unrecognized character", line, column));
         }
 
         if(token_type != EMPTY) {
@@ -174,6 +175,10 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
     return tokens;
 }
 
+std::vector<Error> Lexer::get_errors() {
+    return errors;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //                        LEXER UTILITY FUNCTIONS                           //
 //////////////////////////////////////////////////////////////////////////////
@@ -183,7 +188,7 @@ bool Lexer::is_operator(std::string str) {
 }
 
 bool Lexer::has_had_error() {
-    return had_error;
+    return errors.size() > 0;
 }
 
 bool Lexer::is_digit(char c) {

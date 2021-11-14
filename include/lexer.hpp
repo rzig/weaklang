@@ -7,15 +7,16 @@
 #include <unordered_set>
 
 #include "token.hpp"
+#include "error.hpp"
 
 class Lexer {
 
 public:
     std::vector<Token> lex(const std::string &to_lex);
-    std::vector<Token> lex2(const std::string &to_lex);
     bool has_had_error();
+    std::vector<Error> get_errors();
 private:
-    bool had_error = false;
+    std::vector<Error> errors;
     bool is_digit(char c);
     bool is_alpha(char c);
     bool is_keyword(std::string str);

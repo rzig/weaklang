@@ -4,11 +4,13 @@ CXXFLAGS=-std=c++20 -g -fstandalone-debug -Iinclude/
 weak: bin/weak
 tests: bin/tests
 
-bin/weak: bin/main.o bin/lexer.o bin/token.o bin/stmt.o bin/expr.o bin/parser.o
+bin/weak: bin/main.o bin/lexer.o bin/error.o bin/stmt.o bin/token.o bin/expr.o bin/parser.o
 	$(CXX) $(CXXFLAGS) $^ -o $@
 bin/main.o: src/main.cpp include/lexer.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
-bin/lexer.o: src/lexer.cpp include/lexer.hpp include/token.hpp
+bin/lexer.o: src/lexer.cpp include/lexer.hpp include/token.hpp include/error.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+bin/error.o: src/error.cpp include/error.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 bin/token.o: src/token.cpp include/token.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
@@ -19,7 +21,7 @@ bin/expr.o: src/expr.cpp include/expr.hpp include/token.hpp
 bin/parser.o: src/parser.cpp include/parser.hpp include/token.hpp include/stmt.hpp include/expr.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-bin/tests: bin/catch.o tests/tests.cc src/lexer.cpp src/token.cpp
+bin/tests: bin/catch.o tests/tests.cc src/lexer.cpp src/token.cpp src/error.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 bin/catch.o: tests/catch.cc
