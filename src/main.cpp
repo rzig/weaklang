@@ -14,7 +14,11 @@ int main(int argc, char* argv[]) {
       std::string read((std::istreambuf_iterator<char>(input_file)),
                        (std::istreambuf_iterator<char>()));
       Lexer lexer;
-      lexer.lex(read);
+      std::vector<Token> tokens = lexer.lex(read);
+      for (auto t : tokens) {
+        std::cout << print_token_type(t.type) << " ";
+      }
+      std::cout << std::endl;
     } else {
       std::cout << "Couldn't open file " << argv[i] << ". Quitting."
                 << std::endl;
