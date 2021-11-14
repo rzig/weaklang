@@ -24,15 +24,6 @@ size_t get_longest_element(std::unordered_map<std::string, TokenType> map) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Here, we configure our Lexer class with the tokens of our programming    //
-// language, such as operators etc. As its name suggests, the keywords map  //
-// contains all of our keywords. The operators_flow map contains operators  //
-// and control flow statements. We build a couple utility items from the    //
-// latter, including a set of all operator/flow prefixes, and the length of //
-// the longest operator (so that our lexer can pick the most specific).     //
-// Then, we define whitespace/
-
-//////////////////////////////////////////////////////////////////////////////
 //                          LEXER CONFIGURATION                             //
 //////////////////////////////////////////////////////////////////////////////
 // Here, we configure our Lexer class with the tokens of our programming    //
