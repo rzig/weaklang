@@ -164,13 +164,7 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
 
         if(token_type != EMPTY) {
             std::string lexeme = to_lex.substr(start_index, current_index);
-            if(token_type == NUMBER) {
-                tokens.push_back(Token(token_type, lexeme, line, column, std::stod(lexeme)));
-            } else if (token_type == STRING) {
-                tokens.push_back(Token(token_type, lexeme, line, column, lexeme));
-            } else {
-                tokens.push_back(Token(token_type, lexeme, line, column));
-            }
+            tokens.push_back(Token(token_type, lexeme, line, column));
         }
 
         column += current_index - start_index;
