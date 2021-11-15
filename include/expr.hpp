@@ -52,11 +52,13 @@ public:
     Literal(std::string val);
     Literal(double val);
     Literal(bool val);
+    Literal(std::vector<double> vals);
     ~Literal();
 private:
     std::string string_val;
     double double_val;
     bool bool_val;
+    std::vector<double> array_vals;
 };
 
 class Logical : public Expr {
@@ -94,6 +96,14 @@ public:
     ~Var();
 private:
     Token name;
+};
+
+class Nil : public Expr {
+public:
+    Nil(Token token);
+    ~Nil();
+private:
+    Token token;
 };
 
 #endif // EXPR_H_

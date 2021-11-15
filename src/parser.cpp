@@ -59,7 +59,17 @@ Stmt* Parser::funDeclaration() {
 }
 
 Stmt* Parser::opDeclaration() {
+    Token name = consume(IDENTIFIER, "Expected operator name");
 
+    consume(LEFT_PAREN, "Expected '(' after operator name");
+    Token left = consume(IDENTIFIER, "Exepcted left parameter name in operator declaration");
+    consume(COMMA, "Exepcted ',' after left operator parameter");
+    Token right = consume(IDENTIFIER, "Expected right parameter name in operator declaration");
+    consume(RIGHT_PAREN, "Expected ')' after operator parameters list");
+
+    consume(LEFT_BRACE, "Expected '{' before operator body");
+    std::vector<Stmt*> body = block();
+    return new OpDecl(name, left, right, body);
 }
 
 Stmt* Parser::varDeclaration() {
@@ -82,31 +92,61 @@ Stmt* Parser::statement() {
 }
 
 std::vector<Stmt*> Parser::block() {
+    std::vector<Stmt*> contents;
+    while(tokens.at(cur_index).type != END && tokens.at(cur_index).type != RIGHT_BRACE) {
+        contents.push_back(declaration());
+    }
 
+    if(tokens.at(cur_index).type == END) {
+        create_error(tokens.at(cur_index), "Expected '}' after block");
+    }
+
+    consume(RIGHT_BRACE, "Expected '}' after block");
+
+    return contents;
 }
 
 Stmt* Parser::exprStatement() {
-
+    Expr* exp = expression();
+    consume(SEMI, "Expected ';' after expression");
+    Stmt* stmt = new ExprStmt(exp);
+    return stmt;
 }
 
 Stmt* Parser::ifStatement() {
+    consume(LEFT_PAREN, "Expected '(' before condition");
+    Expr* condition = expression();
+    consume(RIGHT_PAREN, "Expected ')' after condition");
 
+    consume(LEFT_BRACE, "Expected '{' before contents of if statement");
+    std::vector<Stmt*> body = block();
+    return new If(condition, body);
 }
 
 Stmt* Parser::printStatement() {
-
+    Stmt* stmt = new Print(expression());
+    consume(SEMI, "Expected ';' after print statement");
+    return stmt;
 }
 
 Stmt* Parser::whileStatement() {
+    consume(LEFT_PAREN, "Expected '(' before condition");
+    Expr* condition = expression();
+    consume(RIGHT_PAREN, "Expected ')' after condition");
 
+    consume(LEFT_BRACE, "Expected '{' before contents of while loop");
+    std::vector<Stmt*> body = block();
+    return new While(condition, body);
 }
 
 Stmt* Parser::returnStatement() {
-
+    Stmt* stmt = new Return(expression());
+    consume(SEMI, "Expected ';' after return statement");
+    return stmt;
 }
 
 Expr* Parser::expression() {
-
+    
 }
 
 Expr* Parser::assignment() {
@@ -134,13 +174,45 @@ Expr* Parser::term() {
 }
 
 Expr* Parser::factor() {
-
+    // Not sure what this should return
 }
 
 Expr* Parser::unary() {
-
+    switch(tokens.at(cur_index).type) {
+        case EXCLA:
+        case MINUS:
+        case SHAPE: {
+            Token t = tokens.at(cur_index);
+            cur_index += 1;
+            Expr* next = unary();
+            return new Unary(t, next);
+        }
+        default:
+            return primary();
+    }
 }
 
 Expr* Parser::primary() {
-
+    if(match(TRUE)) return new Literal(true);
+    if(match(FALSE)) return new Literal(false);
+    if(match(NIL)) return new Nil(tokens.at(cur_index-1));
+    if(match(NUMBER)) return new Literal(tokens.at(cur_index-1).literal_double);
+    if(match(STRING)) return new Literal(tokens.at(cur_index-1).literal_string);
+    if(match(IDENTIFIER)) return new Var(tokens.at(cur_index-1));
+    if(match(LEFT_PAREN)) {
+        Expr* exp = expression();
+        consume(RIGHT_PAREN, "Expected ')' after expression");
+        return exp;
+    }
+    if(match(LEFT_BRACK)) {
+        std::vector<double> array_vals;
+        while(tokens.at(cur_index).type != END && tokens.at(cur_index).type != RIGHT_BRACK) {
+            if(array_vals.size() > 0) {
+                consume(COMMA, "Expected ',' between values in array");
+            }
+            Token number_token = consume(NUMBER, "Expected numeric value in array");
+            array_vals.push_back(number_token.literal_double);
+        }
+    }
+    throw std::runtime_error(create_error(tokens.at(cur_index), "Expected primary"));
 }

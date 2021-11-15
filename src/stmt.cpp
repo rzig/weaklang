@@ -6,17 +6,17 @@ ExprStmt::ExprStmt(Expr* expr): expr(expr) {}
 
 FuncDecl::FuncDecl(Token name, std::vector<Token> params, std::vector<Stmt*> stmts): name(name), params(params), stmts(stmts) {}
 
-If::If(Expr* cond, Stmt* pos_branch, Stmt* neg_branch): cond(cond), pos_branch(pos_branch), neg_branch(neg_branch) {}
+If::If(Expr* cond, std::vector<Stmt*> stmts): cond(cond), stmts(stmts) {}
 
 OpDecl::OpDecl(Token name, Token left, Token right, std::vector<Stmt*> stmts): name(name), left(left), right(right), stmts(stmts) {}
 
 Print::Print(Expr* expr): expr(expr) {}
 
-Return::Return(Token return_keyword, Expr* expr): return_keyword(return_keyword), expr(expr) {}
+Return::Return(Expr* expr): expr(expr) {}
 
 VarDecl::VarDecl(Token name, Expr* expr): name(name), expr(expr) {}
 
-While::While(Expr* cond, Stmt* body): cond(cond), body(body) {}
+While::While(Expr* cond, std::vector<Stmt*> stmts): cond(cond), stmts(stmts) {}
 
 ExprStmt::~ExprStmt() {
     delete expr;
@@ -28,8 +28,7 @@ FuncDecl::~FuncDecl() {
 
 If::~If() {
     delete cond;
-    delete pos_branch;
-    delete neg_branch;
+    for (auto stmt : stmts) delete stmt;
 }
 
 OpDecl::~OpDecl() {
@@ -50,5 +49,5 @@ VarDecl::~VarDecl() {
 
 While::~While() {
     delete cond;
-    delete body;
+    for(auto stmt : stmts) delete stmt;
 }

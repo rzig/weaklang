@@ -31,12 +31,11 @@ private:
 
 class If : public Stmt {
 public:
-    If(Expr* cond, Stmt* pos_branch, Stmt* neg_branch);
+    If(Expr* cond, std::vector<Stmt*> stmts);
     ~If();
 private:
     Expr* cond;
-    Stmt* pos_branch;
-    Stmt* neg_branch;
+    std::vector<Stmt*> stmts;
 };
 
 class OpDecl : public Stmt {
@@ -60,10 +59,9 @@ private:
 
 class Return : public Stmt {
 public:
-    Return(Token return_keyword, Expr* expr);
+    Return(Expr* expr);
     ~Return();
 private:
-    Token return_keyword;
     Expr* expr;
 };
 
@@ -78,11 +76,11 @@ private:
 
 class While : public Stmt {
 public:
-    While(Expr* cond, Stmt* body);
+    While(Expr* cond, std::vector<Stmt*> body);
     ~While();
 private:
     Expr* cond;
-    Stmt* body;
+    std::vector<Stmt*> stmts;
 };
 
 #endif // STMT_H_

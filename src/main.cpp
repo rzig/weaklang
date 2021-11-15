@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "lexer.hpp"
+#include "parser.hpp"
 
 int main(int argc, char* argv[]) {
   if (argc == 1) {
@@ -19,6 +20,8 @@ int main(int argc, char* argv[]) {
         std::cout << print_token_type(t.type) << " ";
       }
       std::cout << std::endl;
+      Parser p {tokens};
+      p.parse();
     } else {
       std::cout << "Couldn't open file " << argv[i] << ". Quitting."
                 << std::endl;
