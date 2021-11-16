@@ -145,18 +145,26 @@ Stmt* Parser::returnStatement() {
 }
 
 Expr* Parser::expression() {
-    // return assignment();
+    return function();
+}
+
+Expr* Parser::function() {
+
+}
+
+Expr* parser::operation() {
+
 }
 
 Expr* Parser::assignment() {
-  // Expr* exp = or();
-  // if (match(EQUALS)) {
-  //   Token equals = tokens.at(cur_index - 1);
-  //   Expr value = assignment();
-  //   // If instance of Variable; elseif Get;
-  //   if () {}
-  // }
-  // return exp;
+    // Expr* exp = logicOr();
+    // if (match(EQUALS)) {
+    // Token equals = tokens.at(cur_index - 1);
+    // Expr value = assignment();
+	// // If instance of Variable; elseif Get;
+	// if () {}
+    // }
+    // return exp;
 }
 
 Expr* Parser::logicOr() {

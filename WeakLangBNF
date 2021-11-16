@@ -27,7 +27,7 @@ returnStatement := "r" expression? ";"
 whileStatement := "w" "(" expression ")" block
 
 expression := function
-function := IDENTIFIER "(" function ")" | operation
+function := IDENTIFIER "(" arguments? ")" | operation
 operation := assignment ( IDENTIFIER assignment )*
 assignment := IDENTIFIER "=" assignment | logicOr
 logicOr = logicAnd ( "O" logicAnd )*

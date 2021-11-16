@@ -36,6 +36,8 @@ private:
     Stmt* returnStatement();
 
     Expr* expression();
+    Expr* function();
+    Expr* operation();
     Expr* assignment();
     Expr* logicOr();
     Expr* logicAnd();
