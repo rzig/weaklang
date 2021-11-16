@@ -145,35 +145,80 @@ Stmt* Parser::returnStatement() {
 }
 
 Expr* Parser::expression() {
-    
+    // return assignment();
 }
 
 Expr* Parser::assignment() {
-
+  // Expr* exp = or();
+  // if (match(EQUALS)) {
+  //   Token equals = tokens.at(cur_index - 1);
+  //   Expr value = assignment();
+  //   // If instance of Variable; elseif Get;
+  //   if () {}
+  // }
+  // return exp;
 }
 
 Expr* Parser::logicOr() {
-
+  // Expr* exp = and();
+  // while (match(OR)) {
+  //   Token t = tokens.at(cur_index - 1);
+  //   Expr next = and();
+  //   exp = new Expr(exp, t, next);
+  // }
+  // return exp;
 }
 
 Expr* Parser::logicAnd() {
-
+  // Expr* exp = equality();
+  // while (match(AND)) {
+  //   Token t = tokens.at(cur_index - 1);
+  //   Expr next = equality();
+  //   exp = new Expr(exp, t, next);
+  // }
+  // return exp;
 }
 
 Expr* Parser::equality() {
-
+  // Expr* exp = comparison();
+  // while (match(EQUALS_EQUALS, EQUALS)) {
+  //   Token t = tokens.at(cur_index - 1);
+  //   Expr next = comparison();
+  //   exp = new Expr(exp, t, next);
+  // }
+  // return exp; 
 }
 
 Expr* Parser::comparison() {
-
+  // Expr* exp = term();
+  // while (match(GREATER, GREATER_EQUALS, LESSER, LESSER_EQUALS)) {
+  //   Token t = tokens.at(cur_index - 1);
+  //   Expr next = comparison();
+  //   exp = new Expr(exp, t, next);
+  // }
+  // return exp;
 }
 
 Expr* Parser::term() {
-
+  // Expr* exp = factor(); 
+  // while (match(MINUS, PLUS)) {
+  //   Token t = tokens.at(cur_index - 1);
+  //   Expr next = factor();
+  //   exp = new Expr(exp, t, next)
+  // }
+  // return exp;
 }
 
 Expr* Parser::factor() {
-    // Not sure what this should return
+    // // Not sure what this should return
+    //
+    // Expr* exp = unary();
+    // while (match(STAR, SLASH)) {
+    //   Token t = tokens.at(cur_index - 1);
+    //   Expr next = unary();
+    //   exp = new Expr(exp, t, next);
+    // }
+    // return exp;
 }
 
 Expr* Parser::unary() {
