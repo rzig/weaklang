@@ -20,13 +20,13 @@ Literal::Literal(std::vector<double> vals): array_vals(vals) {}
 
 Logical::Logical(Expr* left, Token op, Expr* right): left(left), op(op), right(right) {}
 
+Nil::Nil(Token token): token(token) {}
+
 Op::Op(Token op, Token paren, std::vector<Expr*> args): op(op), paren(paren), args(args) {}
 
 Unary::Unary(Token op, Expr* right): op(op), right(right) {}
 
 Var::Var(Token name): name(name) {}
-
-Nil::Nil(Token token): token(token) {}
 
 Assign::~Assign() {
     delete value;
@@ -54,6 +54,8 @@ Logical::~Logical() {
     delete right;
 }
 
+Nil::~Nil() {}
+
 Op::~Op() {
     for (auto ptr : args) {
         delete ptr;
@@ -65,5 +67,3 @@ Unary::~Unary() {
 }
 
 Var::~Var() {}
-
-Nil::~Nil() {}

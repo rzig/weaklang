@@ -51,17 +51,19 @@ private:
 
 class Print : public Stmt {
 public:
-    Print(Expr* expr);
+    Print(Token return_keyword, Expr* expr);
     ~Print();
 private:
+    Token return_keyword;
     Expr* expr;
 };
 
 class Return : public Stmt {
 public:
-    Return(Expr* expr);
+    Return(Token return_keyword, Expr* expr);
     ~Return();
 private:
+    Token return_keyword;
     Expr* expr;
 };
 
@@ -76,7 +78,7 @@ private:
 
 class While : public Stmt {
 public:
-    While(Expr* cond, std::vector<Stmt*> body);
+    While(Expr* cond, std::vector<Stmt*> stmts);
     ~While();
 private:
     Expr* cond;

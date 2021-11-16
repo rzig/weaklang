@@ -10,9 +10,9 @@ If::If(Expr* cond, std::vector<Stmt*> stmts): cond(cond), stmts(stmts) {}
 
 OpDecl::OpDecl(Token name, Token left, Token right, std::vector<Stmt*> stmts): name(name), left(left), right(right), stmts(stmts) {}
 
-Print::Print(Expr* expr): expr(expr) {}
+Print::Print(Token return_keyword, Expr* expr): return_keyword(return_keyword), expr(expr) {}
 
-Return::Return(Expr* expr): expr(expr) {}
+Return::Return(Token return_keyword, Expr* expr): return_keyword(return_keyword), expr(expr) {}
 
 VarDecl::VarDecl(Token name, Expr* expr): name(name), expr(expr) {}
 

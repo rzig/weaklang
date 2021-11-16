@@ -102,7 +102,6 @@ std::vector<Stmt*> Parser::block() {
     }
 
     consume(RIGHT_BRACE, "Expected '}' after block");
-
     return contents;
 }
 
@@ -124,7 +123,7 @@ Stmt* Parser::ifStatement() {
 }
 
 Stmt* Parser::printStatement() {
-    Stmt* stmt = new Print(expression());
+    Stmt* stmt = new Print(tokens.at(cur_index - 1), expression());
     consume(SEMI, "Expected ';' after print statement");
     return stmt;
 }
@@ -140,7 +139,7 @@ Stmt* Parser::whileStatement() {
 }
 
 Stmt* Parser::returnStatement() {
-    Stmt* stmt = new Return(expression());
+    Stmt* stmt = new Return(tokens.at(cur_index - 1), expression());
     consume(SEMI, "Expected ';' after return statement");
     return stmt;
 }
@@ -213,6 +212,7 @@ Expr* Parser::primary() {
             Token number_token = consume(NUMBER, "Expected numeric value in array");
             array_vals.push_back(number_token.literal_double);
         }
+	return new Literal(array_vals);
     }
     throw std::runtime_error(create_error(tokens.at(cur_index), "Expected primary"));
 }
