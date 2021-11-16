@@ -10,7 +10,7 @@ If::If(Expr* cond, std::vector<Stmt*> stmts): cond(cond), stmts(stmts) {}
 
 OpDecl::OpDecl(Token name, Token left, Token right, std::vector<Stmt*> stmts): name(name), left(left), right(right), stmts(stmts) {}
 
-Print::Print(Token return_keyword, Expr* expr): return_keyword(return_keyword), expr(expr) {}
+Print::Print(Token print_keyword, Expr* expr): print_keyword(print_keyword), expr(expr) {}
 
 Return::Return(Token return_keyword, Expr* expr): return_keyword(return_keyword), expr(expr) {}
 

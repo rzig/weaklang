@@ -51,10 +51,10 @@ private:
 
 class Print : public Stmt {
 public:
-    Print(Token return_keyword, Expr* expr);
+    Print(Token print_keyword, Expr* expr);
     ~Print();
 private:
-    Token return_keyword;
+    Token print_keyword;
     Expr* expr;
 };
 
