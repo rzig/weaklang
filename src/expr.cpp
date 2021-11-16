@@ -20,7 +20,7 @@ Literal::Literal(std::vector<double> vals): array_vals(vals) {}
 
 Logical::Logical(Expr* left, Token op, Expr* right): left(left), op(op), right(right) {}
 
-Nil::Nil(Token token): token(token) {}
+Nil::Nil() {}
 
 Op::Op(Token op, Token paren, std::vector<Expr*> args): op(op), paren(paren), args(args) {}
 

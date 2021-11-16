@@ -139,7 +139,10 @@ Stmt* Parser::whileStatement() {
 }
 
 Stmt* Parser::returnStatement() {
-    Stmt* stmt = new Return(tokens.at(cur_index - 1), expression());
+    Expr* expr;
+    if (tokens.at(cur_index - 1).type != SEMI) expr = expression();
+    else expr = new Nil();
+    Stmt* stmt = new Return(tokens.at(cur_index - 1), expr);
     consume(SEMI, "Expected ';' after return statement");
     return stmt;
 }
@@ -152,7 +155,7 @@ Expr* Parser::function() {
 
 }
 
-Expr* parser::operation() {
+Expr* Parser::operation() {
 
 }
 
@@ -247,7 +250,7 @@ Expr* Parser::unary() {
 Expr* Parser::primary() {
     if(match(TRUE)) return new Literal(true);
     if(match(FALSE)) return new Literal(false);
-    if(match(NIL)) return new Nil(tokens.at(cur_index-1));
+    if(match(NIL)) return new Nil();
     if(match(NUMBER)) return new Literal(tokens.at(cur_index-1).literal_double);
     if(match(STRING)) return new Literal(tokens.at(cur_index-1).literal_string);
     if(match(IDENTIFIER)) return new Var(tokens.at(cur_index-1));

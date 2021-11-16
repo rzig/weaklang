@@ -100,10 +100,8 @@ private:
 
 class Nil : public Expr {
 public:
-    Nil(Token token);
+    Nil();
     ~Nil();
-private:
-    Token token;
 };
 
 #endif // EXPR_H_
