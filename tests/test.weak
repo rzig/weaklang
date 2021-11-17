@@ -8,22 +8,22 @@ o z (b, c) {
 }
 
 f y (b, c, d) {
-  a i = 0;
-  a mat = [b,c,b,c] sa [b, c];
-  w (i < d) {
+  a m = 0;
+  a mat = [] sa [2, 2];
+  w (m < d) {
     mat = mat x mat;
-    i = i + 1;
+    m = m + 1;
   }
-  i (mat[0][1] != 1) {
+  i (mat != 1 O mat != 2) {
     r T;
   }
   r F;
 }
 
-p f(1,2,3);
+p y(1,2,3);
 p "Hello";
 p N;
-p f(1,2,3) O f(2,3,4);
+# p y(1,2,3) O y(2,3,4);
 p 1 > 2;
 p 1 >= 2;
 p 2 < 1;

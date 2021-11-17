@@ -93,6 +93,14 @@ Stmt* Parser::varDeclaration() {
     Expr* initialize = nullptr;
     if (match(EQUALS)) initialize = expression();
 
+    std::cout << "t is " << print_token_type(tokens.at(cur_index).type) << std::endl;
+
+    if(match(AS_SHAPE)) {
+        Token op = tokens.at(cur_index-1);
+        Expr* se = expression();
+        initialize = new Binary(initialize, op, se);
+    }
+
     consume(SEMI, "Expect semi-colon after variable declaration");
     return new VarDecl(name, initialize);
 }
@@ -202,10 +210,11 @@ Expr* Parser::function() {
 Expr* Parser::operation() {
     Expr* exp = assignment();
     std::cout << "built assignment" << std::endl;
+    std::cout << "===" <<std::endl;
     while(match(IDENTIFIER)) {
         Token id = tokens.at(cur_index-1);
         Expr* right = assignment();
-        exp = new Binary(exp, id, right);
+        exp = new Binary(right, id, exp);
     }
     return exp;
 }
@@ -216,7 +225,7 @@ Expr* Parser::assignment() {
     if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index + 1).type == EQUALS) {
         Token id = consume(IDENTIFIER, "Expected identifier");
         consume(EQUALS, "Expected '=' after identifier");
-        Expr* right = assignment();
+        Expr* right = operation();
         return new Assign(id, right);
     } else {
         return logicOr();
@@ -248,7 +257,7 @@ Expr* Parser::logicAnd() {
 Expr* Parser::equality() {
     std::cout << "in equality" << std::endl;
     Expr* exp = comparison();
-    while (match({EQUALS_EQUALS, EQUALS})) {
+    while (match({EQUALS_EQUALS, EQUALS, EXCLA_EQUALS})) {
         Token t = tokens.at(cur_index - 1);
         Expr* next = comparison();
         exp = new Binary(exp, t, next);
@@ -281,7 +290,7 @@ Expr* Parser::term() {
 Expr* Parser::factor() {
     std::cout << "in factor" << std::endl;
     Expr* left = unary();
-    while(match({SLASH, STAR, AT, AS_SHAPE})) {
+    while(match({SLASH, STAR, AT, AS_SHAPE, EXP})) {
         Token op = tokens.at(cur_index-1);
         Expr* un = unary();
         left = new Binary(left, op, un);
@@ -328,7 +337,8 @@ Expr* Parser::primary() {
             Token number_token = consume(NUMBER, "Expected numeric value in array");
             array_vals.push_back(number_token.literal_double);
         }
-	return new Literal(array_vals);
+        consume(RIGHT_BRACK, "Expected ']' after array declaration");
+	    return new Literal(array_vals);
     }
     throw std::runtime_error(create_error(tokens.at(cur_index), "Expected primary"));
 }

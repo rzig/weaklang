@@ -21,7 +21,10 @@ int main(int argc, char* argv[]) {
       }
       std::cout << std::endl;
       Parser p {tokens};
-      p.parse();
+      std::vector<Stmt*> s = p.parse();
+      for(auto k : s) {
+        std::cout << k->ToString().second << std::endl;
+      }
     } else {
       std::cout << "Couldn't open file " << argv[i] << ". Quitting."
                 << std::endl;

@@ -2,10 +2,252 @@ digraph AST {
     splines="FALSE";
 
     /* Entities */
-    declaration1 [label="declaration", shape="square"]
-    declaration1 -> binary1
-    declaration2 [label="declaration", shape="square"]
-    binary1 [label="binary with operator +", shape = "square"]
+statement0[label="Declare Operator x", shape="square"]
+statement1[label="Return Statement", shape="square"]
+assignment0[label="Binary operator^", shape="square"]
+assignment1[label="VAR b", shape="square"]
+
+assignment2[label="Binary operator*", shape="square"]
+assignment3[label="VAR c", shape="square"]
+
+assignment4[label="Literal ", shape="square"]
+
+assignment2->assignment3
+assignment2->assignment4
+
+assignment0->assignment1
+assignment0->assignment2
+
+statement1->assignment0
+
+statement0->statement1
+
+statement2[label="Declare Operator z", shape="square"]
+statement3[label="Return Statement", shape="square"]
+assignment5[label="Binary operator+", shape="square"]
+assignment6[label="Unary operator, lexeme: s", shape="square"]
+assignment7[label="VAR b", shape="square"]
+
+assignment6->assignment7
+
+assignment8[label="Unary operator, lexeme: s", shape="square"]
+assignment9[label="VAR c", shape="square"]
+
+assignment8->assignment9
+
+assignment5->assignment6
+assignment5->assignment8
+
+statement3->assignment5
+
+statement2->statement3
+
+statement4[label="Declare Function y", shape="square"]
+statement5[label="Declare variable m", shape="square"]
+assignment10[label="Literal ", shape="square"]
+
+statement5->assignment10
+
+statement6[label="Declare variable mat", shape="square"]
+assignment11[label="Binary operatorsa", shape="square"]
+assignment12[label="Literal ", shape="square"]
+
+assignment13[label="Literal , , ", shape="square"]
+
+assignment11->assignment12
+assignment11->assignment13
+
+statement6->assignment11
+
+statement7[label="If Statement ", shape="square"]
+statement8[label="Expression Statement", shape="square"]
+assignment14[label="Assignment operator, lexeme: mat", shape="square"]
+assignment15[label="Binary operatorx", shape="square"]
+assignment16[label="VAR mat", shape="square"]
+
+assignment17[label="VAR mat", shape="square"]
+
+assignment15->assignment16
+assignment15->assignment17
+
+assignment14->assignment15
+
+statement8->assignment14
+
+statement9[label="Expression Statement", shape="square"]
+assignment18[label="Assignment operator, lexeme: m", shape="square"]
+assignment19[label="Binary operator+", shape="square"]
+assignment20[label="VAR m", shape="square"]
+
+assignment21[label="Literal ", shape="square"]
+
+assignment19->assignment20
+assignment19->assignment21
+
+assignment18->assignment19
+
+statement9->assignment18
+
+assignment22[label="Binary operator<", shape="square"]
+assignment23[label="VAR m", shape="square"]
+
+assignment24[label="VAR d", shape="square"]
+
+assignment22->assignment23
+assignment22->assignment24
+
+statement7->statement8
+statement7->statement9
+statement7->assignment22
+
+statement10[label="If Statement ", shape="square"]
+statement11[label="Return Statement", shape="square"]
+assignment25[label="Literal ", shape="square"]
+
+statement11->assignment25
+
+assignment26[label="Binary operatorO", shape="square"]
+assignment27[label="Binary operator!=", shape="square"]
+assignment28[label="VAR mat", shape="square"]
+
+assignment29[label="Literal ", shape="square"]
+
+assignment27->assignment28
+assignment27->assignment29
+
+assignment30[label="Binary operator!=", shape="square"]
+assignment31[label="VAR mat", shape="square"]
+
+assignment32[label="Literal ", shape="square"]
+
+assignment30->assignment31
+assignment30->assignment32
+
+assignment26->assignment27
+assignment26->assignment30
+
+statement10->statement11
+statement10->assignment26
+
+statement12[label="Return Statement", shape="square"]
+assignment33[label="Literal ", shape="square"]
+
+statement12->assignment33
+
+statement4->statement5
+statement4->statement6
+statement4->statement7
+statement4->statement10
+statement4->statement12
+
+statement13[label="Print Statement", shape="square"]
+assignment34[label="Function, lexeme: y", shape="square"]
+assignment35[label="Literal ", shape="square"]
+
+assignment36[label="Literal ", shape="square"]
+
+assignment37[label="Literal ", shape="square"]
+
+assignment34->assignment35
+assignment34->assignment36
+assignment34->assignment37
+
+statement13->assignment34
+
+statement14[label="Print Statement", shape="square"]
+assignment38[label="Literal Hello", shape="square"]
+
+statement14->assignment38
+
+statement15[label="Print Statement", shape="square"]
+assignment39[label="NIL", shape="square"]
+
+statement15->assignment39
+
+statement16[label="Print Statement", shape="square"]
+assignment40[label="Binary operator>", shape="square"]
+assignment41[label="Literal ", shape="square"]
+
+assignment42[label="Literal ", shape="square"]
+
+assignment40->assignment41
+assignment40->assignment42
+
+statement16->assignment40
+
+statement17[label="Print Statement", shape="square"]
+assignment43[label="Binary operator>=", shape="square"]
+assignment44[label="Literal ", shape="square"]
+
+assignment45[label="Literal ", shape="square"]
+
+assignment43->assignment44
+assignment43->assignment45
+
+statement17->assignment43
+
+statement18[label="Print Statement", shape="square"]
+assignment46[label="Binary operator<", shape="square"]
+assignment47[label="Literal ", shape="square"]
+
+assignment48[label="Literal ", shape="square"]
+
+assignment46->assignment47
+assignment46->assignment48
+
+statement18->assignment46
+
+statement19[label="Print Statement", shape="square"]
+assignment49[label="Binary operator<=", shape="square"]
+assignment50[label="Literal ", shape="square"]
+
+assignment51[label="Literal ", shape="square"]
+
+assignment49->assignment50
+assignment49->assignment51
+
+statement19->assignment49
+
+statement20[label="Print Statement", shape="square"]
+assignment52[label="Binary operator-", shape="square"]
+assignment53[label="Binary operator+", shape="square"]
+assignment54[label="Literal ", shape="square"]
+
+assignment55[label="Literal ", shape="square"]
+
+assignment53->assignment54
+assignment53->assignment55
+
+assignment56[label="Binary operator/", shape="square"]
+assignment57[label="Binary operator*", shape="square"]
+assignment58[label="Literal ", shape="square"]
+
+assignment59[label="Literal ", shape="square"]
+
+assignment57->assignment58
+assignment57->assignment59
+
+assignment60[label="Literal ", shape="square"]
+
+assignment56->assignment57
+assignment56->assignment60
+
+assignment52->assignment53
+assignment52->assignment56
+
+statement20->assignment52
+
+statement21[label="Print Statement", shape="square"]
+assignment61[label="Binary operator@", shape="square"]
+assignment62[label="Literal ", shape="square"]
+
+assignment63[label="Literal ", shape="square"]
+
+assignment61->assignment62
+assignment61->assignment63
+
+statement21->assignment61
+
     // shortName [label="shortName", shape="square"]
 
     /* Ranks */
