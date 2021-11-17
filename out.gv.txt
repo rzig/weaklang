@@ -1,0 +1,13 @@
+digraph AST {
+    splines="FALSE";
+
+    /* Entities */
+    declaration1 [label="declaration", shape="square"]
+    declaration1 -> binary1
+    declaration2 [label="declaration", shape="square"]
+    binary1 [label="binary with operator +", shape = "square"]
+    // shortName [label="shortName", shape="square"]
+
+    /* Ranks */
+    // { rank=same; shortName; };
+}
