@@ -2,8 +2,8 @@ digraph AST {
     splines="FALSE";
 
     /* Entities */
-statement0[label="Declare Operator x", shape="square"]
-statement1[label="Return Statement", shape="square"]
+statement0[label="Declare Operator x", shape="circle"]
+statement1[label="Return Statement", shape="circle"]
 expression0[label="Binary operator ^", shape="square"]
 expression1[label="Variable b", shape="square"]
 
@@ -22,8 +22,8 @@ statement1->expression0
 
 statement0->statement1
 
-statement2[label="Declare Operator z", shape="square"]
-statement3[label="Return Statement", shape="square"]
+statement2[label="Declare Operator z", shape="circle"]
+statement3[label="Return Statement", shape="circle"]
 expression5[label="Binary operator +", shape="square"]
 expression6[label="Unary s", shape="square"]
 expression7[label="Variable b", shape="square"]
@@ -42,13 +42,13 @@ statement3->expression5
 
 statement2->statement3
 
-statement4[label="Declare Function y", shape="square"]
-statement5[label="Declare variable m", shape="square"]
+statement4[label="Declare Function y", shape="circle"]
+statement5[label="Declare variable m", shape="circle"]
 expression10[label="Literal 0", shape="square"]
 
 statement5->expression10
 
-statement6[label="Declare variable mat", shape="square"]
+statement6[label="Declare variable mat", shape="circle"]
 expression11[label="Binary operator sa", shape="square"]
 expression12[label="Literal 0", shape="square"]
 
@@ -59,8 +59,8 @@ expression11->expression13
 
 statement6->expression11
 
-statement7[label="If Statement ", shape="square"]
-statement8[label="Expression Statement", shape="square"]
+statement7[label="While Statement", shape="circle"]
+statement8[label="Expression statement", shape="circle"]
 expression14[label="Assignment of mat", shape="square"]
 expression15[label="Binary operator x", shape="square"]
 expression16[label="Variable mat", shape="square"]
@@ -74,7 +74,7 @@ expression14->expression15
 
 statement8->expression14
 
-statement9[label="Expression Statement", shape="square"]
+statement9[label="Expression statement", shape="circle"]
 expression18[label="Assignment of m", shape="square"]
 expression19[label="Binary operator +", shape="square"]
 expression20[label="Variable m", shape="square"]
@@ -88,51 +88,21 @@ expression18->expression19
 
 statement9->expression18
 
-expression22[label="Binary operator <", shape="square"]
-expression23[label="Variable m", shape="square"]
-
-expression24[label="Variable d", shape="square"]
-
-expression22->expression23
-expression22->expression24
-
 statement7->statement8
 statement7->statement9
-statement7->expression22
 
-statement10[label="If Statement ", shape="square"]
-statement11[label="Return Statement", shape="square"]
-expression25[label="Literal 0.000000", shape="square"]
+statement10[label="If Statement ", shape="circle"]
+statement11[label="Return Statement", shape="circle"]
+expression22[label="Literal 0.000000", shape="square"]
 
-statement11->expression25
-
-expression26[label="Binary operator O", shape="square"]
-expression27[label="Binary operator !=", shape="square"]
-expression28[label="Variable mat", shape="square"]
-
-expression29[label="Literal 1.000000", shape="square"]
-
-expression27->expression28
-expression27->expression29
-
-expression30[label="Binary operator !=", shape="square"]
-expression31[label="Variable mat", shape="square"]
-
-expression32[label="Literal 2.000000", shape="square"]
-
-expression30->expression31
-expression30->expression32
-
-expression26->expression27
-expression26->expression30
+statement11->expression22
 
 statement10->statement11
-statement10->expression26
 
-statement12[label="Return Statement", shape="square"]
-expression33[label="Literal 0.000000", shape="square"]
+statement12[label="Return Statement", shape="circle"]
+expression23[label="Literal 0.000000", shape="square"]
 
-statement12->expression33
+statement12->expression23
 
 statement4->statement5
 statement4->statement6
@@ -140,43 +110,77 @@ statement4->statement7
 statement4->statement10
 statement4->statement12
 
-statement13[label="Print Statement", shape="square"]
-expression34[label="Function call to y", shape="square"]
-expression35[label="Literal 1.000000", shape="square"]
+statement13[label="Print Statement", shape="circle"]
+expression24[label="Function call to y", shape="square"]
+expression25[label="Literal 1.000000", shape="square"]
 
-expression36[label="Literal 2.000000", shape="square"]
+expression26[label="Literal 2.000000", shape="square"]
 
-expression37[label="Literal 3.000000", shape="square"]
+expression27[label="Literal 3.000000", shape="square"]
 
-expression34->expression35
-expression34->expression36
-expression34->expression37
+expression24->expression25
+expression24->expression26
+expression24->expression27
 
-statement13->expression34
+statement13->expression24
 
-statement14[label="Print Statement", shape="square"]
-expression38[label="Literal Hello", shape="square"]
+statement14[label="Print Statement", shape="circle"]
+expression28[label="Literal 'Hello'", shape="square"]
 
-statement14->expression38
+statement14->expression28
 
-statement15[label="Print Statement", shape="square"]
-expression39[label="NIL", shape="square"]
+statement15[label="Print Statement", shape="circle"]
+expression29[label="NIL", shape="square"]
 
-statement15->expression39
+statement15->expression29
 
-statement16[label="Print Statement", shape="square"]
-expression40[label="Binary operator >", shape="square"]
+statement16[label="Print Statement", shape="circle"]
+expression30[label="Binary operator >", shape="square"]
+expression31[label="Literal 1.000000", shape="square"]
+
+expression32[label="Literal 2.000000", shape="square"]
+
+expression30->expression31
+expression30->expression32
+
+statement16->expression30
+
+statement17[label="Print Statement", shape="circle"]
+expression33[label="Binary operator >=", shape="square"]
+expression34[label="Literal 1.000000", shape="square"]
+
+expression35[label="Literal 2.000000", shape="square"]
+
+expression33->expression34
+expression33->expression35
+
+statement17->expression33
+
+statement18[label="Print Statement", shape="circle"]
+expression36[label="Binary operator <", shape="square"]
+expression37[label="Literal 2.000000", shape="square"]
+
+expression38[label="Literal 1.000000", shape="square"]
+
+expression36->expression37
+expression36->expression38
+
+statement18->expression36
+
+statement19[label="Print Statement", shape="circle"]
+expression39[label="Binary operator <=", shape="square"]
+expression40[label="Literal 2.000000", shape="square"]
+
 expression41[label="Literal 1.000000", shape="square"]
 
-expression42[label="Literal 2.000000", shape="square"]
+expression39->expression40
+expression39->expression41
 
-expression40->expression41
-expression40->expression42
+statement19->expression39
 
-statement16->expression40
-
-statement17[label="Print Statement", shape="square"]
-expression43[label="Binary operator >=", shape="square"]
+statement20[label="Print Statement", shape="circle"]
+expression42[label="Binary operator -", shape="square"]
+expression43[label="Binary operator +", shape="square"]
 expression44[label="Literal 1.000000", shape="square"]
 
 expression45[label="Literal 2.000000", shape="square"]
@@ -184,69 +188,35 @@ expression45[label="Literal 2.000000", shape="square"]
 expression43->expression44
 expression43->expression45
 
-statement17->expression43
+expression46[label="Binary operator /", shape="square"]
+expression47[label="Binary operator *", shape="square"]
+expression48[label="Literal 3.000000", shape="square"]
 
-statement18[label="Print Statement", shape="square"]
-expression46[label="Binary operator <", shape="square"]
-expression47[label="Literal 2.000000", shape="square"]
+expression49[label="Literal 4.000000", shape="square"]
 
-expression48[label="Literal 1.000000", shape="square"]
+expression47->expression48
+expression47->expression49
 
-expression46->expression47
-expression46->expression48
-
-statement18->expression46
-
-statement19[label="Print Statement", shape="square"]
-expression49[label="Binary operator <=", shape="square"]
 expression50[label="Literal 2.000000", shape="square"]
 
-expression51[label="Literal 1.000000", shape="square"]
+expression46->expression47
+expression46->expression50
 
-expression49->expression50
-expression49->expression51
+expression42->expression43
+expression42->expression46
 
-statement19->expression49
+statement20->expression42
 
-statement20[label="Print Statement", shape="square"]
-expression52[label="Binary operator -", shape="square"]
-expression53[label="Binary operator +", shape="square"]
-expression54[label="Literal 1.000000", shape="square"]
+statement21[label="Print Statement", shape="circle"]
+expression51[label="Binary operator @", shape="square"]
+expression52[label="Literal 0.000000", shape="square"]
 
-expression55[label="Literal 2.000000", shape="square"]
+expression53[label="Literal 0.000000", shape="square"]
 
-expression53->expression54
-expression53->expression55
+expression51->expression52
+expression51->expression53
 
-expression56[label="Binary operator /", shape="square"]
-expression57[label="Binary operator *", shape="square"]
-expression58[label="Literal 3.000000", shape="square"]
-
-expression59[label="Literal 4.000000", shape="square"]
-
-expression57->expression58
-expression57->expression59
-
-expression60[label="Literal 2.000000", shape="square"]
-
-expression56->expression57
-expression56->expression60
-
-expression52->expression53
-expression52->expression56
-
-statement20->expression52
-
-statement21[label="Print Statement", shape="square"]
-expression61[label="Binary operator @", shape="square"]
-expression62[label="Literal 0.000000", shape="square"]
-
-expression63[label="Literal 0.000000", shape="square"]
-
-expression61->expression62
-expression61->expression63
-
-statement21->expression61
+statement21->expression51
 
     // shortName [label="shortName", shape="square"]
 

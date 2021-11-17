@@ -11,6 +11,12 @@ public:
     virtual ~Stmt();
     virtual std::pair<std::string, std::string> ToString();
     static size_t statement_counter;
+    template <typename T>
+    static std::pair<std::string, std::string> make_string(std::string label, T* child);
+    template <typename T>
+    static std::pair<std::string, std::string> make_string(std::string label, std::initializer_list<T*> children);
+    template <typename T>
+    static std::pair<std::string, std::string> make_string(std::string label, std::vector<T*> exprs);
 };
 
 class ExprStmt : public Stmt {
