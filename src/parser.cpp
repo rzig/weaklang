@@ -167,21 +167,31 @@ Expr* Parser::expression() {
 }
 
 Expr* Parser::function() {
+    std::cout << "===" << std::endl;
+    std::cout << "in function next type is " << ((cur_index < tokens.size() - 1) ? print_token_type(tokens.at(cur_index+1).type) : print_token_type(EMPTY)) << std::endl;
     if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index+1).type == LEFT_PAREN) {
+        std::cout << "in funciton if" << std::endl;
         Token name = consume(IDENTIFIER, "");
         Token left_p = consume(LEFT_PAREN, "");
         std::vector<Expr*> args;
-        while(cur_index < tokens.size() && tokens.at(cur_index).type == IDENTIFIER) {
+        while(cur_index < tokens.size() && tokens.at(cur_index).type != RIGHT_PAREN) {
+            std::cout << "in loop args.size() is " << args.size() << std::endl;
             if (args.size() == 0) {
                 Expr* arg = expression();
                 args.push_back(arg);
+                std::cout << "in loop added arg" << std::endl;
             }
             else if (args.size() < MAX_ARGS) {
+                std::cout << "in else here" << std::endl;
                 consume(COMMA, "Expected comma in function call");
                 Expr* arg = expression();
                 args.push_back(arg);
             }
         }
+        std::cout << "args size is " << args.size() << std::endl;
+        std::cout << print_token_type(tokens.at(cur_index).type) << std::endl;
+        consume(RIGHT_PAREN, "Expected ')' after function arguments");
+        std::cout << "args size is " << args.size() << std::endl;
         return new Func(name, left_p, args);
     } else {
         std::cout << "function else branch" << std::endl;
