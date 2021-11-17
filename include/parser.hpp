@@ -19,6 +19,8 @@ private:
     size_t cur_index = 0;
 
     bool match(TokenType type);
+    bool match(TokenType type1, TokenType type2);
+    bool match(std::initializer_list<TokenType> types);
     Token consume(TokenType type, std::string message);
     std::string create_error(Token token, std::string message);
 
