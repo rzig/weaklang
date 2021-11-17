@@ -35,7 +35,7 @@ logicAnd = equality ( "A" equality )*
 equality := comparison( ("!=" | "==") comparison*
 comparison := term ( ( ">" | "<") term *
 term := factor ( ( "-" | "+" ) factor )*
-factor := unary ( ( "/" | "*" | "@" | "sa" ) unary )*
+factor := unary ( ( "/" | "*" | "@" | "sa" | "^" ) unary )*
 
 unary := ( "!" | "-" | "s" ) unary | primary
 primary := "T" | "F" | "N" | NUMBER | STRING | IDENTIFIER | "(" expression ")" | "[]" | "[" NUMBER ( "," NUMBER )* "]"

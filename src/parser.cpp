@@ -3,11 +3,22 @@
 Parser::Parser(std::vector<Token> input): tokens(input) {}
 
 std::vector<Stmt*> Parser::parse() {
-    std::vector<Stmt*> decls;
-    while (cur_index < tokens.size()) {
+    while (cur_index < tokens.size() && tokens.at(cur_index).type != END) {
         decls.push_back(declaration());
     }
     return decls;
+}
+
+std::string Parser::as_dot() {
+    std::string dot;
+    dot += "digraph AST { \n";
+    dot += "\n";
+    dot += "splines=\"FALSE\"; \n";
+    for(auto decl : decls) {
+        dot += decl->to_string().second;
+    }
+    dot += "\n}\n";
+    return dot;
 }
 
 bool Parser::match(TokenType type) {
@@ -18,13 +29,48 @@ bool Parser::match(TokenType type) {
     return false;
 }
 
+bool Parser::match(TokenType type1, TokenType type2) {
+    return match(type1) || match(type2);
+}
+
+bool Parser::match(std::initializer_list<TokenType> types) {
+    for(auto t : types) {
+        if(match(t)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Parser::currently_at(TokenType type) {
+    return tokens.at(cur_index).type == type;
+}
+
+bool Parser::currently_at(std::initializer_list<TokenType> types) {
+    for(auto t : types) {
+        if (currently_at(t)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 Token Parser::consume(TokenType type, std::string message) {
     if (tokens.at(cur_index).type == type) return tokens.at(cur_index++);
     throw std::runtime_error(create_error(tokens.at(cur_index), message));
 }
 
+Token Parser::consume(std::initializer_list<TokenType> types, std::string message) {
+    for(auto type : types) {
+        if(tokens.at(cur_index).type == type) {
+            return tokens.at(cur_index++);
+        }
+    }
+    throw std::runtime_error(create_error(tokens.at(cur_index), message));
+}
+
 std::string Parser::create_error(Token token, std::string message) {
-    return message + " : \"" + token.lexeme + "\", at line " + std::to_string(token.line) + " and column " + std::to_string(token.col);
+    return message + " but instead found: \"" + token.lexeme + "\", at line " + std::to_string(token.line + 1) + " and column " + std::to_string(token.col + 1);
 }
 
 Stmt* Parser::declaration() {
@@ -87,8 +133,7 @@ Stmt* Parser::statement() {
     if (match(PRINT)) return printStatement();
     if (match(RETURN)) return returnStatement();
     if (match(WHILE)) return whileStatement();
-    // if (match(LEFT_BRACE)) return new std::vector<Stmt*> stmt.block();
-    return exprStatement();
+    else return exprStatement();
 }
 
 std::vector<Stmt*> Parser::block() {
@@ -152,84 +197,107 @@ Expr* Parser::expression() {
 }
 
 Expr* Parser::function() {
-
+    if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index+1).type == LEFT_PAREN) {
+        Token name = consume(IDENTIFIER, "");
+        Token left_p = consume(LEFT_PAREN, "");
+        std::vector<Expr*> args;
+        while(cur_index < tokens.size() && tokens.at(cur_index).type != RIGHT_PAREN) {
+            if (args.size() == 0) {
+                Expr* arg = expression();
+                args.push_back(arg);
+            }
+            else if (args.size() < MAX_ARGS) {
+                consume(COMMA, "Expected comma in function call");
+                Expr* arg = expression();
+                args.push_back(arg);
+            }
+        }
+        consume(RIGHT_PAREN, "Expected ')' after function arguments");
+        return new Func(name, left_p, args);
+    } else {
+        return operation();
+    }
 }
 
 Expr* Parser::operation() {
-
+    Expr* exp = assignment();
+    while(match(IDENTIFIER)) {
+        Token id = tokens.at(cur_index-1);
+        Expr* right = assignment();
+        exp = new Binary(right, id, exp);
+    }
+    return exp;
 }
 
 Expr* Parser::assignment() {
-    // Expr* exp = logicOr();
-    // if (match(EQUALS)) {
-    // Token equals = tokens.at(cur_index - 1);
-    // Expr value = assignment();
-	// // If instance of Variable; elseif Get;
-	// if () {}
-    // }
-    // return exp;
+    if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index + 1).type == EQUALS) {
+        Token id = consume(IDENTIFIER, "Expected identifier");
+        consume(EQUALS, "Expected '=' after identifier");
+        Expr* right = operation();
+        return new Assign(id, right);
+    } else {
+        return logicOr();
+    }
 }
 
 Expr* Parser::logicOr() {
-  // Expr* exp = and();
-  // while (match(OR)) {
-  //   Token t = tokens.at(cur_index - 1);
-  //   Expr next = and();
-  //   exp = new Expr(exp, t, next);
-  // }
-  // return exp;
+    Expr* exp = logicAnd();
+    while (currently_at(OR)) {
+        Token t = consume(OR, "Expected 'O'");
+        Expr* next = logicAnd();
+        exp = new Binary(exp, t, next);
+    }
+    return exp;
 }
 
 Expr* Parser::logicAnd() {
-  // Expr* exp = equality();
-  // while (match(AND)) {
-  //   Token t = tokens.at(cur_index - 1);
-  //   Expr next = equality();
-  //   exp = new Expr(exp, t, next);
-  // }
-  // return exp;
+    Expr* exp = equality();
+    while (currently_at(AND)) {
+        Token a = consume(AND, "Expected 'A'");
+        Expr* next = equality();
+        exp = new Binary(exp, a, next);
+    }
+    return exp;
 }
 
 Expr* Parser::equality() {
-  // Expr* exp = comparison();
-  // while (match(EQUALS_EQUALS, EQUALS)) {
-  //   Token t = tokens.at(cur_index - 1);
-  //   Expr next = comparison();
-  //   exp = new Expr(exp, t, next);
-  // }
-  // return exp; 
+    Expr* exp = comparison();
+    while (currently_at({EQUALS_EQUALS, EQUALS, EXCLA_EQUALS})) {
+        Token t = consume({EQUALS_EQUALS, EQUALS, EXCLA_EQUALS}, "Expected '==', '=', '!='");
+        Expr* next = comparison();
+        exp = new Binary(exp, t, next);
+    }
+    return exp; 
 }
 
 Expr* Parser::comparison() {
-  // Expr* exp = term();
-  // while (match(GREATER, GREATER_EQUALS, LESSER, LESSER_EQUALS)) {
-  //   Token t = tokens.at(cur_index - 1);
-  //   Expr next = comparison();
-  //   exp = new Expr(exp, t, next);
-  // }
-  // return exp;
+    Expr* exp = term();
+    while(currently_at({GREATER_EQUALS, GREATER, LESSER_EQUALS, LESSER})) {
+        Token comp = consume({GREATER_EQUALS, GREATER, LESSER_EQUALS, LESSER}, "Expected '>=', '>', '<=', '<'");
+        Expr* next = term();
+        exp = new Binary(exp, comp, next);
+    }
+    return exp;
 }
 
 Expr* Parser::term() {
-  // Expr* exp = factor(); 
-  // while (match(MINUS, PLUS)) {
-  //   Token t = tokens.at(cur_index - 1);
-  //   Expr next = factor();
-  //   exp = new Expr(exp, t, next)
-  // }
-  // return exp;
+    Expr* left = factor();
+    while(currently_at({MINUS, PLUS})) {
+        Token op = consume({MINUS, PLUS}, "Expected '-' or '+'");
+        Expr* fac = factor();
+        left = new Binary(left, op, fac);
+    }
+    return left;
 }
 
 Expr* Parser::factor() {
-    // // Not sure what this should return
-    //
-    // Expr* exp = unary();
-    // while (match(STAR, SLASH)) {
-    //   Token t = tokens.at(cur_index - 1);
-    //   Expr next = unary();
-    //   exp = new Expr(exp, t, next);
-    // }
-    // return exp;
+    Expr* left = unary();
+    while(currently_at({SLASH, STAR, AT, AS_SHAPE, EXP})) {
+        Token op = consume({SLASH, STAR, AT, AS_SHAPE, EXP}, "Expected '/', '*', '@', 'sa', '^'");
+        Expr* un = unary();
+        left = new Binary(left, op, un);
+    }
+    return left;
 }
 
 Expr* Parser::unary() {
@@ -268,7 +336,8 @@ Expr* Parser::primary() {
             Token number_token = consume(NUMBER, "Expected numeric value in array");
             array_vals.push_back(number_token.literal_double);
         }
-	return new Literal(array_vals);
+        consume(RIGHT_BRACK, "Expected ']' after array declaration");
+	    return new Literal(array_vals);
     }
     throw std::runtime_error(create_error(tokens.at(cur_index), "Expected primary"));
 }

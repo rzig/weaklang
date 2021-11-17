@@ -14,12 +14,19 @@ class Parser {
 public:
     Parser(std::vector<Token> input);
     std::vector<Stmt*> parse();
+    std::string as_dot();
 private:
     std::vector<Token> tokens;
+    std::vector<Stmt*> decls;
     size_t cur_index = 0;
 
     bool match(TokenType type);
+    bool match(TokenType type1, TokenType type2);
+    bool match(std::initializer_list<TokenType> types);
+    bool currently_at(TokenType type);
+    bool currently_at(std::initializer_list<TokenType> types);
     Token consume(TokenType type, std::string message);
+    Token consume(std::initializer_list<TokenType> types, std::string message);
     std::string create_error(Token token, std::string message);
 
     Stmt* declaration();

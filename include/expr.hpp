@@ -8,11 +8,17 @@
 class Expr {
 public:
     virtual ~Expr();
+    virtual std::pair<std::string, std::string> to_string();
+    static size_t node_counter;
+    static std::pair<std::string, std::string> make_string(std::string label, Expr* child);
+    static std::pair<std::string, std::string> make_string(std::string label, std::initializer_list<Expr*> children);
+    static std::pair<std::string, std::string> make_string(std::string label, std::vector<Expr*> exprs);
 };
 
 class Assign : public Expr {
 public:
     Assign(Token name, Expr* value);
+    std::pair<std::string, std::string> to_string();
     ~Assign();
 private:
     Token name; 
@@ -22,6 +28,7 @@ private:
 class Binary : public Expr {
 public:
     Binary(Expr* left, Token op, Expr* right);
+    std::pair<std::string, std::string> to_string();
     ~Binary();
 private:
     Expr* left;
@@ -32,6 +39,7 @@ private:
 class Func : public Expr {
 public:
     Func(Token func, Token paren, std::vector<Expr*> args);
+    std::pair<std::string, std::string> to_string();
     ~Func();
 private:
     Token func;
@@ -42,6 +50,7 @@ private:
 class Group : public Expr {
 public:
     Group(Expr* expr);
+    std::pair<std::string, std::string> to_string();
     ~Group();
 private:
     Expr* expr;
@@ -53,6 +62,7 @@ public:
     Literal(double val);
     Literal(bool val);
     Literal(std::vector<double> vals);
+    std::pair<std::string, std::string> to_string();
     ~Literal();
 private:
     std::string string_val;
@@ -64,6 +74,7 @@ private:
 class Logical : public Expr {
 public:
     Logical(Expr* left, Token op, Expr* right);
+    std::pair<std::string, std::string> to_string();
     ~Logical();
 private:
     Expr* left;
@@ -74,6 +85,7 @@ private:
 class Op : public Expr {
 public:
     Op(Token op, Token paren, std::vector<Expr*> args);
+    std::pair<std::string, std::string> to_string();
     ~Op();
 private:
     Token op;
@@ -84,6 +96,7 @@ private:
 class Unary : public Expr {
 public:
     Unary(Token op, Expr* right);
+    std::pair<std::string, std::string> to_string();
     ~Unary();
 private:
     Token op;
@@ -93,6 +106,7 @@ private:
 class Var : public Expr {
 public:
     Var(Token name);
+    std::pair<std::string, std::string> to_string();
     ~Var();
 private:
     Token name;
@@ -101,6 +115,7 @@ private:
 class Nil : public Expr {
 public:
     Nil();
+    std::pair<std::string, std::string> to_string();
     ~Nil();
 };
 
