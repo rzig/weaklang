@@ -16,15 +16,9 @@ int main(int argc, char* argv[]) {
                        (std::istreambuf_iterator<char>()));
       Lexer lexer;
       std::vector<Token> tokens = lexer.lex(read);
-      for (auto t : tokens) {
-        std::cout << t.lexeme << " ";
-      }
-      std::cout << std::endl;
       Parser p {tokens};
-      std::vector<Stmt*> s = p.parse();
-      for(auto k : s) {
-        std::cout << k->ToString().second << std::endl;
-      }
+      p.parse();
+      std::cout << p.as_dot() << std::endl;
     } else {
       std::cout << "Couldn't open file " << argv[i] << ". Quitting."
                 << std::endl;

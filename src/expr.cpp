@@ -3,7 +3,7 @@
 
 Expr::~Expr() {}
 
-std::pair<std::string, std::string> Expr::ToString() {
+std::pair<std::string, std::string> Expr::to_string() {
     std::string a = "";
     std::string b = "";
 
@@ -15,7 +15,7 @@ std::pair<std::string, std::string> Expr::make_string(std::string label, std::ve
     id += std::to_string(node_counter++);
     std::vector<std::pair<std::string,std::string>> children_strs;
     for(auto* child : children) {
-        children_strs.push_back(child->ToString());
+        children_strs.push_back(child->to_string());
     }
     // Conform to DOT file syntax
     for(size_t i = 0; i < label.size(); ++i) {
@@ -60,25 +60,25 @@ size_t Expr::node_counter = 0;
 
 Assign::Assign(Token name, Expr* value): name(name), value(value) {}
 
-std::pair<std::string, std::string> Assign::ToString() {
+std::pair<std::string, std::string> Assign::to_string() {
     return make_string("Assignment of " + name.lexeme, value);
 }
 
 Binary::Binary(Expr* left, Token op, Expr* right): left(left), op(op), right(right) {}
 
-std::pair<std::string, std::string> Binary::ToString() {
+std::pair<std::string, std::string> Binary::to_string() {
     return make_string("Binary operator " + op.lexeme, {left, right});
 }
 
 Func::Func(Token func, Token paren, std::vector<Expr*> args): func(func), paren(paren), args(args) {}
 
-std::pair<std::string, std::string> Func::ToString() {
+std::pair<std::string, std::string> Func::to_string() {
     return make_string("Function call to " + func.lexeme, args);
 }
 
 Group::Group(Expr* expr): expr(expr) {}
 
-std::pair<std::string, std::string> Group::ToString() {
+std::pair<std::string, std::string> Group::to_string() {
     return make_string("Group", expr);
 }
 
@@ -90,7 +90,7 @@ Literal::Literal(bool val): bool_val(val) {}
 
 Literal::Literal(std::vector<double> vals): array_vals(vals) {}
 
-std::pair<std::string, std::string> Literal::ToString() {
+std::pair<std::string, std::string> Literal::to_string() {
     std::string label = "Literal ";
     if(not array_vals.empty()) {
         for(auto v : array_vals) {
@@ -109,31 +109,31 @@ std::pair<std::string, std::string> Literal::ToString() {
 
 Logical::Logical(Expr* left, Token op, Expr* right): left(left), op(op), right(right) {}
 
-std::pair<std::string, std::string> Logical::ToString() {
+std::pair<std::string, std::string> Logical::to_string() {
     return make_string("Logical operator " + op.lexeme, {left, right});
 }
 
 Nil::Nil() {}
 
-std::pair<std::string, std::string> Nil::ToString() {
+std::pair<std::string, std::string> Nil::to_string() {
     return make_string("NIL", {});
 }
 
 Op::Op(Token op, Token paren, std::vector<Expr*> args): op(op), paren(paren), args(args) {}
 
-std::pair<std::string, std::string> Op::ToString() {
+std::pair<std::string, std::string> Op::to_string() {
     return make_string("Operation " + op.lexeme, args);
 }
 
 Unary::Unary(Token op, Expr* right): op(op), right(right) {}
 
-std::pair<std::string, std::string> Unary::ToString() {
+std::pair<std::string, std::string> Unary::to_string() {
     return make_string("Unary " + op.lexeme, right);
 }
 
 Var::Var(Token name): name(name) {}
 
-std::pair<std::string, std::string> Var::ToString() {
+std::pair<std::string, std::string> Var::to_string() {
     return make_string("Variable " + name.lexeme, {});
 }
 

@@ -4,7 +4,7 @@ Stmt::~Stmt() {}
 
 size_t Stmt::statement_counter = 0;
 
-std::pair<std::string, std::string> Stmt::ToString() {
+std::pair<std::string, std::string> Stmt::to_string() {
     std::string a = "";
     std::string b = "";
     return std::make_pair(a, b);
@@ -16,7 +16,7 @@ std::pair<std::string, std::string> Stmt::make_string(std::string label, std::ve
     id += std::to_string(statement_counter++);
     std::vector<std::pair<std::string,std::string>> children_strs;
     for(auto* child : children) {
-        children_strs.push_back(child->ToString());
+        children_strs.push_back(child->to_string());
     }
     // Conform to DOT file syntax
     for(size_t i = 0; i < label.size(); ++i) {
@@ -61,49 +61,49 @@ std::pair<std::string, std::string> Stmt::make_string(std::string label, T* chil
 
 ExprStmt::ExprStmt(Expr* expr): expr(expr) {}
 
-std::pair<std::string, std::string> ExprStmt::ToString() {
+std::pair<std::string, std::string> ExprStmt::to_string() {
     return make_string("Expression statement", expr);
 }
 
 FuncDecl::FuncDecl(Token name, std::vector<Token> params, std::vector<Stmt*> stmts): name(name), params(params), stmts(stmts) {}
 
-std::pair<std::string, std::string> FuncDecl::ToString() {
+std::pair<std::string, std::string> FuncDecl::to_string() {
     return make_string("Declare Function " + name.lexeme, stmts);
 }
 
 If::If(Expr* cond, std::vector<Stmt*> stmts): cond(cond), stmts(stmts) {}
 
-std::pair<std::string, std::string> If::ToString() {
+std::pair<std::string, std::string> If::to_string() {
     return make_string("If Statement ", stmts);
 }
 
 OpDecl::OpDecl(Token name, Token left, Token right, std::vector<Stmt*> stmts): name(name), left(left), right(right), stmts(stmts) {}
 
-std::pair<std::string, std::string> OpDecl::ToString() {
+std::pair<std::string, std::string> OpDecl::to_string() {
     return make_string("Declare Operator " + name.lexeme, stmts);
 }
 
 Print::Print(Token print_keyword, Expr* expr): print_keyword(print_keyword), expr(expr) {}
 
-std::pair<std::string, std::string> Print::ToString() {
+std::pair<std::string, std::string> Print::to_string() {
     return make_string("Print Statement", expr);
 }
 
 Return::Return(Token return_keyword, Expr* expr): return_keyword(return_keyword), expr(expr) {}
 
-std::pair<std::string, std::string> Return::ToString() {
+std::pair<std::string, std::string> Return::to_string() {
     return make_string("Return Statement", expr);
 }
 
 VarDecl::VarDecl(Token name, Expr* expr): name(name), expr(expr) {}
 
-std::pair<std::string, std::string> VarDecl::ToString() {
+std::pair<std::string, std::string> VarDecl::to_string() {
     return make_string("Declare variable " + name.lexeme, expr);
 }
 
 While::While(Expr* cond, std::vector<Stmt*> stmts): cond(cond), stmts(stmts) {}
 
-std::pair<std::string, std::string> While::ToString() {
+std::pair<std::string, std::string> While::to_string() {
     return make_string("While Statement", stmts);
 }
 

@@ -1,7 +1,6 @@
-digraph AST {
-    splines="FALSE";
+digraph AST { 
 
-    /* Entities */
+splines="FALSE"; 
 statement0[label="Declare Operator x", shape="circle"]
 statement1[label="Return Statement", shape="circle"]
 expression0[label="Binary operator ^", shape="square"]
@@ -21,7 +20,6 @@ expression0->expression2
 statement1->expression0
 
 statement0->statement1
-
 statement2[label="Declare Operator z", shape="circle"]
 statement3[label="Return Statement", shape="circle"]
 expression5[label="Binary operator +", shape="square"]
@@ -41,7 +39,6 @@ expression5->expression8
 statement3->expression5
 
 statement2->statement3
-
 statement4[label="Declare Function y", shape="circle"]
 statement5[label="Declare variable m", shape="circle"]
 expression10[label="Literal 0", shape="square"]
@@ -93,7 +90,7 @@ statement7->statement9
 
 statement10[label="If Statement ", shape="circle"]
 statement11[label="Return Statement", shape="circle"]
-expression22[label="Literal 0.000000", shape="square"]
+expression22[label="Literal 1", shape="square"]
 
 statement11->expression22
 
@@ -109,7 +106,6 @@ statement4->statement6
 statement4->statement7
 statement4->statement10
 statement4->statement12
-
 statement13[label="Print Statement", shape="circle"]
 expression24[label="Function call to y", shape="square"]
 expression25[label="Literal 1.000000", shape="square"]
@@ -123,17 +119,14 @@ expression24->expression26
 expression24->expression27
 
 statement13->expression24
-
 statement14[label="Print Statement", shape="circle"]
 expression28[label="Literal 'Hello'", shape="square"]
 
 statement14->expression28
-
 statement15[label="Print Statement", shape="circle"]
 expression29[label="NIL", shape="square"]
 
 statement15->expression29
-
 statement16[label="Print Statement", shape="circle"]
 expression30[label="Binary operator >", shape="square"]
 expression31[label="Literal 1.000000", shape="square"]
@@ -144,7 +137,6 @@ expression30->expression31
 expression30->expression32
 
 statement16->expression30
-
 statement17[label="Print Statement", shape="circle"]
 expression33[label="Binary operator >=", shape="square"]
 expression34[label="Literal 1.000000", shape="square"]
@@ -155,7 +147,6 @@ expression33->expression34
 expression33->expression35
 
 statement17->expression33
-
 statement18[label="Print Statement", shape="circle"]
 expression36[label="Binary operator <", shape="square"]
 expression37[label="Literal 2.000000", shape="square"]
@@ -166,7 +157,6 @@ expression36->expression37
 expression36->expression38
 
 statement18->expression36
-
 statement19[label="Print Statement", shape="circle"]
 expression39[label="Binary operator <=", shape="square"]
 expression40[label="Literal 2.000000", shape="square"]
@@ -177,7 +167,6 @@ expression39->expression40
 expression39->expression41
 
 statement19->expression39
-
 statement20[label="Print Statement", shape="circle"]
 expression42[label="Binary operator -", shape="square"]
 expression43[label="Binary operator +", shape="square"]
@@ -206,7 +195,6 @@ expression42->expression43
 expression42->expression46
 
 statement20->expression42
-
 statement21[label="Print Statement", shape="circle"]
 expression51[label="Binary operator @", shape="square"]
 expression52[label="Literal 0.000000", shape="square"]
@@ -218,8 +206,6 @@ expression51->expression53
 
 statement21->expression51
 
-    // shortName [label="shortName", shape="square"]
-
-    /* Ranks */
-    // { rank=same; shortName; };
 }
+
+Couldn't open file -Tpng. Quitting.

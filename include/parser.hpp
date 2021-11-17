@@ -14,8 +14,10 @@ class Parser {
 public:
     Parser(std::vector<Token> input);
     std::vector<Stmt*> parse();
+    std::string as_dot();
 private:
     std::vector<Token> tokens;
+    std::vector<Stmt*> decls;
     size_t cur_index = 0;
 
     bool match(TokenType type);
