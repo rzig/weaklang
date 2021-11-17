@@ -10,6 +10,9 @@ public:
     virtual ~Expr();
     virtual std::pair<std::string, std::string> ToString();
     static size_t node_counter;
+    static std::pair<std::string, std::string> make_string(std::string label, Expr* child);
+    static std::pair<std::string, std::string> make_string(std::string label, std::initializer_list<Expr*> children);
+    static std::pair<std::string, std::string> make_string(std::string label, std::vector<Expr*> exprs);
 };
 
 class Assign : public Expr {

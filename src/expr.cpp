@@ -10,73 +10,20 @@ std::pair<std::string, std::string> Expr::ToString() {
     return std::make_pair(a,b);
 }
 
-size_t Expr::node_counter = 0;
-
-Assign::Assign(Token name, Expr* value): name(name), value(value) {}
-
-std::pair<std::string, std::string> Assign::ToString() {
-    std::string label = "Assignment operator, lexeme: ";
-    label += name.lexeme;
-    std::string id = "assignment";
-    id += std::to_string(node_counter++);
-    std::pair<std::string,std::string> children = value->ToString();
-    std::string g = "";
-    g += id;
-    g += "[";
-    g += "label=\"";
-    g += label;
-    g += "\", shape=\"square\"]\n";
-    g += children.second;
-    g += "\n";
-    g += id;
-    g += "->";
-    g += children.first;
-    g += "\n";
-    return std::make_pair(id, g);
-}
-
-Binary::Binary(Expr* left, Token op, Expr* right): left(left), op(op), right(right) {}
-
-std::pair<std::string, std::string> Binary::ToString() {
-    std::string label = "Binary operator";
-    label += op.lexeme;
-    std::string id = "assignment";
-    id += std::to_string(node_counter++);
-    std::pair<std::string,std::string> children_left = left->ToString();
-    std::pair<std::string,std::string> children_right = right->ToString();
-    std::string g = "";
-    g += id;
-    g += "[";
-    g += "label=\"";
-    g += label;
-    g += "\", shape=\"square\"]\n";
-    g += children_left.second;
-    g += "\n";
-    g += children_right.second;
-    g += "\n";
-    g += id;
-    g += "->";
-    g += children_left.first;
-    g += "\n";
-    g += id;
-    g += "->";
-    g += children_right.first;
-    g += "\n";
-    return std::make_pair(id, g);
-}
-
-Func::Func(Token func, Token paren, std::vector<Expr*> args): func(func), paren(paren), args(args) {}
-
-std::pair<std::string, std::string> Func::ToString() {
-    std::string label = "Function, lexeme: ";
-    label += func.lexeme;
-    std::string id = "assignment";
+std::pair<std::string, std::string> Expr::make_string(std::string label, std::vector<Expr*> children) {
+    std::string id = "expression";
     id += std::to_string(node_counter++);
     std::vector<std::pair<std::string,std::string>> children_strs;
-    for(Expr* arg : args) {
-        children_strs.push_back(arg->ToString());
+    for(auto* child : children) {
+        children_strs.push_back(child->ToString());
     }
-    std::string g = "";
+    // Conform to DOT file syntax
+    for(size_t i = 0; i < label.size(); ++i) {
+        if (label[i] == '"') {
+            label[i] = '\'';
+        }
+    }
+    std::string g;
     g += id;
     g += "[";
     g += "label=\"";
@@ -95,26 +42,44 @@ std::pair<std::string, std::string> Func::ToString() {
     return std::make_pair(id, g);
 }
 
+std::pair<std::string, std::string> Expr::make_string(std::string label, std::initializer_list<Expr*> children) {
+    std::vector<Expr*> child_vec;
+    for(auto* e : children) {
+        child_vec.push_back(e);
+    }
+    return make_string(label, child_vec);
+}
+
+std::pair<std::string, std::string> Expr::make_string(std::string label, Expr* child) {
+    std::vector<Expr*> c;
+    c.push_back(child);
+    return make_string(label, c);
+}
+
+size_t Expr::node_counter = 0;
+
+Assign::Assign(Token name, Expr* value): name(name), value(value) {}
+
+std::pair<std::string, std::string> Assign::ToString() {
+    return make_string("Assignment of " + name.lexeme, value);
+}
+
+Binary::Binary(Expr* left, Token op, Expr* right): left(left), op(op), right(right) {}
+
+std::pair<std::string, std::string> Binary::ToString() {
+    return make_string("Binary operator " + op.lexeme, {left, right});
+}
+
+Func::Func(Token func, Token paren, std::vector<Expr*> args): func(func), paren(paren), args(args) {}
+
+std::pair<std::string, std::string> Func::ToString() {
+    return make_string("Function call to " + func.lexeme, args);
+}
+
 Group::Group(Expr* expr): expr(expr) {}
 
 std::pair<std::string, std::string> Group::ToString() {
-    std::string label = "Group";
-    std::string id = "assignment";
-    id += std::to_string(node_counter++);
-    std::pair<std::string,std::string> children = expr->ToString();
-    std::string g = "";
-    g += id;
-    g += "[";
-    g += "label=\"";
-    g += label;
-    g += "\", shape=\"square\"]\n";
-    g += children.second;
-    g += "\n";
-    g += id;
-    g += "->";
-    g += children.first;
-    g += "\n";
-    return std::make_pair(id, g);
+    return make_string("Group", expr);
 }
 
 Literal::Literal(std::string val): string_val(val) {}
@@ -129,141 +94,48 @@ std::pair<std::string, std::string> Literal::ToString() {
     std::string label = "Literal ";
     if(not array_vals.empty()) {
         for(auto v : array_vals) {
-            label += v;
+            label += std::to_string(v);
             label += ", ";
         }
     } else if(not string_val.empty()) {
         label += string_val;
     } else if (not (double_val == 0)) {
-        label += double_val;
+        label += std::to_string(double_val);
     } else {
-        label += bool_val;
+        label += std::to_string(bool_val);
     }
-    std::string id = "assignment";
-    id += std::to_string(node_counter++);
-    std::string g = "";
-    g += id;
-    g += "[";
-    g += "label=\"";
-    g += label;
-    g += "\", shape=\"square\"]\n";
-    return std::make_pair(id, g);
+    return make_string(label, {});
 }
 
 Logical::Logical(Expr* left, Token op, Expr* right): left(left), op(op), right(right) {}
 
 std::pair<std::string, std::string> Logical::ToString() {
-    std::string label = "Logical operator ";
-    label += op.lexeme;
-    std::string id = "assignment";
-    id += std::to_string(node_counter++);
-    std::pair<std::string,std::string> children_left = left->ToString();
-    std::pair<std::string,std::string> children_right = right->ToString();
-    std::string g = "";
-    g += id;
-    g += "[";
-    g += "label=\"";
-    g += label;
-    g += "\", shape=\"square\"]\n";
-    g += children_left.second;
-    g += "\n";
-    g += children_right.second;
-    g += "\n";
-    g += id;
-    g += "->";
-    g += children_left.first;
-    g += "\n";
-    g += id;
-    g += "->";
-    g += children_right.first;
-    g += "\n";
-    return std::make_pair(id, g);
+    return make_string("Logical operator " + op.lexeme, {left, right});
 }
 
 Nil::Nil() {}
 
 std::pair<std::string, std::string> Nil::ToString() {
-    std::string label = "NIL";
-    std::string id = "assignment";
-    id += std::to_string(node_counter++);
-    std::string g = "";
-    g += id;
-    g += "[";
-    g += "label=\"";
-    g += label;
-    g += "\", shape=\"square\"]\n";
-    return std::make_pair(id, g);
+    return make_string("NIL", {});
 }
 
 Op::Op(Token op, Token paren, std::vector<Expr*> args): op(op), paren(paren), args(args) {}
 
 std::pair<std::string, std::string> Op::ToString() {
-    std::string label = "Option, lexeme: ";
-    label += op.lexeme;
-    std::string id = "assignment";
-    id += std::to_string(node_counter++);
-    std::vector<std::pair<std::string,std::string>> children_strs;
-    for(Expr* arg : args) {
-        children_strs.push_back(arg->ToString());
-    }
-    std::string g = "";
-    g += id;
-    g += "[";
-    g += "label=\"";
-    g += label;
-    g += "\", shape=\"square\"]\n";
-    for(auto x : children_strs) {
-        g += x.second;
-        g += '\n';
-    }
-    for(auto x : children_strs) {
-        g += id;
-        g += "->";
-        g += x.first;
-        g += "\n";
-    }
-    return std::make_pair(id, g);
+    return make_string("Operation " + op.lexeme, args);
 }
 
 Unary::Unary(Token op, Expr* right): op(op), right(right) {}
 
 std::pair<std::string, std::string> Unary::ToString() {
-    std::string label = "Unary operator, lexeme: ";
-    label += op.lexeme;
-    std::string id = "assignment";
-    id += std::to_string(node_counter++);
-    std::pair<std::string,std::string> children = right->ToString();
-    std::string g = "";
-    g += id;
-    g += "[";
-    g += "label=\"";
-    g += label;
-    g += "\", shape=\"square\"]\n";
-    g += children.second;
-    g += "\n";
-    g += id;
-    g += "->";
-    g += children.first;
-    g += "\n";
-    return std::make_pair(id, g);
+    return make_string("Unary " + op.lexeme, right);
 }
 
 Var::Var(Token name): name(name) {}
 
 std::pair<std::string, std::string> Var::ToString() {
-    std::string label = "VAR ";
-    label += name.lexeme;
-    std::string id = "assignment";
-    id += std::to_string(node_counter++);
-    std::string g = "";
-    g += id;
-    g += "[";
-    g += "label=\"";
-    g += label;
-    g += "\", shape=\"square\"]\n";
-    return std::make_pair(id, g);
+    return make_string("Variable " + name.lexeme, {});
 }
-
 
 Assign::~Assign() {
     delete value;
