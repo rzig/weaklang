@@ -23,7 +23,10 @@ private:
     bool match(TokenType type);
     bool match(TokenType type1, TokenType type2);
     bool match(std::initializer_list<TokenType> types);
+    bool currently_at(TokenType type);
+    bool currently_at(std::initializer_list<TokenType> types);
     Token consume(TokenType type, std::string message);
+    Token consume(std::initializer_list<TokenType> types, std::string message);
     std::string create_error(Token token, std::string message);
 
     Stmt* declaration();

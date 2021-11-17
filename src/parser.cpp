@@ -42,13 +42,35 @@ bool Parser::match(std::initializer_list<TokenType> types) {
     return false;
 }
 
+bool Parser::currently_at(TokenType type) {
+    return tokens.at(cur_index).type == type;
+}
+
+bool Parser::currently_at(std::initializer_list<TokenType> types) {
+    for(auto t : types) {
+        if (currently_at(t)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 Token Parser::consume(TokenType type, std::string message) {
     if (tokens.at(cur_index).type == type) return tokens.at(cur_index++);
     throw std::runtime_error(create_error(tokens.at(cur_index), message));
 }
 
+Token Parser::consume(std::initializer_list<TokenType> types, std::string message) {
+    for(auto type : types) {
+        if(tokens.at(cur_index).type == type) {
+            return tokens.at(cur_index++);
+        }
+    }
+    throw std::runtime_error(create_error(tokens.at(cur_index), message));
+}
+
 std::string Parser::create_error(Token token, std::string message) {
-    return message + " : \"" + token.lexeme + "\", at line " + std::to_string(token.line) + " and column " + std::to_string(token.col);
+    return message + " but instead found: \"" + token.lexeme + "\", at line " + std::to_string(token.line + 1) + " and column " + std::to_string(token.col + 1);
 }
 
 Stmt* Parser::declaration() {
@@ -102,12 +124,6 @@ Stmt* Parser::varDeclaration() {
     Expr* initialize = nullptr;
     if (match(EQUALS)) initialize = expression();
 
-    if(match(AS_SHAPE)) {
-        Token op = tokens.at(cur_index-1);
-        Expr* se = expression();
-        initialize = new Binary(initialize, op, se);
-    }
-
     consume(SEMI, "Expect semi-colon after variable declaration");
     return new VarDecl(name, initialize);
 }
@@ -117,8 +133,7 @@ Stmt* Parser::statement() {
     if (match(PRINT)) return printStatement();
     if (match(RETURN)) return returnStatement();
     if (match(WHILE)) return whileStatement();
-    // if (match(LEFT_BRACE)) return new std::vector<Stmt*> stmt.block();
-    return exprStatement();
+    else return exprStatement();
 }
 
 std::vector<Stmt*> Parser::block() {
@@ -227,8 +242,8 @@ Expr* Parser::assignment() {
 
 Expr* Parser::logicOr() {
     Expr* exp = logicAnd();
-    while (match(OR)) {
-        Token t = tokens.at(cur_index - 1);
+    while (currently_at(OR)) {
+        Token t = consume(OR, "Expected 'O'");
         Expr* next = logicAnd();
         exp = new Binary(exp, t, next);
     }
@@ -237,8 +252,8 @@ Expr* Parser::logicOr() {
 
 Expr* Parser::logicAnd() {
     Expr* exp = equality();
-    while (match(AND)) {
-        Token a = tokens.at(cur_index - 1);
+    while (currently_at(AND)) {
+        Token a = consume(AND, "Expected 'A'");
         Expr* next = equality();
         exp = new Binary(exp, a, next);
     }
@@ -247,8 +262,8 @@ Expr* Parser::logicAnd() {
 
 Expr* Parser::equality() {
     Expr* exp = comparison();
-    while (match({EQUALS_EQUALS, EQUALS, EXCLA_EQUALS})) {
-        Token t = tokens.at(cur_index - 1);
+    while (currently_at({EQUALS_EQUALS, EQUALS, EXCLA_EQUALS})) {
+        Token t = consume({EQUALS_EQUALS, EQUALS, EXCLA_EQUALS}, "Expected '==', '=', '!='");
         Expr* next = comparison();
         exp = new Binary(exp, t, next);
     }
@@ -257,8 +272,8 @@ Expr* Parser::equality() {
 
 Expr* Parser::comparison() {
     Expr* exp = term();
-    while(match({GREATER_EQUALS, GREATER, LESSER_EQUALS, LESSER})) {
-        Token comp = tokens.at(cur_index - 1);
+    while(currently_at({GREATER_EQUALS, GREATER, LESSER_EQUALS, LESSER})) {
+        Token comp = consume({GREATER_EQUALS, GREATER, LESSER_EQUALS, LESSER}, "Expected '>=', '>', '<=', '<'");
         Expr* next = term();
         exp = new Binary(exp, comp, next);
     }
@@ -267,8 +282,8 @@ Expr* Parser::comparison() {
 
 Expr* Parser::term() {
     Expr* left = factor();
-    while(match({MINUS, PLUS})) {
-        Token op = tokens.at(cur_index-1);
+    while(currently_at({MINUS, PLUS})) {
+        Token op = consume({MINUS, PLUS}, "Expected '-' or '+'");
         Expr* fac = factor();
         left = new Binary(left, op, fac);
     }
@@ -277,8 +292,8 @@ Expr* Parser::term() {
 
 Expr* Parser::factor() {
     Expr* left = unary();
-    while(match({SLASH, STAR, AT, AS_SHAPE, EXP})) {
-        Token op = tokens.at(cur_index-1);
+    while(currently_at({SLASH, STAR, AT, AS_SHAPE, EXP})) {
+        Token op = consume({SLASH, STAR, AT, AS_SHAPE, EXP}, "Expected '/', '*', '@', 'sa', '^'");
         Expr* un = unary();
         left = new Binary(left, op, un);
     }
