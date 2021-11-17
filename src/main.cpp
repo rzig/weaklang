@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
       Lexer lexer;
       std::vector<Token> tokens = lexer.lex(read);
       for (auto t : tokens) {
-        std::cout << print_token_type(t.type) << " ";
+        std::cout << t.lexeme << " ";
       }
       std::cout << std::endl;
       Parser p {tokens};

@@ -6,13 +6,6 @@ Parser::Parser(std::vector<Token> input): tokens(input) {}
 std::vector<Stmt*> Parser::parse() {
     std::vector<Stmt*> decls;
     while (cur_index < tokens.size() && tokens.at(cur_index).type != END) {
-        for (auto t : tokens) {
-            std::cout << print_token_type(t.type) << " ";
-        }
-        std::cout << std::endl;
-        std::cout << "curr: " << cur_index << std::endl;
-        std::cout << "size: " << tokens.size() << std::endl;
-        std::cout << print_token_type(tokens.at(cur_index).type) << std::endl;
         decls.push_back(declaration());
     }
     return decls;
@@ -191,12 +184,14 @@ Expr* Parser::function() {
         }
         return new Func(name, left_p, args);
     } else {
+        std::cout << "function else branch" << std::endl;
         return operation();
     }
 }
 
 Expr* Parser::operation() {
     Expr* exp = assignment();
+    std::cout << "built assignment" << std::endl;
     while(match(IDENTIFIER)) {
         Token id = tokens.at(cur_index-1);
         Expr* right = assignment();
@@ -206,7 +201,9 @@ Expr* Parser::operation() {
 }
 
 Expr* Parser::assignment() {
-    if(tokens.at(cur_index).type == IDENTIFIER) {
+    std::cout << "in assignment" << std::endl;
+    std::cout << print_token_type(tokens.at(cur_index).type) << std::endl;
+    if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index + 1).type == EQUALS) {
         Token id = consume(IDENTIFIER, "Expected identifier");
         consume(EQUALS, "Expected '=' after identifier");
         Expr* right = assignment();
@@ -217,46 +214,51 @@ Expr* Parser::assignment() {
 }
 
 Expr* Parser::logicOr() {
-  Expr* exp = logicAnd();
-  while (match(OR)) {
-    Token t = tokens.at(cur_index - 1);
-    Expr* next = logicAnd();
-    exp = new Binary(exp, t, next);
-  }
-  return exp;
+    std::cout << "in logic or" << std::endl;
+    Expr* exp = logicAnd();
+    while (match(OR)) {
+        Token t = tokens.at(cur_index - 1);
+        Expr* next = logicAnd();
+        exp = new Binary(exp, t, next);
+    }
+    return exp;
 }
 
 Expr* Parser::logicAnd() {
-  Expr* exp = equality();
-  while (match(AND)) {
-    Token a = tokens.at(cur_index - 1);
-    Expr* next = equality();
-    exp = new Binary(exp, a, next);
-  }
-  return exp;
+    std::cout << "in logic and" << std::endl;
+    Expr* exp = equality();
+    while (match(AND)) {
+        Token a = tokens.at(cur_index - 1);
+        Expr* next = equality();
+        exp = new Binary(exp, a, next);
+    }
+    return exp;
 }
 
 Expr* Parser::equality() {
-  Expr* exp = comparison();
-  while (match({EQUALS_EQUALS, EQUALS})) {
-    Token t = tokens.at(cur_index - 1);
-    Expr* next = comparison();
-    exp = new Binary(exp, t, next);
-  }
-  return exp; 
+    std::cout << "in equality" << std::endl;
+    Expr* exp = comparison();
+    while (match({EQUALS_EQUALS, EQUALS})) {
+        Token t = tokens.at(cur_index - 1);
+        Expr* next = comparison();
+        exp = new Binary(exp, t, next);
+    }
+    return exp; 
 }
 
 Expr* Parser::comparison() {
-  Expr* exp = term();
-  while(match({GREATER_EQUALS, GREATER, LESSER_EQUALS, LESSER})) {
-      Token comp = tokens.at(cur_index - 1);
-      Expr* next = term();
-      exp = new Binary(exp, comp, next);
-  }
-  return exp;
+    std::cout << "in comparison" << std::endl;
+    Expr* exp = term();
+    while(match({GREATER_EQUALS, GREATER, LESSER_EQUALS, LESSER})) {
+        Token comp = tokens.at(cur_index - 1);
+        Expr* next = term();
+        exp = new Binary(exp, comp, next);
+    }
+    return exp;
 }
 
 Expr* Parser::term() {
+    std::cout << "in term" << std::endl;
     Expr* left = factor();
     while(match({MINUS, PLUS})) {
         Token op = tokens.at(cur_index-1);
@@ -267,6 +269,7 @@ Expr* Parser::term() {
 }
 
 Expr* Parser::factor() {
+    std::cout << "in factor" << std::endl;
     Expr* left = unary();
     while(match({SLASH, STAR, AT, AS_SHAPE})) {
         Token op = tokens.at(cur_index-1);
@@ -277,6 +280,7 @@ Expr* Parser::factor() {
 }
 
 Expr* Parser::unary() {
+    std::cout << "in unary" << std::endl;
     switch(tokens.at(cur_index).type) {
         case EXCLA:
         case MINUS:
@@ -292,6 +296,8 @@ Expr* Parser::unary() {
 }
 
 Expr* Parser::primary() {
+    std::cout << "in primary" << std::endl;
+    std::cout << "in primary, token type is " << print_token_type(tokens.at(cur_index).type) << std::endl;
     if(match(TRUE)) return new Literal(true);
     if(match(FALSE)) return new Literal(false);
     if(match(NIL)) return new Nil();
