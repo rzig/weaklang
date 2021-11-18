@@ -322,7 +322,7 @@ Expr* Parser::arrAccess() {
     if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index+1).type == LEFT_BRACK) {
         Token name = consume(IDENTIFIER, "");
         Token left_p = consume(LEFT_PAREN, "");
-        Token first_dim = consume(EXPRESSION, "Expected at least one index for array indexing");
+        Expr* first_dim = expression();
         std::vector<Expr*> args;
         args.push_back(first_dim);
         while(cur_index < tokens.size() && tokens.at(cur_index).type != RIGHT_BRACK) {
@@ -336,7 +336,7 @@ Expr* Parser::arrAccess() {
             }
         }
         consume(RIGHT_BRACK, "Expected ']' after indices");
-        return new /*NEED TO FIGURE OUT TYPE OF EXPRESSION TO PUT HERE*/;
+        return nullptr /*NEED TO FIGURE OUT TYPE OF EXPRESSION TO PUT HERE*/;
     } else {
         return operation();
     }
