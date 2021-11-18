@@ -268,4 +268,11 @@ TEST_CASE("Errors", "[lexer]") {
         REQUIRE(lex.get_errors()[0].line == 0);
         REQUIRE(lex.get_errors()[0].column == 8);
     }
+
+    SECTION("non-ascii"){
+        Lexer lex; 
+        lex.lex("ü");
+        REQUIRE(lex.has_had_error()); 
+    }
 }
+
