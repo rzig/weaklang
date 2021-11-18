@@ -53,6 +53,7 @@ private:
     Expr* term();
     Expr* factor();
     Expr* unary();
+    Expr* arrAccess();
     Expr* primary();
 };
 

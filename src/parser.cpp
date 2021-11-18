@@ -211,6 +211,9 @@ Expr* Parser::function() {
                 Expr* arg = expression();
                 args.push_back(arg);
             }
+            else {
+                throw std::runtime_error(create_error(name, "Too many arguments for function (max " + std::to_string(MAX_ARGS) + ")"));
+            }
         }
         consume(RIGHT_PAREN, "Expected ')' after function arguments");
         return new Func(name, left_p, args);
@@ -311,7 +314,31 @@ Expr* Parser::unary() {
             return new Unary(t, next);
         }
         default:
-            return primary();
+            return arrAccess();
+    }
+}
+
+Expr* Parser::arrAccess() {
+    if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index+1).type == LEFT_BRACK) {
+        Token name = consume(IDENTIFIER, "");
+        Token left_p = consume(LEFT_PAREN, "");
+        Token first_dim = consume(EXPRESSION, "Expected at least one index for array indexing");
+        std::vector<Expr*> args;
+        args.push_back(first_dim);
+        while(cur_index < tokens.size() && tokens.at(cur_index).type != RIGHT_BRACK) {
+            if (args.size() < MAX_ARGS) {
+                consume(COMMA, "Expected comma in function call");
+                Expr* arg = expression();
+                args.push_back(arg);
+            }
+            else {
+                throw std::runtime_error(create_error(name, "Too many arguments for array indexing (max " + std::to_string(MAX_ARGS) + ")"));
+            }
+        }
+        consume(RIGHT_BRACK, "Expected ']' after indices");
+        return new /*NEED TO FIGURE OUT TYPE OF EXPRESSION TO PUT HERE*/;
+    } else {
+        return operation();
     }
 }
 
