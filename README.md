@@ -8,6 +8,7 @@ A guide for installation can be found [here](https://www.cs.odu.edu/~zeil/cs250P
 Make can be downloaded directly [here](https://www.gnu.org/software/make/). 
 
 Alternatively, a package manager can be used. 
+
 For Windows, using [chocolatey](https://chocolatey.org/install)
 ```
 choco install make
