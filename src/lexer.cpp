@@ -95,7 +95,7 @@ const char Lexer::QUOTE_CHAR = '"';
 //                        LEXER IMPLEMENTATION                              //
 //////////////////////////////////////////////////////////////////////////////
 
-std::vector<Token> Lexer::lex(const std::string &to_lex) {    
+std::vector<Token> Lexer::lex(const std::string &to_lex) {
     size_t line = 0, column = 0; // For tracking position of tokens for better syntax error reporting
     size_t start_index = 0, current_index = 0; // For tracking interpretation of tokens
 
