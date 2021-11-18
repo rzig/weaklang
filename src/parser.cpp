@@ -327,7 +327,7 @@ Expr* Parser::arrAccess() {
         args.push_back(first_dim);
         while(cur_index < tokens.size() && tokens.at(cur_index).type != RIGHT_BRACK) {
             if (args.size() < MAX_ARGS) {
-                consume(COMMA, "Expected comma in function call");
+                consume(COMMA, "Expected comma in array indexing");
                 Expr* arg = expression();
                 args.push_back(arg);
             }
