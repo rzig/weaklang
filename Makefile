@@ -21,7 +21,7 @@ bin/expr.o: src/expr.cpp include/expr.hpp include/token.hpp
 bin/parser.o: src/parser.cpp include/parser.hpp include/token.hpp include/stmt.hpp include/expr.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-bin/tests: bin/catch.o tests/tests.cc src/lexer.cpp src/token.cpp src/error.cpp
+bin/tests: bin/catch.o tests/tests.cc src/lexer.cpp src/token.cpp src/error.cpp src/stmt.cpp src/expr.cpp src/parser.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 bin/catch.o: tests/catch.cc
