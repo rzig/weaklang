@@ -246,7 +246,7 @@ TEST_CASE("Complex input", "[lexer]") {
     REQUIRE(tokens[150].col == 5);
 }
 
-TEST_CASE("Errors", "[lexer]") {
+TEST_CASE("Errors", "[lexer] [non-ascii]") {
     // It's kind of hard to add non-ascii symbols, so no test
     // for that for the time being.
     SECTION("string end of file") {
@@ -268,4 +268,9 @@ TEST_CASE("Errors", "[lexer]") {
         REQUIRE(lex.get_errors()[0].line == 0);
         REQUIRE(lex.get_errors()[0].column == 8);
     }
+
+    SECTION("non-ascii"){
+    
+    }
 }
+

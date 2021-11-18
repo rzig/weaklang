@@ -96,6 +96,11 @@ const char Lexer::QUOTE_CHAR = '"';
 //////////////////////////////////////////////////////////////////////////////
 
 std::vector<Token> Lexer::lex(const std::string &to_lex) {
+    /* if(!is_ascii(to_lex)){ 
+        std::cout << "got here" << std::endl; 
+        errors.push_back(Error("Unrecognized character", 0, 0));  
+        } */
+    
     size_t line = 0, column = 0; // For tracking position of tokens for better syntax error reporting
     size_t start_index = 0, current_index = 0; // For tracking interpretation of tokens
 
