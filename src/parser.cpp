@@ -70,7 +70,7 @@ Token Parser::consume(std::initializer_list<TokenType> types, std::string messag
 }
 
 std::string Parser::create_error(Token token, std::string message) {
-    return message + " but instead found: \"" + token.lexeme + "\", at line " + std::to_string(token.line + 1) + " and column " + std::to_string(token.col + 1);
+    return message + " but instead found: \"" + token.lexeme + "\", at line " + std::to_string(token.line + 1) + " and column " + std::to_string(token.col + 1) + ", this token as type " + print_token_type(token.type);
 }
 
 Stmt* Parser::declaration() {
