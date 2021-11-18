@@ -15,6 +15,17 @@ public:
     static std::pair<std::string, std::string> make_string(std::string label, std::vector<Expr*> exprs);
 };
 
+class ArrAccess : public Expr {
+public:
+    ArrAccess(Token id, Token brack, std::vector<Expr*> idx);
+    std::pair<std::string, std::string> to_string();
+    ~ArrAccess();
+private:
+    Token id;
+    Token brack;
+    std::vector<Expr*> idx;
+};
+
 class Assign : public Expr {
 public:
     Assign(Token name, Expr* value);

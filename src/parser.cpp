@@ -321,7 +321,7 @@ Expr* Parser::unary() {
 Expr* Parser::arrAccess() {
     if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index+1).type == LEFT_BRACK) {
         Token name = consume(IDENTIFIER, "");
-        Token left_p = consume(LEFT_PAREN, "");
+        Token left_b = consume(LEFT_BRACK, "");
         Expr* first_dim = expression();
         std::vector<Expr*> args;
         args.push_back(first_dim);
@@ -336,7 +336,7 @@ Expr* Parser::arrAccess() {
             }
         }
         consume(RIGHT_BRACK, "Expected ']' after indices");
-        return nullptr /*NEED TO FIGURE OUT TYPE OF EXPRESSION TO PUT HERE*/;
+        return new ArrAccess(name, left_b, args);
     } else {
         return operation();
     }

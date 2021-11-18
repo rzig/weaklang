@@ -58,6 +58,12 @@ std::pair<std::string, std::string> Expr::make_string(std::string label, Expr* c
 
 size_t Expr::node_counter = 0;
 
+ArrAccess::ArrAccess(Token id, Token brack, std::vector<Expr*> idx): id(id), brack(brack), idx(idx) {}
+
+std::pair<std::string, std::string> ArrAccess::to_string() {
+    return make_string("Array access of " + id.lexeme, idx);
+}
+
 Assign::Assign(Token name, Expr* value): name(name), value(value) {}
 
 std::pair<std::string, std::string> Assign::to_string() {
@@ -135,6 +141,12 @@ Var::Var(Token name): name(name) {}
 
 std::pair<std::string, std::string> Var::to_string() {
     return make_string("Variable " + name.lexeme, {});
+}
+
+ArrAccess::~ArrAccess() {
+    for (auto ptr : idx) {
+        delete ptr;
+    }
 }
 
 Assign::~Assign() {
