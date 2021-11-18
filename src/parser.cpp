@@ -338,7 +338,7 @@ Expr* Parser::arrAccess() {
         consume(RIGHT_BRACK, "Expected ']' after indices");
         return new ArrAccess(name, left_b, args);
     } else {
-        return operation();
+        return primary();
     }
 }
 
