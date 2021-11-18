@@ -8,6 +8,7 @@
 //                                 Includes                                 //
 //////////////////////////////////////////////////////////////////////////////
 #include "lexer.hpp"
+#include "parser.hpp"
 #include<iostream>
 #include<fstream>
 #include<sstream>
@@ -276,3 +277,10 @@ TEST_CASE("Errors", "[lexer]") {
     }
 }
 
+TEST_CASE("Assignment", "[parser]"){
+    std::string program = "a x = 5;";
+    Lexer lex; 
+    std::vector<Token> tokens = lex.lex(program); 
+    Parser p{tokens}; 
+    std::vector<Stmt*> statements = p.parse(); 
+}
