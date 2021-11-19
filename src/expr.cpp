@@ -3,12 +3,12 @@
 
 Expr::~Expr() {}
 
-std::pair<std::string, std::string> Expr::to_string() {
+/* std::pair<std::string, std::string> Expr::to_string() {
     std::string a = "";
     std::string b = "";
 
     return std::make_pair(a,b);
-}
+} */
 
 std::pair<std::string, std::string> Expr::make_string(std::string label, std::vector<Expr*> children) {
     std::string id = "expression";

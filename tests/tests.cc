@@ -8,6 +8,7 @@
 //                                 Includes                                 //
 //////////////////////////////////////////////////////////////////////////////
 #include "lexer.hpp"
+#include "parser.hpp"
 #include<iostream>
 #include<fstream>
 #include<sstream>
@@ -274,4 +275,15 @@ TEST_CASE("Complex input", "[lexer]") {
     REQUIRE(tokens[100].col == 3);
     REQUIRE(tokens[150].line == 30);
     REQUIRE(tokens[150].col == 20);
+}
+
+<<<<<<< HEAD
+=======
+TEST_CASE("Assignment", "[parser]"){
+    std::string program = "a x = 5;";
+    Lexer lex; 
+    std::vector<Token> tokens = lex.lex(program); 
+    Parser p{tokens}; 
+    std::vector<Stmt*> statements = p.parse(); 
+>>>>>>> chris/dev
 }
