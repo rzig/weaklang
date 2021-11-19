@@ -4,26 +4,7 @@
 #include "lexer.hpp"
 #include "parser.hpp"
 
-// testing the simplest possible assignment
-int test_assignment() {
-  std::string program = "a x = 5;";
-  Lexer lex; 
-  std::vector<Token> tokens = lex.lex(program); 
-  /* for(auto& token : tokens){
-    std::cout << print_token_type(token.type) << ": " << token.lexeme << std::endl; 
-  } */
-  Parser p{tokens}; 
-  std::vector<Stmt*> statements = p.parse(); 
-  // std::cout << p.as_dot() << std::endl; 
-
-  for(auto* s : statements)
-    delete s;
-  return 0; 
-}
-
 int main(int argc, char* argv[]) {
-  return test_assignment();
-  
   if (argc == 1) {
     std::cout << "Usage: " << argv[0] << " INPUT_FILE" << std::endl;
     return 1;
