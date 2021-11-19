@@ -1,7 +1,5 @@
 #include "parser.hpp"
 
-#include <iostream>
-
 Parser::Parser(std::vector<Token> input): tokens(input) {}
 
 std::vector<Stmt*> Parser::parse() {
@@ -234,20 +232,11 @@ Expr* Parser::operation() {
     return exp;
 }
 
-Expr* Parser::assignment() { // this function was being called an infinite amount of times
-    // base case: end of line or number + end of line
-    if(tokens.at(cur_index + 1).type == SEMI){
-        Token last = tokens.at(cur_index); 
-        if(last.type == NUMBER){
-            return new Assign(consume(NUMBER, "Expected number"), nullptr);
-        }
-        return new Assign(consume(IDENTIFIER, "Expected identifier"), nullptr); 
-    }
-
+Expr* Parser::assignment() {
     if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index + 1).type == EQUALS) {
         Token id = consume(IDENTIFIER, "Expected identifier");
         consume(EQUALS, "Expected '=' after identifier");
-        Expr* right = assignment(); // unsure about this change, don't know if it has to be operation()
+        Expr* right = operation();
         return new Assign(id, right);
     } else {
         return logicOr();
