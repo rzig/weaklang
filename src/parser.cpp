@@ -70,7 +70,7 @@ Token Parser::consume(std::initializer_list<TokenType> types, std::string messag
 }
 
 std::string Parser::create_error(Token token, std::string message) {
-    return message + " but instead found: \"" + token.lexeme + "\", at line " + std::to_string(token.line + 1) + " and column " + std::to_string(token.col + 1) + ", this token as type " + print_token_type(token.type);
+    return message + " but instead found: \"" + token.lexeme + "\", at line " + std::to_string(token.line + 1) + " and column " + std::to_string(token.col + 1) + ", this token has type " + print_token_type(token.type);
 }
 
 Stmt* Parser::declaration() {
@@ -193,7 +193,18 @@ Stmt* Parser::returnStatement() {
 }
 
 Expr* Parser::expression() {
-    return function();
+    return assignment();
+}
+
+Expr* Parser::assignment() {
+    if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index + 1).type == EQUALS) {
+        Token id = consume(IDENTIFIER, "Expected identifier");
+        consume(EQUALS, "Expected '=' after identifier");
+        Expr* right = assignment();
+        return new Assign(id, right);
+    } else {
+        return function();
+    }
 }
 
 Expr* Parser::function() {
@@ -223,24 +234,14 @@ Expr* Parser::function() {
 }
 
 Expr* Parser::operation() {
-    Expr* exp = assignment();
+    Expr* exp = logicOr();
     while(match(IDENTIFIER)) {
         Token id = tokens.at(cur_index-1);
-        Expr* right = assignment();
+        if (id.type == EQUALS) throw std::runtime_error(create_error(id, "Can't interpret = as a binary operator"));
+        Expr* right = logicOr();
         exp = new Binary(right, id, exp);
     }
     return exp;
-}
-
-Expr* Parser::assignment() {
-    if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index + 1).type == EQUALS) {
-        Token id = consume(IDENTIFIER, "Expected identifier");
-        consume(EQUALS, "Expected '=' after identifier");
-        Expr* right = operation();
-        return new Assign(id, right);
-    } else {
-        return logicOr();
-    }
 }
 
 Expr* Parser::logicOr() {
@@ -265,8 +266,8 @@ Expr* Parser::logicAnd() {
 
 Expr* Parser::equality() {
     Expr* exp = comparison();
-    while (currently_at({EQUALS_EQUALS, EQUALS, EXCLA_EQUALS})) {
-        Token t = consume({EQUALS_EQUALS, EQUALS, EXCLA_EQUALS}, "Expected '==', '=', '!='");
+    while (currently_at({EQUALS_EQUALS, EXCLA_EQUALS})) {
+        Token t = consume({EQUALS_EQUALS, EXCLA_EQUALS}, "Expected '==' or '!='");
         Expr* next = comparison();
         exp = new Binary(exp, t, next);
     }
