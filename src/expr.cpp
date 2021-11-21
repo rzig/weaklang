@@ -3,13 +3,6 @@
 
 Expr::~Expr() {}
 
-/* std::pair<std::string, std::string> Expr::to_string() {
-    std::string a = "";
-    std::string b = "";
-
-    return std::make_pair(a,b);
-} */
-
 std::pair<std::string, std::string> Expr::make_string(std::string label, std::vector<Expr*> children) {
     std::string id = "expression";
     id += std::to_string(node_counter++);
@@ -88,24 +81,24 @@ std::pair<std::string, std::string> Group::to_string() {
     return make_string("Group", expr);
 }
 
-Literal::Literal(std::string val): string_val(val) {}
+Literal::Literal(std::string val): string_val(val), literal_type(LITERAL_STRING) {}
 
-Literal::Literal(double val): double_val(val) {}
+Literal::Literal(double val): double_val(val), literal_type(LITERAL_DOUBLE) {}
 
-Literal::Literal(bool val): bool_val(val) {}
+Literal::Literal(bool val): bool_val(val), literal_type(LITERAL_BOOL) {}
 
-Literal::Literal(std::vector<double> vals): array_vals(vals) {}
+Literal::Literal(std::vector<double> vals): array_vals(vals), literal_type(LITERAL_ARRAY) {}
 
 std::pair<std::string, std::string> Literal::to_string() {
     std::string label = "Literal ";
-    if(not array_vals.empty()) {
+    if(literal_type == LITERAL_ARRAY) {
         for(auto v : array_vals) {
             label += std::to_string(v);
             label += ", ";
         }
-    } else if(not string_val.empty()) {
+    } else if(literal_type == LITERAL_STRING) {
         label += string_val;
-    } else if (not (double_val == 0)) {
+    } else if (literal_type == LITERAL_DOUBLE) {
         label += std::to_string(double_val);
     } else {
         label += std::to_string(bool_val);

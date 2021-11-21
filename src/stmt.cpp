@@ -4,12 +4,6 @@ Stmt::~Stmt() {}
 
 size_t Stmt::statement_counter = 0;
 
-std::pair<std::string, std::string> Stmt::to_string() {
-    std::string a = "";
-    std::string b = "";
-    return std::make_pair(a, b);
-}
-
 template <typename T>
 std::pair<std::string, std::string> Stmt::make_string(std::string label, std::vector<T*> children) {
     std::string id = "statement";

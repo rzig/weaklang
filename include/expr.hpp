@@ -67,6 +67,13 @@ private:
     Expr* expr;
 };
 
+enum LiteralType {
+    LITERAL_STRING,
+    LITERAL_DOUBLE,
+    LITERAL_BOOL,
+    LITERAL_ARRAY
+};
+
 class Literal : public Expr {
 public: 
     Literal(std::string val);
@@ -76,10 +83,12 @@ public:
     std::pair<std::string, std::string> to_string();
     ~Literal();
 private:
+    LiteralType literal_type;
     std::string string_val;
     double double_val;
     bool bool_val;
     std::vector<double> array_vals;
+    
 };
 
 class Logical : public Expr {

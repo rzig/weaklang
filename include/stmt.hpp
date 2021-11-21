@@ -9,7 +9,7 @@
 class Stmt {
 public:
     virtual ~Stmt();
-    virtual std::pair<std::string, std::string> to_string();
+    virtual std::pair<std::string, std::string> to_string() = 0;
     static size_t statement_counter;
     template <typename T>
     static std::pair<std::string, std::string> make_string(std::string label, T* child);
