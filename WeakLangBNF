@@ -28,8 +28,7 @@ whileStatement := "w" "(" expression ")" block
 
 expression := assignment
 assignment := IDENTIFIER "=" assignment | operation
-operation := function ( IDENTIFIER function )*
-function := IDENTIFIER "(" arguments? ")" | logicOr
+operation := logicOr ( IDENTIFIER logicOr )*
 logicOr = logicAnd ( "O" logicAnd )*
 logicAnd = equality ( "A" equality )*
 equality := comparison( ("!=" | "==") comparison*
@@ -38,7 +37,8 @@ term := factor ( ( "-" | "+" ) factor )*
 factor := unary ( ( "/" | "*" | "@" | "sa" | "^" ) unary )*
 
 unary := ( "!" | "-" | "s" ) unary | arrAccess
-arrAccess := IDENTIFIER "[" arguments "]" | primary
+arrAccess := IDENTIFIER "[" arguments "]" | function
+function := IDENTIFIER "(" arguments? ")" | primary
 primary := "T" | "F" | "N" | NUMBER | STRING | IDENTIFIER | "(" expression ")" | "[]" | "[" arguments "]"
 
 NUMBER := DIGIT+ ( "." DIGIT+ )?

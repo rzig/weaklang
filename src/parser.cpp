@@ -208,40 +208,14 @@ Expr* Parser::assignment() {
 }
 
 Expr* Parser::operation() {
-    Expr* exp = function();
+    Expr* exp = logicOr();
     while(match(IDENTIFIER)) {
         Token id = tokens.at(cur_index-1);
         if (id.type == EQUALS) throw std::runtime_error(create_error(id, "Can't interpret = as a binary operator"));
-        Expr* right = function();
+        Expr* right = logicOr();
         exp = new Binary(right, id, exp);
     }
     return exp;
-}
-
-Expr* Parser::function() {
-    if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index+1).type == LEFT_PAREN) {
-        Token name = consume(IDENTIFIER, "");
-        Token left_p = consume(LEFT_PAREN, "");
-        std::vector<Expr*> args;
-        while(cur_index < tokens.size() && tokens.at(cur_index).type != RIGHT_PAREN) {
-            if (args.size() == 0) {
-                Expr* arg = expression();
-                args.push_back(arg);
-            }
-            else if (args.size() < MAX_ARGS) {
-                consume(COMMA, "Expected comma in function call");
-                Expr* arg = expression();
-                args.push_back(arg);
-            }
-            else {
-                throw std::runtime_error(create_error(name, "Too many arguments for function (max " + std::to_string(MAX_ARGS) + ")"));
-            }
-        }
-        consume(RIGHT_PAREN, "Expected ')' after function arguments");
-        return new Func(name, left_p, args);
-    } else {
-        return logicOr();
-    }
 }
 
 Expr* Parser::logicOr() {
@@ -338,6 +312,32 @@ Expr* Parser::arrAccess() {
         }
         consume(RIGHT_BRACK, "Expected ']' after indices");
         return new ArrAccess(name, left_b, args);
+    } else {
+        return function();
+    }
+}
+
+Expr* Parser::function() {
+    if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index+1).type == LEFT_PAREN) {
+        Token name = consume(IDENTIFIER, "");
+        Token left_p = consume(LEFT_PAREN, "");
+        std::vector<Expr*> args;
+        while(cur_index < tokens.size() && tokens.at(cur_index).type != RIGHT_PAREN) {
+            if (args.size() == 0) {
+                Expr* arg = expression();
+                args.push_back(arg);
+            }
+            else if (args.size() < MAX_ARGS) {
+                consume(COMMA, "Expected comma in function call");
+                Expr* arg = expression();
+                args.push_back(arg);
+            }
+            else {
+                throw std::runtime_error(create_error(name, "Too many arguments for function (max " + std::to_string(MAX_ARGS) + ")"));
+            }
+        }
+        consume(RIGHT_PAREN, "Expected ')' after function arguments");
+        return new Func(name, left_p, args);
     } else {
         return primary();
     }
