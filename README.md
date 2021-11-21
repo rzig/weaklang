@@ -21,9 +21,13 @@ sudo apt-get install build-essential
 ### Building the Project
 Inside the directory of the project, run from a terminal
 ```
+mkdir bin
+```
+Then, run
+```
 make weak
 ```
-This creates a the WeakLang compiler/parser in a `./bin/` folder. Simply run from a terminal
+This creates a the WeakLang binary in the `./bin/` folder. Simply run from a terminal
 ```
 ./bin/weak [INPUT-FILE]
 ```
