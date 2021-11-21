@@ -87,15 +87,12 @@ Literal::Literal(double val): double_val(val), literal_type(LITERAL_DOUBLE) {}
 
 Literal::Literal(bool val): bool_val(val), literal_type(LITERAL_BOOL) {}
 
-Literal::Literal(std::vector<double> vals): array_vals(vals), literal_type(LITERAL_ARRAY) {}
+Literal::Literal(std::vector<Expr*> vals): array_vals(vals), literal_type(LITERAL_ARRAY) {}
 
 std::pair<std::string, std::string> Literal::to_string() {
     std::string label = "Literal ";
     if(literal_type == LITERAL_ARRAY) {
-        for(auto v : array_vals) {
-            label += std::to_string(v);
-            label += ", ";
-        }
+	return make_string("Literal Array", array_vals);
     } else if(literal_type == LITERAL_STRING) {
         label += string_val;
     } else if (literal_type == LITERAL_DOUBLE) {

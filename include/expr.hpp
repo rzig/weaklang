@@ -79,7 +79,7 @@ public:
     Literal(std::string val);
     Literal(double val);
     Literal(bool val);
-    Literal(std::vector<double> vals);
+    Literal(std::vector<Expr*> vals);
     std::pair<std::string, std::string> to_string();
     ~Literal();
 private:
@@ -87,7 +87,7 @@ private:
     std::string string_val;
     double double_val;
     bool bool_val;
-    std::vector<double> array_vals;
+    std::vector<Expr*> array_vals;
     
 };
 

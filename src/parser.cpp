@@ -356,16 +356,16 @@ Expr* Parser::primary() {
         return exp;
     }
     if(match(LEFT_BRACK)) {
-        std::vector<double> array_vals;
+        std::vector<Expr*> array_vals;
         while(tokens.at(cur_index).type != END && tokens.at(cur_index).type != RIGHT_BRACK) {
             if(array_vals.size() > 0) {
                 consume(COMMA, "Expected ',' between values in array");
             }
-            Token number_token = consume(NUMBER, "Expected numeric value in array");
-            array_vals.push_back(number_token.literal_double);
+	    Expr* expr = expression();
+	    array_vals.push_back(expr);
         }
         consume(RIGHT_BRACK, "Expected ']' after array declaration");
-	    return new Literal(array_vals);
+	return new Literal(array_vals);
     }
     throw std::runtime_error(create_error(tokens.at(cur_index), "Expected primary"));
 }
