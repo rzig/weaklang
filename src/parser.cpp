@@ -203,8 +203,19 @@ Expr* Parser::assignment() {
         Expr* right = assignment();
         return new Assign(id, right);
     } else {
-        return function();
+        return operation();
     }
+}
+
+Expr* Parser::operation() {
+    Expr* exp = function();
+    while(match(IDENTIFIER)) {
+        Token id = tokens.at(cur_index-1);
+        if (id.type == EQUALS) throw std::runtime_error(create_error(id, "Can't interpret = as a binary operator"));
+        Expr* right = function();
+        exp = new Binary(right, id, exp);
+    }
+    return exp;
 }
 
 Expr* Parser::function() {
@@ -229,19 +240,8 @@ Expr* Parser::function() {
         consume(RIGHT_PAREN, "Expected ')' after function arguments");
         return new Func(name, left_p, args);
     } else {
-        return operation();
+        return logicOr();
     }
-}
-
-Expr* Parser::operation() {
-    Expr* exp = logicOr();
-    while(match(IDENTIFIER)) {
-        Token id = tokens.at(cur_index-1);
-        if (id.type == EQUALS) throw std::runtime_error(create_error(id, "Can't interpret = as a binary operator"));
-        Expr* right = logicOr();
-        exp = new Binary(right, id, exp);
-    }
-    return exp;
 }
 
 Expr* Parser::logicOr() {
