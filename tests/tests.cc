@@ -280,12 +280,65 @@ TEST_CASE("Complex input", "[lexer]") {
 
 #define REQUIRE_ABILITY(x) if(x) {REQUIRE(true);} else {REQUIRE(false);}
 #define TO_MAKE(type, variable) CAN_MAKE(type, variable)
+#define required_if(condition) REQUIRE_ABILITY(condition); if(condition)
+
+using Svec = std::vector<Stmt*>;
+
+Svec getStatements(std::string program) {
+    Lexer lex;
+    Parser p {lex.lex(program)};
+    return p.parse();
+}
 
 TEST_CASE("Assignment", "[parser]"){
-    std::string program = "a x = 5;";
-    Lexer lex; 
-    std::vector<Token> tokens = lex.lex(program); 
-    Parser p{tokens}; 
-    std::vector<Stmt*> statements = p.parse();
-    REQUIRE_ABILITY(TO_MAKE(VarDecl*, dec)_FROM(statements[0]));
+    SECTION("to literal") {
+        Svec statements = getStatements("a x = 5;");
+        required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
+            REQUIRE(v->name.lexeme == "x");
+            required_if(CAN_MAKE(Literal*, l)_FROM(v->expr)) {
+                REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
+                REQUIRE(l->double_val == 5);
+            }
+        }
+    }
+
+    SECTION("to function") {
+        Svec statements = getStatements("a var = func(b, c);");
+        required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
+            REQUIRE(v->name.lexeme == "var");
+            required_if(CAN_MAKE(Func*, f)_FROM(v->expr)) {
+                REQUIRE(f->func.lexeme == "func");
+                REQUIRE(f->args.size() == 2);
+                required_if(CAN_MAKE(Var*, v1)_FROM(f->args[0])) {
+                    REQUIRE(v1->name.lexeme == "b");
+                }
+                required_if(CAN_MAKE(Var*, v2)_FROM(f->args[1])) {
+                    REQUIRE(v2->name.lexeme == "c");
+                }
+            }
+        }
+    }
+
+    SECTION ("to array") {
+        Svec statements = getStatements("a array = [1,2,3];");
+        required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
+            REQUIRE(v->name.lexeme == "array");
+            required_if(CAN_MAKE(Literal*, l)_FROM(v->expr)) {
+                REQUIRE(l->literal_type == LiteralType::LITERAL_ARRAY);
+                REQUIRE(l->array_vals.size() == 3);
+                required_if(CAN_MAKE(Literal*, v1)_FROM(l->array_vals[0])) {
+                    REQUIRE(v1->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(v1->double_val == 1);
+                }
+                required_if(CAN_MAKE(Literal*, v2)_FROM(l->array_vals[1])) {
+                    REQUIRE(v2->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(v2->double_val == 2);
+                }
+                required_if(CAN_MAKE(Literal*, v3)_FROM(l->array_vals[2])) {
+                    REQUIRE(v3->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(v3->double_val == 3);
+                }
+            }
+        }
+    }
 }
