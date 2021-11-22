@@ -24,7 +24,6 @@ public:
     ExprStmt(Expr* expr);
     ~ExprStmt();
     std::pair<std::string, std::string> to_string();
-private:
     Expr* expr;
 };
 
@@ -33,7 +32,6 @@ public:
     FuncDecl(Token name, std::vector<Token> params, std::vector<Stmt*> stmts);
     ~FuncDecl();
     std::pair<std::string, std::string> to_string();
-private:
     Token name;
     std::vector<Token> params;
     std::vector<Stmt*> stmts;
@@ -44,7 +42,6 @@ public:
     If(Expr* cond, std::vector<Stmt*> stmts);
     ~If();
     std::pair<std::string, std::string> to_string();
-private:
     Expr* cond;
     std::vector<Stmt*> stmts;
 };
@@ -54,7 +51,6 @@ public:
     OpDecl(Token name, Token left, Token right, std::vector<Stmt*> stmts);
     ~OpDecl();
     std::pair<std::string, std::string> to_string();
-private:
     Token name;
     Token left;
     Token right;
@@ -66,7 +62,6 @@ public:
     Print(Token print_keyword, Expr* expr);
     ~Print();
     std::pair<std::string, std::string> to_string();
-private:
     Token print_keyword;
     Expr* expr;
 };
@@ -76,7 +71,6 @@ public:
     Return(Token return_keyword, Expr* expr);
     ~Return();
     std::pair<std::string, std::string> to_string();
-private:
     Token return_keyword;
     Expr* expr;
 };
@@ -86,7 +80,6 @@ public:
     VarDecl(Token name, Expr* expr);
     ~VarDecl();
     std::pair<std::string, std::string> to_string();
-private:
     Token name;
     Expr* expr;
 };
@@ -96,7 +89,6 @@ public:
     While(Expr* cond, std::vector<Stmt*> stmts);
     ~While();
     std::pair<std::string, std::string> to_string();
-private:
     Expr* cond;
     std::vector<Stmt*> stmts;
 };

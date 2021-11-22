@@ -20,7 +20,6 @@ public:
     ArrAccess(Token id, Token brack, std::vector<Expr*> idx);
     std::pair<std::string, std::string> to_string();
     ~ArrAccess();
-private:
     Token id;
     Token brack;
     std::vector<Expr*> idx;
@@ -31,7 +30,6 @@ public:
     Assign(Token name, Expr* value);
     std::pair<std::string, std::string> to_string();
     ~Assign();
-private:
     Token name; 
     Expr* value;
 };
@@ -41,7 +39,6 @@ public:
     Binary(Expr* left, Token op, Expr* right);
     std::pair<std::string, std::string> to_string();
     ~Binary();
-private:
     Expr* left;
     Token op; 
     Expr* right;
@@ -52,7 +49,6 @@ public:
     Func(Token func, Token paren, std::vector<Expr*> args);
     std::pair<std::string, std::string> to_string();
     ~Func();
-private:
     Token func;
     Token paren;
     std::vector<Expr*> args;
@@ -63,7 +59,6 @@ public:
     Group(Expr* expr);
     std::pair<std::string, std::string> to_string();
     ~Group();
-private:
     Expr* expr;
 };
 
@@ -82,7 +77,6 @@ public:
     Literal(std::vector<Expr*> vals);
     std::pair<std::string, std::string> to_string();
     ~Literal();
-private:
     LiteralType literal_type;
     std::string string_val;
     double double_val;
@@ -96,7 +90,6 @@ public:
     Logical(Expr* left, Token op, Expr* right);
     std::pair<std::string, std::string> to_string();
     ~Logical();
-private:
     Expr* left;
     Token op;
     Expr* right;
@@ -107,7 +100,6 @@ public:
     Op(Token op, Token paren, std::vector<Expr*> args);
     std::pair<std::string, std::string> to_string();
     ~Op();
-private:
     Token op;
     Token paren;
     std::vector<Expr*> args;
@@ -118,7 +110,6 @@ public:
     Unary(Token op, Expr* right);
     std::pair<std::string, std::string> to_string();
     ~Unary();
-private:
     Token op;
     Expr* right;
 };
@@ -128,7 +119,6 @@ public:
     Var(Token name);
     std::pair<std::string, std::string> to_string();
     ~Var();
-private:
     Token name;
 };
 
