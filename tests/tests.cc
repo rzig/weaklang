@@ -279,7 +279,7 @@ TEST_CASE("Complex input", "[lexer]") {
 }
 
 #define REQUIRE_ABILITY(x) if(x) {REQUIRE(true);} else {REQUIRE(false);}
-#define ToMake(type, variable) CanMake(type, variable)
+#define TO_MAKE(type, variable) CAN_MAKE(type, variable)
 
 TEST_CASE("Assignment", "[parser]"){
     std::string program = "a x = 5;";
@@ -287,5 +287,5 @@ TEST_CASE("Assignment", "[parser]"){
     std::vector<Token> tokens = lex.lex(program); 
     Parser p{tokens}; 
     std::vector<Stmt*> statements = p.parse();
-    REQUIRE_ABILITY(ToMake(VarDecl*, dec)_From(statements[0]));
+    REQUIRE_ABILITY(TO_MAKE(VarDecl*, dec)_FROM(statements[0]));
 }

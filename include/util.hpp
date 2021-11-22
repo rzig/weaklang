@@ -4,7 +4,7 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
-#define CanMake(type, variable) type variable = dynamic_cast<type>
-#define _From(other) (other)
+#define CAN_MAKE(type, variable) type variable = dynamic_cast<type>
+#define _FROM(other) (other)
 
 #endif
