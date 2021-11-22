@@ -9,6 +9,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "util.hpp"
 #include<iostream>
 #include<fstream>
 #include<sstream>
@@ -277,10 +278,14 @@ TEST_CASE("Complex input", "[lexer]") {
     REQUIRE(tokens[150].line == 28);
 }
 
+#define REQUIRE_ABILITY(x) if(x) {REQUIRE(true);} else {REQUIRE(false);}
+#define ToMake(type, variable) CanMake(type, variable)
+
 TEST_CASE("Assignment", "[parser]"){
     std::string program = "a x = 5;";
     Lexer lex; 
     std::vector<Token> tokens = lex.lex(program); 
     Parser p{tokens}; 
-    std::vector<Stmt*> statements = p.parse(); 
+    std::vector<Stmt*> statements = p.parse();
+    REQUIRE_ABILITY(ToMake(VarDecl*, dec)_From(statements[0]));
 }
