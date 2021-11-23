@@ -17,8 +17,8 @@ int main(int argc, char* argv[]) {
       Lexer lexer;
       std::vector<Token> tokens = lexer.lex(read);
       Parser p(tokens);
-      p.parse();
-      std::cout << p.as_dot() << std::endl;
+      std::vector<Stmt*> program = p.parse();
+      //std::cout << p.as_dot() << std::endl;
     } else {
       std::cout << "Couldn't open file " << argv[i] << ". Quitting."
                 << std::endl;
