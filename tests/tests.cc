@@ -342,3 +342,143 @@ TEST_CASE("Assignment", "[parser]"){
         }
     }
 }
+
+TEST_CASE("Operation", "[parser]") {
+    SECTION("with single or") {
+        Svec statements = getStatements("var O T;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
+                REQUIRE(b->op.type == OR);
+                required_if(CAN_MAKE(Var*, v)_FROM(b->left)) {
+                    REQUIRE(v->name.lexeme == "var");
+                }
+                required_if(CAN_MAKE(Literal*, l)_FROM(b->right)) {
+                    REQUIRE(l->literal_type == LiteralType::LITERAL_BOOL);
+                    REQUIRE(l->bool_val == true);
+                }
+            }
+        }
+    }
+
+    SECTION("with single and") {
+        Svec statements = getStatements("func() A arr[1];");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
+                REQUIRE(b->op.type == AND);
+                required_if(CAN_MAKE(Func*, f)_FROM(b->left)) {
+                    REQUIRE(f->func.lexeme == "func");
+                    REQUIRE(f->args.size() == 0);
+                }
+                required_if(CAN_MAKE(ArrAccess*, a)_FROM(b->right)) {
+                    REQUIRE(a->id.lexeme == "arr");
+                    REQUIRE(a->idx.size() == 1);
+                    required_if(CAN_MAKE(Literal*, l)_FROM(a->idx[0])) {
+                        REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
+                        REQUIRE(l->double_val == 1);
+                    }
+                }
+            }
+        }
+    }
+
+    SECTION("with multiple and/or") {
+        // The purpose of this test is solely to test order of
+        // operations and *not* literal parsing, so we do not check
+        // that the literal values are correct, only that they exist
+        Svec statements = getStatements("T O F A T;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, parent)_FROM(e->expr)) {
+                REQUIRE_ABILITY(TO_MAKE(Literal*, l)_FROM(parent->left));
+                REQUIRE(parent->op.type == OR);
+                required_if(CAN_MAKE(Binary*, child)_FROM(parent->right)) {
+                    REQUIRE(child->op.type == AND);
+                    REQUIRE_ABILITY(TO_MAKE(Literal*, cl1)_FROM(child->left));
+                    REQUIRE_ABILITY(TO_MAKE(Literal*, cl2)_FROM(child->right));
+                }
+            }
+        }
+    }
+}
+
+TEST_CASE("Equality", "[parser]") {
+    SECTION("with two literals and ==") {
+        Svec statements = getStatements("T == 1;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
+                required_if(CAN_MAKE(Literal*, l)_FROM(b->left)) {
+                    REQUIRE(l->literal_type == LiteralType::LITERAL_BOOL);
+                    REQUIRE(l->bool_val == true);
+                }
+                required_if(CAN_MAKE(Literal*, r)_FROM(b->right)) {
+                    REQUIRE(r->literal_type == LITERAL_DOUBLE);
+                    REQUIRE(r->double_val == 1);
+                }
+                REQUIRE(b->op.type == EQUALS_EQUALS);
+            }
+        }
+    }
+
+    // SECTION("with function and variable and ==") {
+
+    // }
+
+    // SECTION("with literal and variable and !=") {
+
+    // }
+}
+
+// TEST_CASE("Comparison", "[parser]") {
+//     SECTION("literal > literal") {
+
+//     }
+
+//     SECTION("variable >= function") {
+
+//     }
+
+//     SECTION("function <= literal") {
+
+//     }
+
+//     SECTION("arrAccess < unary") {
+
+//     }
+// }
+
+// TEST_CASE("Terms and factors", "[parser]") {
+//     SECTION("multiple addition and subtraction") {
+
+//     }
+
+//     SECTION("addition and multiplication") {
+
+//     }
+
+//     SECTION("all operators") {
+
+//     }
+// }
+
+// TEST_CASE("Unary operations", "[parser]") {
+//     SECTION("!") {
+
+//     }
+
+//     SECTION("-") {
+
+//     }
+
+//     SECTION("s") {
+
+//     }
+// }
+
+// TEST_CASE("Array access", "[parser]") {
+//     SECTION("1D") {
+
+//     }
+
+//     SECTION("2D") {
+
+//     }
+// }
