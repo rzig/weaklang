@@ -3,6 +3,7 @@
 
 #include <variant>
 #include <vector>
+#include <string>
 
 class Variable {
 public:
