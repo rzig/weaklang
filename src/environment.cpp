@@ -65,14 +65,50 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	    Environment env;
 	    env.func_symbol_table = func_symbol_table;
 	    env.op_symbol_table = op_symbol_table;
-	    env.add_var(opDecl->left.lexeme, evaluate_expr(binary->left));
-	    env.add_var(opDecl->right.lexeme, evaluate_expr(binary->right));
+	    env.add_var(opDecl->left.lexeme, left_var);
+	    env.add_var(opDecl->right.lexeme, right_var);
 	    for (Stmt* stmt : opDecl->stmts) {
 		env.execute_stmt(stmt);
 	    }
 	    return env.get_return_val();
 	}
+	case OR: {
+	    runtime_assert(left_var.is_bool(), binary->op, "Left expression evaluates to non-boolean value");
+	    runtime_assert(right_var.is_bool(), binary->op, "Right expression evaluates to non-boolean value");
+	    return std::get<bool>(left_var) || std::get<bool>(right_var);
 	}
+	case AND: {
+	    runtime_assert(left_var.is_bool(), binary->op, "Left expression evaluates to non-boolean value");
+	    runtime_assert(right_var.is_bool(), binary->op, "Right expression evaluates to non-boolean value");
+	    return std::get<bool>(left_var) && std::get<bool>(right_var);
+	}
+	case EQUALS_EQUALS: {
+	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
+	    return left_var == right_var;
+	}
+	case EXCLA_EQUALS: {
+	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
+	    return left_var != right_var;
+	}
+	case GREATER_EQUALS: {
+	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
+	    return left_var >= right_var;
+	}
+	case GREATER: {
+	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
+	    return left_var > right_var;
+	}
+	case LESSER_EQUALS: {
+	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
+	    return left_var <= right_var;
+	}
+	case LESSER: {
+	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
+	    return left_var < right_var;
+	}
+    }
+    if (CAN_MAKE(Func*, func)_FROM(expr)) {
+	
     }
 }
 
