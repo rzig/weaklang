@@ -95,16 +95,6 @@ public:
     Expr* right;
 };
 
-class Op : public Expr {
-public:
-    Op(Token op, Token paren, std::vector<Expr*> args);
-    std::pair<std::string, std::string> to_string();
-    ~Op();
-    Token op;
-    Token paren;
-    std::vector<Expr*> args;
-};
-
 class Unary : public Expr {
 public:
     Unary(Token op, Expr* right);

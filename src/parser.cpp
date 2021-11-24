@@ -211,7 +211,7 @@ Expr* Parser::operation() {
     Expr* exp = logicOr();
     while(match(IDENTIFIER)) {
         Token id = tokens.at(cur_index-1);
-        if (id.type == EQUALS) throw std::runtime_error(create_error(id, "Can't interpret = as a binary operator"));
+        if (id.type == EQUALS) throw std::runtime_error(create_error(id, "Can't parse = as a binary operator"));
         Expr* right = logicOr();
         exp = new Binary(right, id, exp);
     }

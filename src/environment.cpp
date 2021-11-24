@@ -2,12 +2,12 @@
 
 Environment::Environment(): return_val(), hit_return(false) {}
 
-void Environment::add_func(std::string name, Stmt* func) {
-    func_symbol_table.insert(std::pair<std::string, Stmt*>(name, func));
+void Environment::add_func(std::string name, FuncDecl* func) {
+    func_symbol_table.insert(std::pair<std::string, FuncDecl*>(name, func));
 }
 
-void Environment::add_op(std::string name, Stmt* op) {
-    op_symbol_table.insert(std::pair<std::string, Stmt*>(name, op));
+void Environment::add_op(std::string name, OpDecl* op) {
+    op_symbol_table.insert(std::pair<std::string, OpDecl*>(name, op));
 }
 
 void Environment::add_var(std::string name, Variable var) {
@@ -48,6 +48,31 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	    flat_index = indices[i] + flat_index * arr.second[i - 1];
 	}
 	return Variable(arr.first.at(flat_index));
+    }
+    if (CAN_MAKE(Assign*, assign)_FROM(expr)) {
+	runtime_assert(VAR_EXISTS(assign->name.lexeme), assign->name, "Identifier doesn't correspond to a declared variable name");
+	Variable var = evaluate_expr(assign->value);
+	var_symbol_table.at(assign->name.lexeme) = var;
+	return var;
+    }
+    if (CAN_MAKE(Binary*, binary)_FROM(expr)) {
+	Variable left_var = evaluate_expr(binary->left);
+	Variable right_var = evaluate_expr(binary->right);
+	switch (binary->op.type) {
+	case IDENTIFIER: {
+	    runtime_assert(OP_EXISTS(binary->op.lexeme), binary->op, "Identifier doesn't correspond to a defined operator name");
+	    OpDecl* opDecl = op_symbol_table.at(binary->op.lexeme);
+	    Environment env;
+	    env.func_symbol_table = func_symbol_table;
+	    env.op_symbol_table = op_symbol_table;
+	    env.add_var(opDecl->left.lexeme, evaluate_expr(binary->left));
+	    env.add_var(opDecl->right.lexeme, evaluate_expr(binary->right));
+	    for (Stmt* stmt : opDecl->stmts) {
+		env.execute_stmt(stmt);
+	    }
+	    return env.get_return_val();
+	}
+	}
     }
 }
 

@@ -115,12 +115,6 @@ std::pair<std::string, std::string> Nil::to_string() {
     return make_string("NIL", {});
 }
 
-Op::Op(Token op, Token paren, std::vector<Expr*> args): op(op), paren(paren), args(args) {}
-
-std::pair<std::string, std::string> Op::to_string() {
-    return make_string("Operation " + op.lexeme, args);
-}
-
 Unary::Unary(Token op, Expr* right): op(op), right(right) {}
 
 std::pair<std::string, std::string> Unary::to_string() {
@@ -166,12 +160,6 @@ Logical::~Logical() {
 }
 
 Nil::~Nil() {}
-
-Op::~Op() {
-    for (auto ptr : args) {
-        delete ptr;
-    }
-}
 
 Unary::~Unary() {
     delete right;
