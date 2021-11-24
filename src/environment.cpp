@@ -33,6 +33,21 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	runtime_assert(var.is_ndarray(), arrAccess->id, "Identifier in array access isn't an ndarray");
 	auto arr = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(var.value);
 	runtime_assert(arr.second.size() == arrAccess->idx.size(), arrAccess->brack, "Number of dimensions in array element access differs from number of dimensions in array");
+	std::vector<size_t> indices;
+	for (size_t i = 0; i < arrAccess->idx.size(); i++) {
+	    Expr* index = arrAccess->idx.at(i);
+	    Variable index_val = evaluate_expr(index);
+	    runtime_assert(index_val.is_double(), arrAccess->brack, "An expression used in array indexing is not a number");
+	    size_t casted = (size_t) std::get<double>(index_val.value);
+	    runtime_assert((double) casted == std::get<double>(index_val.value), arrAccess->brack, "An expression used in array indexing is not close to an integer");
+	    runtime_assert(casted < arr.second.at(i), arrAccess->brack, "An expression used in array indexing is larger than a dimension of the ndarray");
+	    indices.push_back(casted);
+	}
+	size_t flat_index = indices[0];
+	for (size_t i = 1; i < indices.size(); i++) {
+	    flat_index = indices[i] + flat_index * arr.second[i - 1];
+	}
+	return Variable(arr.first.at(flat_index));
     }
 }
 
