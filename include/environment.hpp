@@ -2,10 +2,17 @@
 #define ENVIRONMENT_H_
 
 #include <unordered_map>
+#include <stdexcept>
 #include <string>
 
 #include "variable.hpp"
 #include "parser.hpp"
+#include "error.hpp"
+#include "util.hpp"
+
+#define FUNC_EXISTS(func) (func_symbol_table.find(func) != func_symbol_table.end())
+#define OP_EXISTS(op) (op_symbol_table.find(op) != op_symbol_table.end())
+#define VAR_EXISTS(var) (var_symbol_table.find(var) != var_symbol_table.end())
 
 class Environment {
 public:
@@ -24,6 +31,8 @@ private:
     bool hit_return;
     Variable return_val;
     Variable evaluate_expr(Expr* expr);
+    void runtime_assert(bool cond, Token loc, std::string error_msg);
+    std::string create_error(std::string error_msg, Token loc);
 };
 
 #endif // ENVIRONMENT_H_

@@ -18,7 +18,6 @@ public:
     bool is_double();
     bool is_ndarray();
     bool is_nil();
-private:
     std::variant<std::string, bool, double, std::pair<std::vector<double>, std::vector<size_t>>, void*> value;
 };
 
