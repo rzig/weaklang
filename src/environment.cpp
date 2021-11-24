@@ -110,6 +110,18 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	case PLUS: ELEMENTWISE_OP(+)
 	case SLASH: ELEMENTWISE_OP(/)
 	case STAR: ELEMENTWISE_OP(*)
+	case AS_SHAPE: {
+	    runtime_assert(left_var.is_ndarray(), binary->op, "Left expression isn't an ndarray");
+	    runtime_assert(right_var.is_ndarray(), binary->op, "Right expression isn't an ndarray");
+	    auto new_size_double = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(right_var.value).first; 
+	    std::vector<size_t> new_size;
+	    for (size_t i = 0; i < new_size_double.size(); i++) {
+		size_t casted = (size_t) new_size_double.at(i);
+		runtime_assert((double) casted == new_size_double.at(i), binary->op, "An expression used in array size is not close to an integer");
+		new_size.push_back(casted);
+	    }
+	    return Variable(std::pair<std::vector<double>, std::vector<size_t>>(std::get<std::pair<std::vector<double>, std::vector<size_t>>>(left_var.value).first, new_size));
+	}
 	case EXP: {
 	    if (left_var.is_double() && right_var.is_double()) { 
 		return Variable(pow(std::get<double>(left_var.value), std::get<double>(right_var.value))); 
@@ -138,6 +150,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
 		} 
 		return Variable(std::pair<std::vector<double>, std::vector<size_t>>(zipped, left_var_pair.second)); 
 	    } 
+	    runtime_assert(false, binary->op, "At least one of left and right expressions are neither numbers nor ndarrays");
 	}
 	}
     }

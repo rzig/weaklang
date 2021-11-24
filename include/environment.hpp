@@ -43,6 +43,7 @@
 	} \
 	return Variable(std::pair<std::vector<double>, std::vector<size_t>>(zipped, left_var_pair.second)); \
     } \
+    runtime_assert(false, binary->op, "At least one of left and right expressions are neither numbers nor ndarrays"); \
 }
 
 class Environment {
