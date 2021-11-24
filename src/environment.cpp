@@ -152,6 +152,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	    } 
 	    runtime_assert(false, binary->op, "At least one of left and right expressions are neither numbers nor ndarrays");
 	}
+	default: runtime_assert(false, binary->op, "Invalid binary operator");
 	}
     }
     if (CAN_MAKE(Func*, func)_FROM(expr)) {
