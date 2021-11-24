@@ -75,36 +75,66 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	case OR: {
 	    runtime_assert(left_var.is_bool(), binary->op, "Left expression evaluates to non-boolean value");
 	    runtime_assert(right_var.is_bool(), binary->op, "Right expression evaluates to non-boolean value");
-	    return std::get<bool>(left_var) || std::get<bool>(right_var);
+	    return Variable(std::get<bool>(left_var.value) || std::get<bool>(right_var.value));
 	}
 	case AND: {
 	    runtime_assert(left_var.is_bool(), binary->op, "Left expression evaluates to non-boolean value");
 	    runtime_assert(right_var.is_bool(), binary->op, "Right expression evaluates to non-boolean value");
-	    return std::get<bool>(left_var) && std::get<bool>(right_var);
+	    return Variable(std::get<bool>(left_var.value) && std::get<bool>(right_var.value));
 	}
 	case EQUALS_EQUALS: {
-	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
-	    return left_var == right_var;
+	    runtime_assert(left_var.value.index() == right_var.value.index(), binary->op, "Left and right expressions differ in type");
+	    return left_var.value == right_var.value;
 	}
 	case EXCLA_EQUALS: {
-	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
-	    return left_var != right_var;
+	    runtime_assert(left_var.value.index() == right_var.value.index(), binary->op, "Left and right expressions differ in type");
+	    return left_var.value != right_var.value;
 	}
 	case GREATER_EQUALS: {
-	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
-	    return left_var >= right_var;
+	    runtime_assert(left_var.value.index() == right_var.value.index(), binary->op, "Left and right expressions differ in type");
+	    return left_var.value >= right_var.value;
 	}
 	case GREATER: {
-	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
-	    return left_var > right_var;
+	    runtime_assert(left_var.value.index() == right_var.value.index(), binary->op, "Left and right expressions differ in type");
+	    return left_var.value > right_var.value;
 	}
 	case LESSER_EQUALS: {
-	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
-	    return left_var <= right_var;
+	    runtime_assert(left_var.value.index() == right_var.value.index(), binary->op, "Left and right expressions differ in type");
+	    return left_var.value <= right_var.value;
 	}
 	case LESSER: {
-	    runtime_assert(left_var.index() == right_var.index(), binary->op, "Left and right expressions differ in type")
-	    return left_var < right_var;
+	    runtime_assert(left_var.value.index() == right_var.value.index(), binary->op, "Left and right expressions differ in type");
+	    return left_var.value < right_var.value;
+	}
+	case MINUS: {
+	    if (left_var.is_double() && right_var.is_double()) {
+		return Variable(std::get<double>(left_var.value) - std::get<double>(right_var.value));
+	    }
+	    if (left_var.is_double() && right_var.is_ndarray()) {
+		auto right_arr = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(right_var.value).first;
+		for (size_t i = 0; i < right_arr.size(); i++) {
+		    right_arr.at(i) = std::get<double>(left_var.value) - right_arr.at(i);
+		}
+		return Variable(std::pair<std::vector<double>, std::vector<size_t>>(right_arr, std::get<std::pair<std::vector<double>, std::vector<size_t>>>(right_var.value).second));
+	    }
+	    if (left_var.is_ndarray() && right_var.is_double()) {
+		auto left_arr = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(left_var.value).first;
+		for (size_t i = 0; i < left_arr.size(); i++) {
+		    left_arr.at(i) = left_arr.at(i) - std::get<double>(right_var.value);
+		}
+		return Variable(std::pair<std::vector<double>, std::vector<size_t>>(left_arr, std::get<std::pair<std::vector<double>, std::vector<size_t>>>(left_var.value).second));
+	    }
+	    if (left_var.is_ndarray() && right_var.is_ndarray()) {
+		auto left_var_pair = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(left_var.value);
+		auto right_var_pair = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(right_var.value);
+		runtime_assert(left_var_pair.second == right_var_pair.second, binary->op, "Expressions evaluate to arrays of differing sizes");
+		std::vector<double> zipped;
+		for (size_t i = 0; i < left_var_pair.first.size(); i++) {
+		    zipped.push_back(left_var_pair.first.at(i) - right_var_pair.first.at(i));
+		}
+		return Variable(std::pair<std::vector<double>, std::vector<size_t>>(zipped, left_var_pair.second));
+	    }
+	}
 	}
     }
     if (CAN_MAKE(Func*, func)_FROM(expr)) {
