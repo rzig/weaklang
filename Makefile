@@ -1,11 +1,12 @@
 CXX=clang++
 CXXFLAGS=-std=c++20 -g -fstandalone-debug -Iinclude/
+LFLAGS=-lcblas
 
 weak: bin/weak
 tests: bin/tests
 
 bin/weak: bin/main.o bin/lexer.o bin/error.o bin/stmt.o bin/token.o bin/expr.o bin/parser.o bin/environment.o bin/variable.o
-	$(CXX) $(CXXFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LFLAGS)
 bin/main.o: src/main.cpp include/lexer.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 bin/lexer.o: src/lexer.cpp include/lexer.hpp include/token.hpp include/error.hpp

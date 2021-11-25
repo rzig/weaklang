@@ -110,6 +110,22 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	case PLUS: ELEMENTWISE_OP(+)
 	case SLASH: ELEMENTWISE_OP(/)
 	case STAR: ELEMENTWISE_OP(*)
+	case AT: {
+	    runtime_assert(left_var.is_ndarray(), binary->op, "Left expression isn't an ndarray");
+	    runtime_assert(right_var.is_ndarray(), binary->op, "Right expression isn't an ndarray");
+	    auto extract_left = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(left_var.value); 
+	    auto extract_right = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(right_var.value); 
+	    runtime_assert(extract_left.second.size() == 2, binary->op, "Left expression isn't a 2d ndarray");
+	    runtime_assert(extract_right.second.size() == 2, binary->op, "Left expression isn't a 2d ndarray");
+	    runtime_assert(extract_left.second.at(1) == extract_right.second.at(0), binary->op, "Left array's num of cols differs from right array's num of rows");
+	    size_t r = extract_left.second.at(0);
+	    size_t m = extract_left.second.at(1);
+	    size_t c = extract_right.second.at(1);
+	    std::vector<double> result;
+	    result.reserve(r * c);
+	    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, r, c, m, 1., extract_left.first.data(), m, extract_right.first.data(), c, 0., result.data(), c);
+	    return Variable(std::pair<std::vector<double>, std::vector<size_t>>(result, {r, c}));
+	}
 	case AS_SHAPE: {
 	    runtime_assert(left_var.is_ndarray(), binary->op, "Left expression isn't an ndarray");
 	    runtime_assert(right_var.is_ndarray(), binary->op, "Right expression isn't an ndarray");
