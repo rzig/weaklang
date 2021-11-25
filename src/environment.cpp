@@ -170,7 +170,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	}
 	return env.get_return_val();
     }
-    if (CAN_MAKE(Literal*, literal)_FROM(literal)) {
+    if (CAN_MAKE(Literal*, literal)_FROM(expr)) {
 	switch (literal->literal_type) {
 	case LITERAL_STRING: return Variable(literal->string_val);
 	case LITERAL_DOUBLE: return Variable(literal->double_val);
@@ -185,6 +185,34 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	    return Variable(std::pair<std::vector<double>, std::vector<size_t>>(nums, {nums.size()}));
 	}
 	}
+    }
+    if (CAN_MAKE(Unary*, unary)_FROM(expr)) {
+	Variable val = evaluate_expr(unary->right);
+	switch(unary->op.type) {
+	case EXCLA: {
+	    runtime_assert(val.is_bool(), unary->op, "Expression evaluates to a non-bool");
+	    return Variable(!std::get<bool>(val.value));
+	}
+	case MINUS: {
+	    runtime_assert(val.is_double(), unary->op, "Expression evaluates to a non-number");
+	    return Variable(-std::get<double>(val.value));
+	}
+	case SHAPE: {
+	    runtime_assert(val.is_ndarray(), unary->op, "Expression evaluates to a non-ndarray");
+	    std::vector<double> casted_shape;
+	    for (size_t d : std::get<std::pair<std::vector<double>, std::vector<size_t>>>(val.value).second) {
+		casted_shape.push_back((double) d);
+	    }
+	    return Variable(std::pair<std::vector<double>, std::vector<size_t>>(casted_shape, {casted_shape.size()}));
+	}
+	default: runtime_assert(false, binary->op, "Invalid unary operator");
+	}
+    }
+    if (CAN_MAKE(Var*, var)_FROM(expr)) {
+	
+    }
+    if (CAN_MAKE(Nil*, nil)_FROM(expr)) {
+	return Variable();
     }
 }
 

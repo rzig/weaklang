@@ -78,16 +78,6 @@ public:
     
 };
 
-class Logical : public Expr {
-public:
-    Logical(Expr* left, Token op, Expr* right);
-    std::pair<std::string, std::string> to_string();
-    ~Logical();
-    Expr* left;
-    Token op;
-    Expr* right;
-};
-
 class Unary : public Expr {
 public:
     Unary(Token op, Expr* right);

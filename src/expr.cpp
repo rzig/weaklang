@@ -97,12 +97,6 @@ std::pair<std::string, std::string> Literal::to_string() {
     return make_string(label, {});
 }
 
-Logical::Logical(Expr* left, Token op, Expr* right): left(left), op(op), right(right) {}
-
-std::pair<std::string, std::string> Logical::to_string() {
-    return make_string("Logical operator " + op.lexeme, {left, right});
-}
-
 Nil::Nil() {}
 
 std::pair<std::string, std::string> Nil::to_string() {
@@ -143,11 +137,6 @@ Func::~Func() {
 }
 
 Literal::~Literal() {}
-
-Logical::~Logical() {
-    delete left;
-    delete right;
-}
 
 Nil::~Nil() {}
 
