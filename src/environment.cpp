@@ -156,7 +156,19 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	}
     }
     if (CAN_MAKE(Func*, func)_FROM(expr)) {
-	
+	runtime_assert(FUNC_EXISTS(func->func.lexeme), func->func, "Identifier doesn't correspond to a defined function name");
+	FuncDecl* funcDecl = func_symbol_table.at(func->func.lexeme);
+	Environment env;
+	env.func_symbol_table = func_symbol_table;
+	env.op_symbol_table = op_symbol_table;
+	runtime_assert(func->args.size() == funcDecl->params.size(), func->paren, "Function called with different number of args than defined with");
+	for (size_t i = 0; i < func->args.size(); i++) {
+	    env.add_var(funcDecl->params.at(i).lexeme, evaluate_expr(func->args.at(i)));
+	}
+	for (Stmt* stmt: funcDecl->stmts) {
+	    env.execute_stmt(stmt);
+	}
+	return env.get_return_val();
     }
 }
 
