@@ -205,11 +205,12 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	    }
 	    return Variable(std::pair<std::vector<double>, std::vector<size_t>>(casted_shape, {casted_shape.size()}));
 	}
-	default: runtime_assert(false, binary->op, "Invalid unary operator");
+	default: runtime_assert(false, unary->op, "Invalid unary operator");
 	}
     }
     if (CAN_MAKE(Var*, var)_FROM(expr)) {
-	
+	runtime_assert(VAR_EXISTS(var->name.lexeme), var->name, "Identifier doesn't correspond to a declared variable name");
+	return var_symbol_table.at(var->name.lexeme);
     }
     if (CAN_MAKE(Nil*, nil)_FROM(expr)) {
 	return Variable();
