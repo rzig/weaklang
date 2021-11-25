@@ -75,19 +75,13 @@ std::pair<std::string, std::string> Func::to_string() {
     return make_string("Function call to " + func.lexeme, args);
 }
 
-Group::Group(Expr* expr): expr(expr) {}
+Literal::Literal(Token token, std::string val): token(token), string_val(val), literal_type(LITERAL_STRING) {}
 
-std::pair<std::string, std::string> Group::to_string() {
-    return make_string("Group", expr);
-}
+Literal::Literal(Token token, double val): token(token), double_val(val), literal_type(LITERAL_DOUBLE) {}
 
-Literal::Literal(std::string val): string_val(val), literal_type(LITERAL_STRING) {}
+Literal::Literal(Token token, bool val): token(token), bool_val(val), literal_type(LITERAL_BOOL) {}
 
-Literal::Literal(double val): double_val(val), literal_type(LITERAL_DOUBLE) {}
-
-Literal::Literal(bool val): bool_val(val), literal_type(LITERAL_BOOL) {}
-
-Literal::Literal(std::vector<Expr*> vals): array_vals(vals), literal_type(LITERAL_ARRAY) {}
+Literal::Literal(Token token, std::vector<Expr*> vals): token(token), array_vals(vals), literal_type(LITERAL_ARRAY) {}
 
 std::pair<std::string, std::string> Literal::to_string() {
     std::string label = "Literal ";
@@ -146,10 +140,6 @@ Func::~Func() {
     for (auto ptr : args) {
         delete ptr;
     }
-}
-
-Group::~Group() {
-    delete expr;
 }
 
 Literal::~Literal() {}

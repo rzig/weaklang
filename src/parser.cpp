@@ -344,11 +344,11 @@ Expr* Parser::function() {
 }
 
 Expr* Parser::primary() {
-    if(match(TRUE)) return new Literal(true);
-    if(match(FALSE)) return new Literal(false);
+    if(match(TRUE)) return new Literal(tokens.at(cur_index-1), true);
+    if(match(FALSE)) return new Literal(tokens.at(cur_index-1), false);
     if(match(NIL)) return new Nil();
-    if(match(NUMBER)) return new Literal(tokens.at(cur_index-1).literal_double);
-    if(match(STRING)) return new Literal(tokens.at(cur_index-1).literal_string);
+    if(match(NUMBER)) return new Literal(tokens.at(cur_index-1), tokens.at(cur_index-1).literal_double);
+    if(match(STRING)) return new Literal(tokens.at(cur_index-1), tokens.at(cur_index-1).literal_string);
     if(match(IDENTIFIER)) return new Var(tokens.at(cur_index-1));
     if(match(LEFT_PAREN)) {
         Expr* exp = expression();
@@ -357,6 +357,7 @@ Expr* Parser::primary() {
     }
     if(match(LEFT_BRACK)) {
         std::vector<Expr*> array_vals;
+	Token left_brack_token = tokens.at(cur_index-1);
         while(tokens.at(cur_index).type != END && tokens.at(cur_index).type != RIGHT_BRACK) {
             if(array_vals.size() > 0) {
                 consume(COMMA, "Expected ',' between values in array");
@@ -365,7 +366,7 @@ Expr* Parser::primary() {
 	    array_vals.push_back(expr);
         }
         consume(RIGHT_BRACK, "Expected ']' after array declaration");
-	return new Literal(array_vals);
+	return new Literal(left_brack_token, array_vals);
     }
     throw std::runtime_error(create_error(tokens.at(cur_index), "Expected primary"));
 }

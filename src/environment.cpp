@@ -170,6 +170,22 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	}
 	return env.get_return_val();
     }
+    if (CAN_MAKE(Literal*, literal)_FROM(literal)) {
+	switch (literal->literal_type) {
+	case LITERAL_STRING: return Variable(literal->string_val);
+	case LITERAL_DOUBLE: return Variable(literal->double_val);
+	case LITERAL_BOOL: return Variable(literal->bool_val);
+	case LITERAL_ARRAY: {
+	    std::vector<double> nums;
+	    for (Expr* expr : literal->array_vals) {
+		Variable val = evaluate_expr(expr);
+		runtime_assert(val.is_double(), literal->token, "Expression in array literal evaluates to a non-number");
+		nums.push_back(std::get<double>(val.value));
+	    }
+	    return Variable(std::pair<std::vector<double>, std::vector<size_t>>(nums, {nums.size()}));
+	}
+	}
+    }
 }
 
 void Environment::runtime_assert(bool cond, Token loc, std::string error_msg) {

@@ -54,14 +54,6 @@ public:
     std::vector<Expr*> args;
 };
 
-class Group : public Expr {
-public:
-    Group(Expr* expr);
-    std::pair<std::string, std::string> to_string();
-    ~Group();
-    Expr* expr;
-};
-
 enum LiteralType {
     LITERAL_STRING,
     LITERAL_DOUBLE,
@@ -71,12 +63,13 @@ enum LiteralType {
 
 class Literal : public Expr {
 public: 
-    Literal(std::string val);
-    Literal(double val);
-    Literal(bool val);
-    Literal(std::vector<Expr*> vals);
+    Literal(Token token, std::string val);
+    Literal(Token token, double val);
+    Literal(Token token, bool val);
+    Literal(Token token, std::vector<Expr*> vals);
     std::pair<std::string, std::string> to_string();
     ~Literal();
+    Token token;
     LiteralType literal_type;
     std::string string_val;
     double double_val;
