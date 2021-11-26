@@ -686,12 +686,35 @@ TEST_CASE("Unary operations", "[parser]") {
     }
 }
 
-// TEST_CASE("Array access", "[parser]") {
-//     SECTION("1D") {
+TEST_CASE("Array access", "[parser]") {
+    SECTION("1D") {
+        Svec statements = getStatements("array[1];");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(ArrAccess*, a)_FROM(e->expr)) {
+                REQUIRE(a->id.lexeme == "array");
+                REQUIRE(a->idx.size() == 1);
+                required_if(CAN_MAKE(Literal*, one)_FROM(a->idx[0])) {
+                    REQUIRE(one->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(one->double_val == 1);
+                }
+            }
+        }
+    }
 
-//     }
-
-//     SECTION("2D") {
-
-//     }
-// }
+    SECTION("2D") {
+        Svec statements = getStatements("mat[1, b];");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(ArrAccess*, a)_FROM(e->expr)) {
+                REQUIRE(a->id.lexeme == "mat");
+                REQUIRE(a->idx.size() == 2);
+                required_if(CAN_MAKE(Literal*, one)_FROM(a->idx[0])) {
+                    REQUIRE(one->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(one->double_val == 1);
+                }
+                required_if(CAN_MAKE(Var*, b)_FROM(a->idx[1])) {
+                    REQUIRE(b->name.lexeme == "b");
+                }
+            }
+        }
+    }
+}
