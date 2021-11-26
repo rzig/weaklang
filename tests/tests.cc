@@ -718,3 +718,86 @@ TEST_CASE("Array access", "[parser]") {
         }
     }
 }
+
+TEST_CASE("While statements", "[parser]") {
+    SECTION("with simple expression") {
+        Svec statements = getStatements("w (var) {var = var O T;}");
+        required_if(CAN_MAKE(While*, w)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Var*, var)_FROM(w->cond)) {
+                REQUIRE(var->name.lexeme == "var");
+            }
+            REQUIRE(w->stmts.size() == 1);
+            required_if(CAN_MAKE(ExprStmt*, e)_FROM(w->stmts[0])) {
+                required_if(CAN_MAKE(Assign*, a)_FROM(e->expr)) {
+                    REQUIRE(a->name.lexeme == "var");
+                    required_if(CAN_MAKE(Binary*, b)_FROM(a->value)) {
+                        REQUIRE(b->op.type == OR);
+                        required_if(CAN_MAKE(Var*, var)_FROM(b->left)) {
+                            REQUIRE(var->name.lexeme == "var");
+                        }
+                        required_if(CAN_MAKE(Literal*, t)_FROM(b->right)) {
+                            REQUIRE(t->literal_type == LiteralType::LITERAL_BOOL);
+                            REQUIRE(t->bool_val == true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    SECTION("with complex expression") {
+        Svec statements = getStatements("w (var A !func(var)) {}");
+        required_if(CAN_MAKE(While*, w)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(w->cond)) {
+                required_if(CAN_MAKE(Var*, var)_FROM(b->left)) {
+                    REQUIRE(var->name.lexeme == "var");
+                }
+                required_if(CAN_MAKE(Unary*, u)_FROM(b->right)) {
+                    REQUIRE(u->op.type == EXCLA);
+                    required_if(CAN_MAKE(Func*, func)_FROM(u->right)) {
+                        REQUIRE(func->func.lexeme == "func");
+                        REQUIRE(func->args.size() == 1);
+                        required_if(CAN_MAKE(Var*, var)_FROM(func->args[0])) {
+                            REQUIRE(var->name.lexeme == "var");
+                        }
+                    }
+                }
+            }
+            REQUIRE(w->stmts.size() == 0);
+        }
+    }
+}
+
+// TEST_CASE("Return statement", "[parser]") {
+//     SECTION("with no expression") {
+
+//     }
+
+//     SECTION("with expression") {
+
+//     }
+// }
+
+// TEST_CASE("Print statement", "[parser]") {
+//     SECTION("with simple expression") {
+
+//     }
+
+//     SECTION("with complex expression") {
+
+//     }
+// }
+
+// TEST_CASE("If statement", "[parser]") {
+//     SECTION("with simple expression") {
+
+//     }
+
+//     SECTION("with complex expression") {
+
+//     }
+// }
+
+// Note that all of the above tests depend on the parser's
+// ability to parse blocks, so we don't need to specifically test
+// that.
