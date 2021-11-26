@@ -870,6 +870,10 @@ TEST_CASE("Print statement", "[parser]") {
             }
         }
     }
+
+    SECTION("Error - no semicolon after print") {
+        REQUIRE_THROWS_WITH(getStatements("p T"), "Expected ';' after print statement but instead found: \"\", at line 1 and column 4, this token has type END");
+    }
 }
 
 TEST_CASE("If statement", "[parser]") {
