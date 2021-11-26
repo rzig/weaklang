@@ -685,6 +685,22 @@ TEST_CASE("Unary operations", "[parser]") {
             }
         }
     }
+
+    SECTION("Error - hanging !") {
+        REQUIRE_THROWS_WITH(getStatements("!"), "Expected primary but instead found: \"\", at line 1 and column 2, this token has type END");
+    }
+
+    SECTION("Error - hanging -") {
+        REQUIRE_THROWS_WITH(getStatements("-"), "Expected primary but instead found: \"\", at line 1 and column 2, this token has type END");
+    }
+
+    SECTION("Error - hanging s") {
+        REQUIRE_THROWS_WITH(getStatements("s"), "Expected primary but instead found: \"\", at line 1 and column 2, this token has type END");
+    }
+
+    SECTION("Error - nonsense after operator") {
+        REQUIRE_THROWS_WITH(getStatements("- o;"), "Expected primary but instead found: \"o\", at line 1 and column 3, this token has type OPERATOR");
+    }
 }
 
 TEST_CASE("Array access", "[parser]") {
