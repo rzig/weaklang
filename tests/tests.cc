@@ -617,6 +617,26 @@ TEST_CASE("Terms and factors", "[parser]") {
             }
         }
     }
+
+    SECTION("Error - hanging +") {
+        REQUIRE_THROWS_WITH(getStatements("b + "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
+    }
+
+    SECTION("Error - hanging -") {
+        REQUIRE_THROWS_WITH(getStatements("c - "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
+    }
+
+    SECTION("Error - hanging *") {
+        REQUIRE_THROWS_WITH(getStatements("c - b *"), "Expected primary but instead found: \"\", at line 1 and column 8, this token has type END");
+    }
+
+    SECTION("Error - hanging /") {
+        REQUIRE_THROWS_WITH(getStatements("c / "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
+    }
+
+    SECTION("Error - hanging @") {
+        REQUIRE_THROWS_WITH(getStatements("d / "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
+    }
 }
 
 TEST_CASE("Unary operations", "[parser]") {
