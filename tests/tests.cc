@@ -1104,6 +1104,18 @@ TEST_CASE("Variable declaration", "[parser]"){
             }
         }
     }
+
+    SECTION("Error - hanging =") {
+        REQUIRE_THROWS_WITH(getStatements("a x = ;"), "Expected primary but instead found: \";\", at line 1 and column 7, this token has type SEMI");
+    }
+
+    SECTION("Error - missing variable name") {
+        REQUIRE_THROWS_WITH(getStatements("a = b"), "Expected variable name but instead found: \"=\", at line 1 and column 3, this token has type EQUALS");
+    }
+
+    SECTION("Error - missing semicolon") {
+        REQUIRE_THROWS_WITH(getStatements("a x = b"), "Expect semi-colon after variable declaration but instead found: \"\", at line 1 and column 8, this token has type END");
+    }
 }
 
 // Note that all of the above tests depend on the parser's
