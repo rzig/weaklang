@@ -768,15 +768,30 @@ TEST_CASE("While statements", "[parser]") {
     }
 }
 
-// TEST_CASE("Return statement", "[parser]") {
-//     SECTION("with no expression") {
+TEST_CASE("Return statement", "[parser]") {
+    SECTION("with no expression") {
+        Svec statements = getStatements("r;");
+        required_if(CAN_MAKE(Return*, r)_FROM(statements[0])) {
+            REQUIRE_ABILITY(TO_MAKE(Nil*, n)_FROM(r->expr));
+        }
+    }
 
-//     }
-
-//     SECTION("with expression") {
-
-//     }
-// }
+    SECTION("with expression") {
+        Svec statements = getStatements("r var + 2;");
+        required_if(CAN_MAKE(Return*, r)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(r->expr)) {
+                required_if(CAN_MAKE(Var*, var)_FROM(b->left)) {
+                    REQUIRE(var->name.lexeme == "var");
+                }
+                required_if(CAN_MAKE(Literal*, two)_FROM(b->right)) {
+                    REQUIRE(two->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(two->double_val == 2);
+                }
+                REQUIRE(b->op.type == PLUS);
+            }
+        }
+    }
+}
 
 // TEST_CASE("Print statement", "[parser]") {
 //     SECTION("with simple expression") {

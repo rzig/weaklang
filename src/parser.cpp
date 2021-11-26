@@ -185,7 +185,7 @@ Stmt* Parser::whileStatement() {
 
 Stmt* Parser::returnStatement() {
     Expr* expr;
-    if (tokens.at(cur_index - 1).type != SEMI) expr = expression();
+    if (cur_index < tokens.size() && tokens.at(cur_index).type != SEMI) expr = expression();
     else expr = new Nil();
     Stmt* stmt = new Return(tokens.at(cur_index - 1), expr);
     consume(SEMI, "Expected ';' after return statement");
