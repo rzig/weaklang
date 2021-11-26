@@ -744,6 +744,9 @@ TEST_CASE("Array access", "[parser]") {
     }
 }
 
+// Note: for the above cases, we do not test for semicolons because it is reasonable to assume
+// that these expressions will be used in things like while conditions etc.
+
 TEST_CASE("While statements", "[parser]") {
     SECTION("with simple expression") {
         auto statements = getStatements("w (var) {var = var O T;}");
@@ -803,6 +806,10 @@ TEST_CASE("While statements", "[parser]") {
 
     SECTION("Error - without block") {
         REQUIRE_THROWS_WITH(getStatements("w (T)"), "Expected '{' before contents of while loop but instead found: \"\", at line 1 and column 6, this token has type END");
+    }
+
+    SECTION("Error - unterminated block") {
+        REQUIRE_THROWS_WITH(getStatements("w (T) {"), "Expected '}' after block but instead found: \"\", at line 1 and column 8, this token has type END");
     }
 }
 
@@ -952,6 +959,10 @@ TEST_CASE("If statement", "[parser]") {
     SECTION("Error - without block") {
         REQUIRE_THROWS_WITH(getStatements("i (T)"), "Expected '{' before contents of if statement but instead found: \"\", at line 1 and column 6, this token has type END");
     }
+
+    SECTION("Error - unterminated block") {
+        REQUIRE_THROWS_WITH(getStatements("i (F) {"), "Expected '}' after block but instead found: \"\", at line 1 and column 8, this token has type END");
+    }
 }
 
 TEST_CASE("Function declaration", "[parser]") {
@@ -1018,6 +1029,10 @@ TEST_CASE("Function declaration", "[parser]") {
     SECTION("Error - nonsense parameters") {
         REQUIRE_THROWS_WITH(getStatements("f x(a)"), "Expected parameter name in function declaration but instead found: \"a\", at line 1 and column 5, this token has type LET");
     }
+
+    SECTION("Error - unterminated block") {
+        REQUIRE_THROWS_WITH(getStatements("f x(b) {"), "Expected '}' after block but instead found: \"\", at line 1 and column 9, this token has type END");
+    }
 }
 
 TEST_CASE("Operator declaration", "[parser]") {
@@ -1050,6 +1065,10 @@ TEST_CASE("Operator declaration", "[parser]") {
 
     SECTION("Error - no block") {
         REQUIRE_THROWS_WITH(getStatements("o x(b, c)"), "Expected '{' before operator body but instead found: \"\", at line 1 and column 10, this token has type END");
+    }
+
+    SECTION("Error - unterminated block") {
+        REQUIRE_THROWS_WITH(getStatements("o x(b,c) {"), "Expected '}' after block but instead found: \"\", at line 1 and column 11, this token has type END");
     }
 }
 
