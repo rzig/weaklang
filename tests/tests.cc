@@ -15,7 +15,7 @@
 #include<sstream>
 
 //////////////////////////////////////////////////////////////////////////////
-//                                Test Cases                                //
+//                                Lexer tests                               //
 //////////////////////////////////////////////////////////////////////////////
 
 void no_error(std::string str){
@@ -277,6 +277,10 @@ TEST_CASE("Complex input", "[lexer]") {
     REQUIRE(tokens[150].col == 3);
     REQUIRE(tokens[150].line == 28);
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//                               Parser tests                               //
+//////////////////////////////////////////////////////////////////////////////
 
 #define REQUIRE_ABILITY(x) if(x) {REQUIRE(true);} else {REQUIRE(false);}
 #define TO_MAKE(type, variable) CAN_MAKE(type, variable)
