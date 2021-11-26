@@ -734,6 +734,14 @@ TEST_CASE("Array access", "[parser]") {
             }
         }
     }
+
+    SECTION("Error - empty access") {
+        REQUIRE_THROWS_WITH(getStatements("arr[];"), "Expected primary but instead found: \"]\", at line 1 and column 5, this token has type RIGHT_BRACK");
+    }
+
+    SECTION("Error - missing comma") {
+        REQUIRE_THROWS_WITH(getStatements("arr[1 2];"), "Expected comma in array indexing but instead found: \"2\", at line 1 and column 7, this token has type NUMBER");
+    }
 }
 
 TEST_CASE("While statements", "[parser]") {
