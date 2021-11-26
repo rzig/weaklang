@@ -940,6 +940,18 @@ TEST_CASE("If statement", "[parser]") {
             }
         }
     }
+
+    SECTION("Error - without condition") {
+        REQUIRE_THROWS_WITH(getStatements("i {}"), "Expected '(' before condition but instead found: \"{\", at line 1 and column 3, this token has type LEFT_BRACE");
+    }
+
+    SECTION("Error - empty condition") {
+        REQUIRE_THROWS_WITH(getStatements("i () {}"), "Expected primary but instead found: \")\", at line 1 and column 4, this token has type RIGHT_PAREN");
+    }
+
+    SECTION("Error - without block") {
+        REQUIRE_THROWS_WITH(getStatements("i (T)"), "Expected '{' before contents of if statement but instead found: \"\", at line 1 and column 6, this token has type END");
+    }
 }
 
 TEST_CASE("Function declaration", "[parser]") {
