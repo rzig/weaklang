@@ -749,6 +749,7 @@ TEST_CASE("While statements", "[parser]") {
         Svec statements = getStatements("w (var A !func(var)) {}");
         required_if(CAN_MAKE(While*, w)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(w->cond)) {
+                REQUIRE(b->op.type == AND);
                 required_if(CAN_MAKE(Var*, var)_FROM(b->left)) {
                     REQUIRE(var->name.lexeme == "var");
                 }
@@ -826,15 +827,71 @@ TEST_CASE("Print statement", "[parser]") {
     }
 }
 
-// TEST_CASE("If statement", "[parser]") {
-//     SECTION("with simple expression") {
+TEST_CASE("If statement", "[parser]") {
+    SECTION("with simple expression") {
+        Svec statements = getStatements("i (T) {}");
+        required_if(CAN_MAKE(If*, i)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Literal*, t)_FROM(i->cond)) {
+                REQUIRE(t->literal_type == LiteralType::LITERAL_BOOL);
+                REQUIRE(t->bool_val == true);
+            }
+            REQUIRE(i->stmts.size() == 0);
+        }
+    }
 
-//     }
-
-//     SECTION("with complex expression") {
-
-//     }
-// }
+    SECTION("with complex expression") {
+        Svec statements = getStatements("i (var O !func(var)) {b = c; c = b; var = b == c;}");
+        required_if(CAN_MAKE(If*, i)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(i->cond)) {
+                REQUIRE(b->op.type == OR);
+                required_if(CAN_MAKE(Var*, var)_FROM(b->left)) {
+                    REQUIRE(var->name.lexeme == "var");
+                }
+                required_if(CAN_MAKE(Unary*, u)_FROM(b->right)) {
+                    REQUIRE(u->op.type == EXCLA);
+                    required_if(CAN_MAKE(Func*, func)_FROM(u->right)) {
+                        REQUIRE(func->func.lexeme == "func");
+                        REQUIRE(func->args.size() == 1);
+                        required_if(CAN_MAKE(Var*, var)_FROM(func->args[0])) {
+                            REQUIRE(var->name.lexeme == "var");
+                        }
+                    }
+                }
+            }
+            REQUIRE(i->stmts.size() == 3);
+            required_if(CAN_MAKE(ExprStmt*, e1)_FROM(i->stmts[0])) {
+                required_if(CAN_MAKE(Assign*, a)_FROM(e1->expr)) {
+                    REQUIRE(a->name.lexeme == "b");
+                    required_if(CAN_MAKE(Var*, c)_FROM(a->value)) {
+                        REQUIRE(c->name.lexeme == "c");
+                    }
+                }
+            }
+            required_if(CAN_MAKE(ExprStmt*, e2)_FROM(i->stmts[1])) {
+                required_if(CAN_MAKE(Assign*, a)_FROM(e2->expr)) {
+                    REQUIRE(a->name.lexeme == "c");
+                    required_if(CAN_MAKE(Var*, b)_FROM(a->value)) {
+                        REQUIRE(b->name.lexeme == "b");
+                    }
+                }
+            }
+            required_if(CAN_MAKE(ExprStmt*, e3)_FROM(i->stmts[2])) {
+                required_if(CAN_MAKE(Assign*, a)_FROM(e3->expr)) {
+                    REQUIRE(a->name.lexeme == "var");
+                    required_if(CAN_MAKE(Binary*, bin)_FROM(a->value)) {
+                        required_if(CAN_MAKE(Var*, b)_FROM(bin->left)) {
+                            REQUIRE(b->name.lexeme == "b");
+                        }
+                        required_if(CAN_MAKE(Var*, c)_FROM(bin->right)) {
+                            REQUIRE(c->name.lexeme == "c");
+                        }
+                        REQUIRE(bin->op.type == EQUALS_EQUALS);
+                    }
+                }
+            }
+        }
+    }
+}
 
 // Note that all of the above tests depend on the parser's
 // ability to parse blocks, so we don't need to specifically test
