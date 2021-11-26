@@ -793,15 +793,38 @@ TEST_CASE("Return statement", "[parser]") {
     }
 }
 
-// TEST_CASE("Print statement", "[parser]") {
-//     SECTION("with simple expression") {
+TEST_CASE("Print statement", "[parser]") {
+    SECTION("with simple expression") {
+        Svec statements = getStatements("p it;");
+        required_if(CAN_MAKE(Print*, p)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Var*, it)_FROM(p->expr)) {
+                REQUIRE(it->name.lexeme == "it");
+            }
+        }
+    }
 
-//     }
-
-//     SECTION("with complex expression") {
-
-//     }
-// }
+    SECTION("with complex expression") {
+        Svec statements = getStatements("p v() + b@b;");
+        required_if(CAN_MAKE(Print*, p)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, parent)_FROM(p->expr)) {
+                required_if(CAN_MAKE(Func*, v)_FROM(parent->left)) {
+                    REQUIRE(v->func.lexeme == "v");
+                    REQUIRE(v->args.size() == 0);
+                }
+                required_if(CAN_MAKE(Binary*, child)_FROM(parent->right)) {
+                    required_if(CAN_MAKE(Var*, b)_FROM(child->left)) {
+                        REQUIRE(b->name.lexeme == "b");
+                    }
+                    required_if(CAN_MAKE(Var*, b)_FROM(child->right)) {
+                        REQUIRE(b->name.lexeme == "b");
+                    }
+                    REQUIRE(child->op.type == AT);
+                }
+                REQUIRE(parent->op.type == PLUS);
+            }
+        }
+    }
+}
 
 // TEST_CASE("If statement", "[parser]") {
 //     SECTION("with simple expression") {
