@@ -642,19 +642,49 @@ TEST_CASE("Terms and factors", "[parser]") {
     }
 }
 
-// TEST_CASE("Unary operations", "[parser]") {
-//     SECTION("!") {
+TEST_CASE("Unary operations", "[parser]") {
+    SECTION("!") {
+        Svec statements = getStatements("!var;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Unary*, u)_FROM(e->expr)) {
+                REQUIRE(u->op.type == EXCLA);
+                required_if(CAN_MAKE(Var*, var)_FROM(u->right)) {
+                    REQUIRE(var->name.lexeme == "var");
+                }
+            }
+        }
+    }
 
-//     }
+    SECTION("-") {
+        Svec statements = getStatements("-x;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Unary*, u)_FROM(e->expr)) {
+                REQUIRE(u->op.type == MINUS);
+                required_if(CAN_MAKE(Var*, x)_FROM(u->right)) {
+                    REQUIRE(x->name.lexeme == "x");
+                }
+            }
+        }
+    }
 
-//     SECTION("-") {
-
-//     }
-
-//     SECTION("s") {
-
-//     }
-// }
+    SECTION("s") {
+        Svec statements = getStatements("s (c + d);");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Unary*, u)_FROM(e->expr)) {
+                REQUIRE(u->op.type == SHAPE);
+                required_if(CAN_MAKE(Binary*, b)_FROM(u->right)) {
+                    REQUIRE(b->op.type == PLUS);
+                    required_if(CAN_MAKE(Var*, c)_FROM(b->left)) {
+                        REQUIRE(c->name.lexeme == "c");
+                    }
+                    required_if(CAN_MAKE(Var*, d)_FROM(b->right)) {
+                        REQUIRE(d->name.lexeme == "d");
+                    }
+                }
+            }
+        }
+    }
+}
 
 // TEST_CASE("Array access", "[parser]") {
 //     SECTION("1D") {
