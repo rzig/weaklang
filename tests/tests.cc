@@ -1144,3 +1144,25 @@ TEST_CASE("Variable declaration", "[parser]"){
 // Note that all of the above tests depend on the parser's
 // ability to parse blocks, so we don't need to specifically test
 // that.
+
+TEST_CASE("Composite", "[parser]") {
+    // A program is just a vector of statements, so we test a case of two such statements
+    // and can reasonably assert that our parser will generalize to *n* statements
+    // because the individual statement parsing tests above pass
+    SECTION("Simple program") {
+        auto statements = getStatements("p F;r T;");
+        REQUIRE(statements.size() == 2);
+        required_if(CAN_MAKE(Print*, p)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Literal*, l)_FROM(p->expr)) {
+                REQUIRE(l->literal_type == LiteralType::LITERAL_BOOL);
+                REQUIRE(l->bool_val == false);
+            }
+        }
+        required_if(CAN_MAKE(Return*, r)_FROM(statements[1])) {
+            required_if(CAN_MAKE(Literal*, l)_FROM(r->expr)) {
+                REQUIRE(l->literal_type == LiteralType::LITERAL_BOOL);
+                REQUIRE(l->bool_val == true);
+            }
+        }
+    }
+}
