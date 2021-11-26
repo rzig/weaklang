@@ -1031,6 +1031,26 @@ TEST_CASE("Operator declaration", "[parser]") {
             REQUIRE(o->stmts.size() == 0);
         }
     }
+
+    SECTION("Error - no parameters") {
+        REQUIRE_THROWS_WITH(getStatements("o x() {}"), "Exepcted left parameter name in operator declaration but instead found: \")\", at line 1 and column 5, this token has type RIGHT_PAREN");
+    }
+
+    SECTION("Error - one parameter") {
+        REQUIRE_THROWS_WITH(getStatements("o x(b) {}"), "Exepcted ',' after left operator parameter but instead found: \")\", at line 1 and column 6, this token has type RIGHT_PAREN");
+    }
+
+    SECTION("Error - three parameters") {
+        REQUIRE_THROWS_WITH(getStatements("o x(b,c,d) {}"), "Expected ')' after operator parameters list but instead found: \",\", at line 1 and column 8, this token has type COMMA");
+    }
+
+    SECTION("Error - no comma") {
+        REQUIRE_THROWS_WITH(getStatements("o x(b c) {}"), "Exepcted ',' after left operator parameter but instead found: \"c\", at line 1 and column 7, this token has type IDENTIFIER");
+    }
+
+    SECTION("Error - no block") {
+        REQUIRE_THROWS_WITH(getStatements("o x(b, c)"), "Expected '{' before operator body but instead found: \"\", at line 1 and column 10, this token has type END");
+    }
 }
 
 TEST_CASE("Variable declaration", "[parser]"){
