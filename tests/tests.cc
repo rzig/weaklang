@@ -418,32 +418,123 @@ TEST_CASE("Equality", "[parser]") {
         }
     }
 
-    // SECTION("with function and variable and ==") {
+    SECTION("with function and variable and ==") {
+        Svec statements = getStatements("v(b) == b;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
+                required_if(CAN_MAKE(Func*, f)_FROM(b->left)) {
+                    REQUIRE(f->func.lexeme == "v");
+                    REQUIRE(f->args.size() == 1);
+                    required_if(CAN_MAKE(Var*, v)_FROM(f->args[0])) {
+                        REQUIRE(v->name.lexeme == "b");
+                    }
+                }
+                required_if(CAN_MAKE(Var*, v)_FROM(b->right)) {
+                    REQUIRE(v->name.lexeme == "b");
+                }
+                REQUIRE(b->op.type == EQUALS_EQUALS);
+            }
+        }
+    }
 
-    // }
-
-    // SECTION("with literal and variable and !=") {
-
-    // }
+    SECTION("with literal and variable and !=") {
+        Svec statements = getStatements("v != 10;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
+                required_if(CAN_MAKE(Var*, v)_FROM(b->left)) {
+                    REQUIRE(v->name.lexeme == "v");
+                }
+                required_if(CAN_MAKE(Literal*, l)_FROM(b->right)) {
+                    REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(l->double_val == 10);
+                }
+                REQUIRE(b->op.type == EXCLA_EQUALS);
+            }
+        }
+    }
 }
 
-// TEST_CASE("Comparison", "[parser]") {
-//     SECTION("literal > literal") {
+TEST_CASE("Comparison", "[parser]") {
+    SECTION("literal > literal") {
+        Svec statements = getStatements("2 > 3;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
+                required_if(CAN_MAKE(Literal*, left)_FROM(b->left)) {
+                    REQUIRE(left->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(left->double_val == 2);
+                }
+                required_if(CAN_MAKE(Literal*, right)_FROM(b->right)) {
+                    REQUIRE(right->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(right->double_val == 3);
+                }
+                REQUIRE(b->op.type == GREATER);
+            }
+        }
+    }
 
-//     }
+    SECTION("variable >= function") {
+        Svec statements = getStatements("var >= func(b,2);");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
+                required_if(CAN_MAKE(Var*, v)_FROM(b->left)) {
+                    REQUIRE(v->name.lexeme == "var");
+                }
+                required_if(CAN_MAKE(Func*, f)_FROM(b->right)) {
+                    REQUIRE(f->func.lexeme == "func");
+                    REQUIRE(f->args.size() == 2);
+                    required_if(CAN_MAKE(Var*, v)_FROM(f->args[0])) {
+                        REQUIRE(v->name.lexeme == "b");
+                    }
+                    required_if(CAN_MAKE(Literal*, l)_FROM(f->args[1])) {
+                        REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
+                        REQUIRE(l->double_val == 2);
+                    }
+                }
+                REQUIRE(b->op.type == GREATER_EQUALS);
+            }
+        }
+    }
 
-//     SECTION("variable >= function") {
+    SECTION("function <= literal") {
+        Svec statements = getStatements("v() <= 3;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
+                required_if(CAN_MAKE(Func*, f)_FROM(b->left)) {
+                    REQUIRE(f->func.lexeme == "v");
+                    REQUIRE(f->args.size() == 0);
+                }
+                required_if(CAN_MAKE(Literal*, l)_FROM(b->right)) {
+                    REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(l->double_val == 3);
+                }
+                REQUIRE(b->op.type == LESSER_EQUALS);
+            }
+        }
+    }
 
-//     }
-
-//     SECTION("function <= literal") {
-
-//     }
-
-//     SECTION("arrAccess < unary") {
-
-//     }
-// }
+    SECTION("arrAccess < unary") {
+        Svec statements = getStatements("arr[1] < -x;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
+                required_if(CAN_MAKE(ArrAccess*, a)_FROM(b->left)) {
+                    REQUIRE(a->id.lexeme == "arr");
+                    REQUIRE(a->idx.size() == 1);
+                    required_if(CAN_MAKE(Literal*, l)_FROM(a->idx[0])) {
+                        REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
+                        REQUIRE(l->double_val == 1);
+                    }
+                }
+                required_if(CAN_MAKE(Unary*, u)_FROM(b->right)) {
+                    REQUIRE(u->op.type == MINUS);
+                    required_if(CAN_MAKE(Var*, v)_FROM(u->right)) {
+                        REQUIRE(v->name.lexeme == "x");
+                    }
+                }
+                REQUIRE(b->op.type == LESSER);
+            }
+        }
+    }
+}
 
 // TEST_CASE("Terms and factors", "[parser]") {
 //     SECTION("multiple addition and subtraction") {
