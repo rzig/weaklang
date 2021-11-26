@@ -637,6 +637,10 @@ TEST_CASE("Terms and factors", "[parser]") {
     SECTION("Error - hanging @") {
         REQUIRE_THROWS_WITH(getStatements("d / "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
     }
+
+    SECTION("Error - nonsense after operator") {
+        REQUIRE_THROWS_WITH(getStatements("d / a"), "Expected primary but instead found: \"a\", at line 1 and column 5, this token has type LET");
+    }
 }
 
 TEST_CASE("Unary operations", "[parser]") {
