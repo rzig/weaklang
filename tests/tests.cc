@@ -898,12 +898,18 @@ TEST_CASE("Function declaration", "[parser]") {
     }
 }
 
-// TEST_CASE("Operator declaration", "[parser]") {
-//     // There is only one valid way to create an operator
-//     SECTION("Standard declaration") {
-
-//     }
-// }
+TEST_CASE("Operator declaration", "[parser]") {
+    // There is only one valid way to create an operator
+    SECTION("Standard declaration") {
+        Svec statements = getStatements("o n(x, y) {}");
+        required_if(CAN_MAKE(OpDecl*, o)_FROM(statements[0])) {
+            REQUIRE(o->name.lexeme == "n");
+            REQUIRE(o->left.lexeme == "x");
+            REQUIRE(o->right.lexeme == "y");
+            REQUIRE(o->stmts.size() == 0);
+        }
+    }
+}
 
 TEST_CASE("Variable declaration", "[parser]"){
     SECTION("to literal") {
