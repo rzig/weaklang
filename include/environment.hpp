@@ -49,7 +49,7 @@
 class Environment {
 public:
     Environment();
-    ~Environment() = default;
+    ~Environment(); 
     void add_func(std::string name, FuncDecl* func);
     void add_op(std::string name, OpDecl* op);
     void add_var(std::string name, Variable var);

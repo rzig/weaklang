@@ -27,7 +27,7 @@ bin/environment.o: src/environment.cpp include/environment.hpp include/variable.
 bin/variable.o: src/variable.cpp include/variable.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-bin/tests: bin/catch.o tests/tests.cc src/lexer.cpp src/token.cpp src/error.cpp src/stmt.cpp src/expr.cpp src/parser.cpp src/util.cpp
+bin/tests: bin/catch.o tests/tests.cc src/lexer.cpp src/token.cpp src/error.cpp src/stmt.cpp src/expr.cpp src/parser.cpp src/util.cpp src/environment.cpp src/variable.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 bin/catch.o: tests/catch.cc

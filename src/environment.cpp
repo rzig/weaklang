@@ -215,6 +215,8 @@ Variable Environment::evaluate_expr(Expr* expr) {
     if (CAN_MAKE(Nil*, nil)_FROM(expr)) {
 	return Variable();
     }
+
+	return Variable(); 
 }
 
 void Environment::runtime_assert(bool cond, Token loc, std::string error_msg) {
@@ -223,4 +225,11 @@ void Environment::runtime_assert(bool cond, Token loc, std::string error_msg) {
 
 std::string Environment::create_error(std::string error_msg, Token loc) {
     return "Runtime error: " + error_msg + ", occurred at line " + std::to_string(loc.line) + " at column " + std::to_string(loc.col);
+}
+
+Environment::~Environment() {
+	// delete the pointers in each of the maps
+	// TODO potential issues for scope with functions
+	for(auto& it : func_symbol_table) delete it.second; 
+	for(auto& it : op_symbol_table) delete it.second; 
 }

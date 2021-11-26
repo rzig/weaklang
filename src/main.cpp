@@ -3,6 +3,7 @@
 
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "environment.hpp"
 
 int main(int argc, char* argv[]) {
   if (argc == 1) {
@@ -16,9 +17,17 @@ int main(int argc, char* argv[]) {
                        (std::istreambuf_iterator<char>()));
       Lexer lexer;
       std::vector<Token> tokens = lexer.lex(read);
+      if(lexer.has_had_error()) { 
+        std::cout << lexer.print_errors();  
+        return 1; // if errors in syntax, don't continue to parse
+      }
       Parser p(tokens);
       std::vector<Stmt*> program = p.parse();
-      //std::cout << p.as_dot() << std::endl;
+      std::cout << p.as_dot() << std::endl;
+      Environment env; 
+      for(auto* statement : program) {
+        env.execute_stmt(statement); 
+      }
     } else {
       std::cout << "Couldn't open file " << argv[i] << ". Quitting."
                 << std::endl;
