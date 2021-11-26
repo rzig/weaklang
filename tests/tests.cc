@@ -536,19 +536,111 @@ TEST_CASE("Comparison", "[parser]") {
     }
 }
 
-// TEST_CASE("Terms and factors", "[parser]") {
-//     SECTION("multiple addition and subtraction") {
+TEST_CASE("Terms and factors", "[parser]") {
+    SECTION("multiple addition and subtraction") {
+        Svec statements = getStatements("d + b - c + 3;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, parent)_FROM(e->expr)) {
+                REQUIRE(parent->op.type == PLUS);
+                required_if(CAN_MAKE(Literal*, three)_FROM(parent->right)) {
+                    REQUIRE(three->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(three->double_val == 3);
+                }
+                required_if(CAN_MAKE(Binary*, child1)_FROM(parent->left)) {
+                    REQUIRE(child1->op.type == MINUS);
+                    required_if(CAN_MAKE(Var*, c)_FROM(child1->right)) {
+                        REQUIRE(c->name.lexeme == "c");
+                    }
+                    required_if(CAN_MAKE(Binary*, child2)_FROM(child1->left)) {
+                        REQUIRE(child2->op.type == PLUS);
+                        required_if(CAN_MAKE(Var*, d)_FROM(child2->left)) {
+                            REQUIRE(d->name.lexeme == "d");
+                        }
+                        required_if(CAN_MAKE(Var*, b)_FROM(child2->right)) {
+                            REQUIRE(b->name.lexeme == "b");
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-//     }
+    SECTION("multiplication and division with minus") {
+        Svec statements = getStatements("d * b - c / 3;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, parent)_FROM(e->expr)) {
+                REQUIRE(parent->op.type == MINUS);
+                required_if(CAN_MAKE(Binary*, left)_FROM(parent->left)) {
+                    required_if(CAN_MAKE(Var*, d)_FROM(left->left)) {
+                        REQUIRE(d->name.lexeme == "d");
+                    }
+                    required_if(CAN_MAKE(Var*, b)_FROM(left->right)) {
+                        REQUIRE(b->name.lexeme == "b");
+                    }
+                    REQUIRE(left->op.type == STAR);
+                }
+                required_if(CAN_MAKE(Binary*, right)_FROM(parent->right)) {
+                    required_if(CAN_MAKE(Var*, c)_FROM(right->left)) {
+                        REQUIRE(c->name.lexeme == "c");
+                    }
+                    required_if(CAN_MAKE(Literal*, three)_FROM(right->right)) {
+                        REQUIRE(three->literal_type == LiteralType::LITERAL_DOUBLE);
+                        REQUIRE(three->double_val == 3);
+                    }
+                    REQUIRE(right->op.type == SLASH);
+                }
+            }
+        }
+    }
 
-//     SECTION("addition and multiplication") {
-
-//     }
-
-//     SECTION("all operators") {
-
-//     }
-// }
+    SECTION("all binary operators with a unary operator") {
+        Svec statements = getStatements("(b@c) + (c/d) * (d^e) * s arr;");
+        required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, parent)_FROM(e->expr)) {
+                REQUIRE(parent->op.type == PLUS);
+                required_if(CAN_MAKE(Binary*, child1)_FROM(parent->left)) {
+                    REQUIRE(child1->op.type == AT);
+                    required_if(CAN_MAKE(Var*, b)_FROM(child1->left)) {
+                        REQUIRE(b->name.lexeme == "b");
+                    }
+                    required_if(CAN_MAKE(Var*, c)_FROM(child1->right)) {
+                        REQUIRE(c->name.lexeme == "c");
+                    }
+                }
+                required_if(CAN_MAKE(Binary*, child2)_FROM(parent->right)) {
+                    REQUIRE(child2->op.type == STAR);
+                    required_if(CAN_MAKE(Unary*, u)_FROM(child2->right)) {
+                        REQUIRE(u->op.type == SHAPE);
+                        required_if(CAN_MAKE(Var*, arr)_FROM(u->right)) {
+                            REQUIRE(arr->name.lexeme == "arr");
+                        }
+                    }
+                    required_if(CAN_MAKE(Binary*, child3)_FROM(child2->left)) {
+                        REQUIRE(child3->op.type == STAR);
+                        required_if(CAN_MAKE(Binary*, child4)_FROM(child3->left)) {
+                            REQUIRE(child4->op.type == SLASH);
+                            required_if(CAN_MAKE(Var*, c)_FROM(child4->left)) {
+                                REQUIRE(c->name.lexeme == "c");
+                            }
+                            required_if(CAN_MAKE(Var*, d)_FROM(child4->right)) {
+                                REQUIRE(d->name.lexeme == "d");
+                            }
+                        }
+                        required_if(CAN_MAKE(Binary*, child5)_FROM(child3->right)) {
+                            REQUIRE(child5->op.type == EXP);
+                            required_if(CAN_MAKE(Var*, d)_FROM(child5->left)) {
+                                REQUIRE(d->name.lexeme == "d");
+                            }
+                            required_if(CAN_MAKE(Var*, e)_FROM(child5->right)) {
+                                REQUIRE(e->name.lexeme == "e");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 // TEST_CASE("Unary operations", "[parser]") {
 //     SECTION("!") {
