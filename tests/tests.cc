@@ -495,6 +495,22 @@ TEST_CASE("Comparison", "[parser]") {
             }
         }
     }
+
+    SECTION("Error - hanging >") {
+        REQUIRE_THROWS_WITH(getStatements("v > "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
+    }
+
+    SECTION("Error - hanging >=") {
+        REQUIRE_THROWS_WITH(getStatements("v >= "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
+    }
+
+    SECTION("Error - hanging <=") {
+        REQUIRE_THROWS_WITH(getStatements("v <= "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
+    }
+
+    SECTION("Error - hanging <") {
+        REQUIRE_THROWS_WITH(getStatements("v < "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
+    }
 }
 
 TEST_CASE("Terms and factors", "[parser]") {
