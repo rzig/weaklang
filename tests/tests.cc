@@ -792,6 +792,18 @@ TEST_CASE("While statements", "[parser]") {
             REQUIRE(w->stmts.size() == 0);
         }
     }
+
+    SECTION("Error - without condition") {
+        REQUIRE_THROWS_WITH(getStatements("w {}"), "Expected '(' before condition but instead found: \"{\", at line 1 and column 3, this token has type LEFT_BRACE");
+    }
+
+    SECTION("Error - empty condition") {
+        REQUIRE_THROWS_WITH(getStatements("w () {}"), "Expected primary but instead found: \")\", at line 1 and column 4, this token has type RIGHT_PAREN");
+    }
+
+    SECTION("Error - without block") {
+        REQUIRE_THROWS_WITH(getStatements("w (T)"), "Expected '{' before contents of while loop but instead found: \"\", at line 1 and column 6, this token has type END");
+    }
 }
 
 TEST_CASE("Return statement", "[parser]") {
