@@ -290,59 +290,6 @@ Svec getStatements(std::string program) {
     return p.parse();
 }
 
-TEST_CASE("Assignment", "[parser]"){
-    SECTION("to literal") {
-        Svec statements = getStatements("a x = 5;");
-        required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
-            REQUIRE(v->name.lexeme == "x");
-            required_if(CAN_MAKE(Literal*, l)_FROM(v->expr)) {
-                REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
-                REQUIRE(l->double_val == 5);
-            }
-        }
-    }
-
-    SECTION("to function") {
-        Svec statements = getStatements("a var = func(b, c);");
-        required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
-            REQUIRE(v->name.lexeme == "var");
-            required_if(CAN_MAKE(Func*, f)_FROM(v->expr)) {
-                REQUIRE(f->func.lexeme == "func");
-                REQUIRE(f->args.size() == 2);
-                required_if(CAN_MAKE(Var*, v1)_FROM(f->args[0])) {
-                    REQUIRE(v1->name.lexeme == "b");
-                }
-                required_if(CAN_MAKE(Var*, v2)_FROM(f->args[1])) {
-                    REQUIRE(v2->name.lexeme == "c");
-                }
-            }
-        }
-    }
-
-    SECTION ("to array") {
-        Svec statements = getStatements("a array = [1,2,3];");
-        required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
-            REQUIRE(v->name.lexeme == "array");
-            required_if(CAN_MAKE(Literal*, l)_FROM(v->expr)) {
-                REQUIRE(l->literal_type == LiteralType::LITERAL_ARRAY);
-                REQUIRE(l->array_vals.size() == 3);
-                required_if(CAN_MAKE(Literal*, v1)_FROM(l->array_vals[0])) {
-                    REQUIRE(v1->literal_type == LiteralType::LITERAL_DOUBLE);
-                    REQUIRE(v1->double_val == 1);
-                }
-                required_if(CAN_MAKE(Literal*, v2)_FROM(l->array_vals[1])) {
-                    REQUIRE(v2->literal_type == LiteralType::LITERAL_DOUBLE);
-                    REQUIRE(v2->double_val == 2);
-                }
-                required_if(CAN_MAKE(Literal*, v3)_FROM(l->array_vals[2])) {
-                    REQUIRE(v3->literal_type == LiteralType::LITERAL_DOUBLE);
-                    REQUIRE(v3->double_val == 3);
-                }
-            }
-        }
-    }
-}
-
 TEST_CASE("Operation", "[parser]") {
     SECTION("with single or") {
         Svec statements = getStatements("var O T;");
@@ -896,3 +843,117 @@ TEST_CASE("If statement", "[parser]") {
 // Note that all of the above tests depend on the parser's
 // ability to parse blocks, so we don't need to specifically test
 // that.
+
+TEST_CASE("Function declaration", "[parser]") {
+    SECTION("With no parameters") {
+        Svec statements = getStatements("f x() {r T;}");
+        required_if(CAN_MAKE(FuncDecl*, f)_FROM(statements[0])) {
+            REQUIRE(f->name.lexeme == "x");
+            REQUIRE(f->params.size() == 0);
+            REQUIRE(f->stmts.size() == 1);
+            required_if(CAN_MAKE(Return*, r)_FROM(f->stmts[0])) {
+                required_if(CAN_MAKE(Literal*, l)_FROM(r->expr)) {
+                    REQUIRE(l->literal_type == LiteralType::LITERAL_BOOL);
+                    REQUIRE(l->bool_val == true);
+                }
+            }
+        }
+    }
+
+    SECTION("With one parameter") {
+        Svec statements = getStatements("f y(t) {r t;}");
+        required_if(CAN_MAKE(FuncDecl*, f)_FROM(statements[0])) {
+            REQUIRE(f->name.lexeme == "y");
+            REQUIRE(f->params.size() == 1);
+            REQUIRE(f->params[0].lexeme == "t");
+            REQUIRE(f->stmts.size() == 1);
+            required_if(CAN_MAKE(Return*, r)_FROM(f->stmts[0])) {
+                required_if(CAN_MAKE(Var*, t)_FROM(r->expr)) {
+                    REQUIRE(t->name.lexeme == "t");
+                }
+            }
+        }
+    }
+
+    SECTION("With two parameters") {
+        Svec statements = getStatements("f z(t, k) {r t + k;}");
+        required_if(CAN_MAKE(FuncDecl*, f)_FROM(statements[0])) {
+            REQUIRE(f->name.lexeme == "z");
+            REQUIRE(f->params.size() == 2);
+            REQUIRE(f->params[0].lexeme == "t");
+            REQUIRE(f->params[1].lexeme == "k");
+            REQUIRE(f->stmts.size() == 1);
+            required_if(CAN_MAKE(Return*, r)_FROM(f->stmts[0])) {
+                required_if(CAN_MAKE(Binary*, b)_FROM(r->expr)) {
+                    required_if(CAN_MAKE(Var*, t)_FROM(b->left)) {
+                        REQUIRE(t->name.lexeme == "t");
+                    }
+                    required_if(CAN_MAKE(Var*, k)_FROM(b->right)) {
+                        REQUIRE(k->name.lexeme == "k");
+                    }
+                    REQUIRE(b->op.type == PLUS);
+                }
+            }
+        }
+    }
+}
+
+// TEST_CASE("Operator declaration", "[parser]") {
+//     // There is only one valid way to create an operator
+//     SECTION("Standard declaration") {
+
+//     }
+// }
+
+TEST_CASE("Variable declaration", "[parser]"){
+    SECTION("to literal") {
+        Svec statements = getStatements("a x = 5;");
+        required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
+            REQUIRE(v->name.lexeme == "x");
+            required_if(CAN_MAKE(Literal*, l)_FROM(v->expr)) {
+                REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
+                REQUIRE(l->double_val == 5);
+            }
+        }
+    }
+
+    SECTION("to function") {
+        Svec statements = getStatements("a var = func(b, c);");
+        required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
+            REQUIRE(v->name.lexeme == "var");
+            required_if(CAN_MAKE(Func*, f)_FROM(v->expr)) {
+                REQUIRE(f->func.lexeme == "func");
+                REQUIRE(f->args.size() == 2);
+                required_if(CAN_MAKE(Var*, v1)_FROM(f->args[0])) {
+                    REQUIRE(v1->name.lexeme == "b");
+                }
+                required_if(CAN_MAKE(Var*, v2)_FROM(f->args[1])) {
+                    REQUIRE(v2->name.lexeme == "c");
+                }
+            }
+        }
+    }
+
+    SECTION ("to array") {
+        Svec statements = getStatements("a array = [1,2,3];");
+        required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
+            REQUIRE(v->name.lexeme == "array");
+            required_if(CAN_MAKE(Literal*, l)_FROM(v->expr)) {
+                REQUIRE(l->literal_type == LiteralType::LITERAL_ARRAY);
+                REQUIRE(l->array_vals.size() == 3);
+                required_if(CAN_MAKE(Literal*, v1)_FROM(l->array_vals[0])) {
+                    REQUIRE(v1->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(v1->double_val == 1);
+                }
+                required_if(CAN_MAKE(Literal*, v2)_FROM(l->array_vals[1])) {
+                    REQUIRE(v2->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(v2->double_val == 2);
+                }
+                required_if(CAN_MAKE(Literal*, v3)_FROM(l->array_vals[2])) {
+                    REQUIRE(v3->literal_type == LiteralType::LITERAL_DOUBLE);
+                    REQUIRE(v3->double_val == 3);
+                }
+            }
+        }
+    }
+}
