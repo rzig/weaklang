@@ -282,9 +282,7 @@ TEST_CASE("Complex input", "[lexer]") {
 #define TO_MAKE(type, variable) CAN_MAKE(type, variable)
 #define required_if(condition) REQUIRE_ABILITY(condition); if(condition)
 
-using Svec = std::vector<Stmt*>;
-
-Svec getStatements(std::string program) {
+std::vector<Stmt*> getStatements(std::string program) {
     Lexer lex;
     Parser p {lex.lex(program)};
     return p.parse();
@@ -292,7 +290,7 @@ Svec getStatements(std::string program) {
 
 TEST_CASE("Operation", "[parser]") {
     SECTION("with single or") {
-        Svec statements = getStatements("var O T;");
+        auto statements = getStatements("var O T;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 REQUIRE(b->op.type == OR);
@@ -308,7 +306,7 @@ TEST_CASE("Operation", "[parser]") {
     }
 
     SECTION("with single and") {
-        Svec statements = getStatements("func() A arr[1];");
+        auto statements = getStatements("func() A arr[1];");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 REQUIRE(b->op.type == AND);
@@ -332,7 +330,7 @@ TEST_CASE("Operation", "[parser]") {
         // The purpose of this test is solely to test order of
         // operations and *not* literal parsing, so we do not check
         // that the literal values are correct, only that they exist
-        Svec statements = getStatements("T O F A T;");
+        auto statements = getStatements("T O F A T;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, parent)_FROM(e->expr)) {
                 REQUIRE_ABILITY(TO_MAKE(Literal*, l)_FROM(parent->left));
@@ -349,7 +347,7 @@ TEST_CASE("Operation", "[parser]") {
 
 TEST_CASE("Equality", "[parser]") {
     SECTION("with two literals and ==") {
-        Svec statements = getStatements("T == 1;");
+        auto statements = getStatements("T == 1;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Literal*, l)_FROM(b->left)) {
@@ -366,7 +364,7 @@ TEST_CASE("Equality", "[parser]") {
     }
 
     SECTION("with function and variable and ==") {
-        Svec statements = getStatements("v(b) == b;");
+        auto statements = getStatements("v(b) == b;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Func*, f)_FROM(b->left)) {
@@ -385,7 +383,7 @@ TEST_CASE("Equality", "[parser]") {
     }
 
     SECTION("with literal and variable and !=") {
-        Svec statements = getStatements("v != 10;");
+        auto statements = getStatements("v != 10;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Var*, v)_FROM(b->left)) {
@@ -403,7 +401,7 @@ TEST_CASE("Equality", "[parser]") {
 
 TEST_CASE("Comparison", "[parser]") {
     SECTION("literal > literal") {
-        Svec statements = getStatements("2 > 3;");
+        auto statements = getStatements("2 > 3;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Literal*, left)_FROM(b->left)) {
@@ -420,7 +418,7 @@ TEST_CASE("Comparison", "[parser]") {
     }
 
     SECTION("variable >= function") {
-        Svec statements = getStatements("var >= func(b,2);");
+        auto statements = getStatements("var >= func(b,2);");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Var*, v)_FROM(b->left)) {
@@ -443,7 +441,7 @@ TEST_CASE("Comparison", "[parser]") {
     }
 
     SECTION("function <= literal") {
-        Svec statements = getStatements("v() <= 3;");
+        auto statements = getStatements("v() <= 3;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Func*, f)_FROM(b->left)) {
@@ -460,7 +458,7 @@ TEST_CASE("Comparison", "[parser]") {
     }
 
     SECTION("arrAccess < unary") {
-        Svec statements = getStatements("arr[1] < -x;");
+        auto statements = getStatements("arr[1] < -x;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(ArrAccess*, a)_FROM(b->left)) {
@@ -485,7 +483,7 @@ TEST_CASE("Comparison", "[parser]") {
 
 TEST_CASE("Terms and factors", "[parser]") {
     SECTION("multiple addition and subtraction") {
-        Svec statements = getStatements("d + b - c + 3;");
+        auto statements = getStatements("d + b - c + 3;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, parent)_FROM(e->expr)) {
                 REQUIRE(parent->op.type == PLUS);
@@ -513,7 +511,7 @@ TEST_CASE("Terms and factors", "[parser]") {
     }
 
     SECTION("multiplication and division with minus") {
-        Svec statements = getStatements("d * b - c / 3;");
+        auto statements = getStatements("d * b - c / 3;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, parent)_FROM(e->expr)) {
                 REQUIRE(parent->op.type == MINUS);
@@ -541,7 +539,7 @@ TEST_CASE("Terms and factors", "[parser]") {
     }
 
     SECTION("all binary operators with a unary operator") {
-        Svec statements = getStatements("(b@c) + (c/d) * (d^e) * s arr;");
+        auto statements = getStatements("(b@c) + (c/d) * (d^e) * s arr;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, parent)_FROM(e->expr)) {
                 REQUIRE(parent->op.type == PLUS);
@@ -591,7 +589,7 @@ TEST_CASE("Terms and factors", "[parser]") {
 
 TEST_CASE("Unary operations", "[parser]") {
     SECTION("!") {
-        Svec statements = getStatements("!var;");
+        auto statements = getStatements("!var;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Unary*, u)_FROM(e->expr)) {
                 REQUIRE(u->op.type == EXCLA);
@@ -603,7 +601,7 @@ TEST_CASE("Unary operations", "[parser]") {
     }
 
     SECTION("-") {
-        Svec statements = getStatements("-x;");
+        auto statements = getStatements("-x;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Unary*, u)_FROM(e->expr)) {
                 REQUIRE(u->op.type == MINUS);
@@ -615,7 +613,7 @@ TEST_CASE("Unary operations", "[parser]") {
     }
 
     SECTION("s") {
-        Svec statements = getStatements("s (c + d);");
+        auto statements = getStatements("s (c + d);");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Unary*, u)_FROM(e->expr)) {
                 REQUIRE(u->op.type == SHAPE);
@@ -635,7 +633,7 @@ TEST_CASE("Unary operations", "[parser]") {
 
 TEST_CASE("Array access", "[parser]") {
     SECTION("1D") {
-        Svec statements = getStatements("array[1];");
+        auto statements = getStatements("array[1];");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(ArrAccess*, a)_FROM(e->expr)) {
                 REQUIRE(a->id.lexeme == "array");
@@ -649,7 +647,7 @@ TEST_CASE("Array access", "[parser]") {
     }
 
     SECTION("2D") {
-        Svec statements = getStatements("mat[1, b];");
+        auto statements = getStatements("mat[1, b];");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(ArrAccess*, a)_FROM(e->expr)) {
                 REQUIRE(a->id.lexeme == "mat");
@@ -668,7 +666,7 @@ TEST_CASE("Array access", "[parser]") {
 
 TEST_CASE("While statements", "[parser]") {
     SECTION("with simple expression") {
-        Svec statements = getStatements("w (var) {var = var O T;}");
+        auto statements = getStatements("w (var) {var = var O T;}");
         required_if(CAN_MAKE(While*, w)_FROM(statements[0])) {
             required_if(CAN_MAKE(Var*, var)_FROM(w->cond)) {
                 REQUIRE(var->name.lexeme == "var");
@@ -693,7 +691,7 @@ TEST_CASE("While statements", "[parser]") {
     }
 
     SECTION("with complex expression") {
-        Svec statements = getStatements("w (var A !func(var)) {}");
+        auto statements = getStatements("w (var A !func(var)) {}");
         required_if(CAN_MAKE(While*, w)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(w->cond)) {
                 REQUIRE(b->op.type == AND);
@@ -718,14 +716,14 @@ TEST_CASE("While statements", "[parser]") {
 
 TEST_CASE("Return statement", "[parser]") {
     SECTION("with no expression") {
-        Svec statements = getStatements("r;");
+        auto statements = getStatements("r;");
         required_if(CAN_MAKE(Return*, r)_FROM(statements[0])) {
             REQUIRE_ABILITY(TO_MAKE(Nil*, n)_FROM(r->expr));
         }
     }
 
     SECTION("with expression") {
-        Svec statements = getStatements("r var + 2;");
+        auto statements = getStatements("r var + 2;");
         required_if(CAN_MAKE(Return*, r)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(r->expr)) {
                 required_if(CAN_MAKE(Var*, var)_FROM(b->left)) {
@@ -743,7 +741,7 @@ TEST_CASE("Return statement", "[parser]") {
 
 TEST_CASE("Print statement", "[parser]") {
     SECTION("with simple expression") {
-        Svec statements = getStatements("p it;");
+        auto statements = getStatements("p it;");
         required_if(CAN_MAKE(Print*, p)_FROM(statements[0])) {
             required_if(CAN_MAKE(Var*, it)_FROM(p->expr)) {
                 REQUIRE(it->name.lexeme == "it");
@@ -752,7 +750,7 @@ TEST_CASE("Print statement", "[parser]") {
     }
 
     SECTION("with complex expression") {
-        Svec statements = getStatements("p v() + b@b;");
+        auto statements = getStatements("p v() + b@b;");
         required_if(CAN_MAKE(Print*, p)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, parent)_FROM(p->expr)) {
                 required_if(CAN_MAKE(Func*, v)_FROM(parent->left)) {
@@ -776,7 +774,7 @@ TEST_CASE("Print statement", "[parser]") {
 
 TEST_CASE("If statement", "[parser]") {
     SECTION("with simple expression") {
-        Svec statements = getStatements("i (T) {}");
+        auto statements = getStatements("i (T) {}");
         required_if(CAN_MAKE(If*, i)_FROM(statements[0])) {
             required_if(CAN_MAKE(Literal*, t)_FROM(i->cond)) {
                 REQUIRE(t->literal_type == LiteralType::LITERAL_BOOL);
@@ -787,7 +785,7 @@ TEST_CASE("If statement", "[parser]") {
     }
 
     SECTION("with complex expression") {
-        Svec statements = getStatements("i (var O !func(var)) {b = c; c = b; var = b == c;}");
+        auto statements = getStatements("i (var O !func(var)) {b = c; c = b; var = b == c;}");
         required_if(CAN_MAKE(If*, i)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(i->cond)) {
                 REQUIRE(b->op.type == OR);
@@ -840,13 +838,9 @@ TEST_CASE("If statement", "[parser]") {
     }
 }
 
-// Note that all of the above tests depend on the parser's
-// ability to parse blocks, so we don't need to specifically test
-// that.
-
 TEST_CASE("Function declaration", "[parser]") {
     SECTION("With no parameters") {
-        Svec statements = getStatements("f x() {r T;}");
+        auto statements = getStatements("f x() {r T;}");
         required_if(CAN_MAKE(FuncDecl*, f)_FROM(statements[0])) {
             REQUIRE(f->name.lexeme == "x");
             REQUIRE(f->params.size() == 0);
@@ -861,7 +855,7 @@ TEST_CASE("Function declaration", "[parser]") {
     }
 
     SECTION("With one parameter") {
-        Svec statements = getStatements("f y(t) {r t;}");
+        auto statements = getStatements("f y(t) {r t;}");
         required_if(CAN_MAKE(FuncDecl*, f)_FROM(statements[0])) {
             REQUIRE(f->name.lexeme == "y");
             REQUIRE(f->params.size() == 1);
@@ -876,7 +870,7 @@ TEST_CASE("Function declaration", "[parser]") {
     }
 
     SECTION("With two parameters") {
-        Svec statements = getStatements("f z(t, k) {r t + k;}");
+        auto statements = getStatements("f z(t, k) {r t + k;}");
         required_if(CAN_MAKE(FuncDecl*, f)_FROM(statements[0])) {
             REQUIRE(f->name.lexeme == "z");
             REQUIRE(f->params.size() == 2);
@@ -901,7 +895,7 @@ TEST_CASE("Function declaration", "[parser]") {
 TEST_CASE("Operator declaration", "[parser]") {
     // There is only one valid way to create an operator
     SECTION("Standard declaration") {
-        Svec statements = getStatements("o n(x, y) {}");
+        auto statements = getStatements("o n(x, y) {}");
         required_if(CAN_MAKE(OpDecl*, o)_FROM(statements[0])) {
             REQUIRE(o->name.lexeme == "n");
             REQUIRE(o->left.lexeme == "x");
@@ -913,7 +907,7 @@ TEST_CASE("Operator declaration", "[parser]") {
 
 TEST_CASE("Variable declaration", "[parser]"){
     SECTION("to literal") {
-        Svec statements = getStatements("a x = 5;");
+        auto statements = getStatements("a x = 5;");
         required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
             REQUIRE(v->name.lexeme == "x");
             required_if(CAN_MAKE(Literal*, l)_FROM(v->expr)) {
@@ -924,7 +918,7 @@ TEST_CASE("Variable declaration", "[parser]"){
     }
 
     SECTION("to function") {
-        Svec statements = getStatements("a var = func(b, c);");
+        auto statements = getStatements("a var = func(b, c);");
         required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
             REQUIRE(v->name.lexeme == "var");
             required_if(CAN_MAKE(Func*, f)_FROM(v->expr)) {
@@ -941,7 +935,7 @@ TEST_CASE("Variable declaration", "[parser]"){
     }
 
     SECTION ("to array") {
-        Svec statements = getStatements("a array = [1,2,3];");
+        auto statements = getStatements("a array = [1,2,3];");
         required_if(CAN_MAKE(VarDecl*, v)_FROM(statements[0])) {
             REQUIRE(v->name.lexeme == "array");
             required_if(CAN_MAKE(Literal*, l)_FROM(v->expr)) {
@@ -963,3 +957,7 @@ TEST_CASE("Variable declaration", "[parser]"){
         }
     }
 }
+
+// Note that all of the above tests depend on the parser's
+// ability to parse blocks, so we don't need to specifically test
+// that.
