@@ -1006,6 +1006,18 @@ TEST_CASE("Function declaration", "[parser]") {
             }
         }
     }
+
+    SECTION("Error - missing commas") {
+        REQUIRE_THROWS_WITH(getStatements("f x(b c) {}"), "Expected comma in function declaration but instead found: \"c\", at line 1 and column 7, this token has type IDENTIFIER");
+    }
+
+    SECTION("Error - missing block") {
+        REQUIRE_THROWS_WITH(getStatements("f x(b, c)"), "Expected '{' before function body but instead found: \"\", at line 1 and column 10, this token has type END");
+    }
+
+    SECTION("Error - nonsense parameters") {
+        REQUIRE_THROWS_WITH(getStatements("f x(a)"), "Expected parameter name in function declaration but instead found: \"a\", at line 1 and column 5, this token has type LET");
+    }
 }
 
 TEST_CASE("Operator declaration", "[parser]") {
