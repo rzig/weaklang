@@ -343,6 +343,14 @@ TEST_CASE("Operation", "[parser]") {
             }
         }
     }
+
+    SECTION("Error - hanging O") {
+        REQUIRE_THROWS_WITH(getStatements("T O F O;"), "Expected primary but instead found: \";\", at line 1 and column 8, this token has type SEMI");
+    }
+
+    SECTION("Error - hanging A") {
+        REQUIRE_THROWS_WITH(getStatements("T O F A;"), "Expected primary but instead found: \";\", at line 1 and column 8, this token has type SEMI");
+    }
 }
 
 TEST_CASE("Equality", "[parser]") {
@@ -396,6 +404,14 @@ TEST_CASE("Equality", "[parser]") {
                 REQUIRE(b->op.type == EXCLA_EQUALS);
             }
         }
+    }
+
+    SECTION("Error - hanging ==") {
+        REQUIRE_THROWS_WITH(getStatements("T == "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
+    }
+
+    SECTION("Error - hanging !=") {
+        REQUIRE_THROWS_WITH(getStatements("F != "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
     }
 }
 
