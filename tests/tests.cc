@@ -829,6 +829,14 @@ TEST_CASE("Return statement", "[parser]") {
             }
         }
     }
+
+    SECTION("Error - no semicolon after blank return") {
+        REQUIRE_THROWS_WITH(getStatements("r"), "Expected primary but instead found: \"\", at line 1 and column 2, this token has type END");
+    }
+
+    SECTION("Error - no semicolon after expression return") {
+        REQUIRE_THROWS_WITH(getStatements("r T"), "Expected ';' after return statement but instead found: \"\", at line 1 and column 4, this token has type END");
+    }
 }
 
 TEST_CASE("Print statement", "[parser]") {
