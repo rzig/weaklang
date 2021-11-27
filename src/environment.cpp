@@ -61,6 +61,7 @@ void Environment::execute_stmt(Stmt* stmt) {
 	    }
 	    std::cout << ']' << std::endl;
 	}
+	else std::cout << "Nil" << std::endl;
     }
     else if (CAN_MAKE(Return*, returnStmt)_FROM(stmt)) {
 	hit_return = true;

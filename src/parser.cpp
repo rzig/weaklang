@@ -121,8 +121,9 @@ Stmt* Parser::opDeclaration() {
 Stmt* Parser::varDeclaration() {
     Token name = consume(IDENTIFIER, "Expected variable name");
 
-    Expr* initialize = nullptr;
+    Expr* initialize;
     if (match(EQUALS)) initialize = expression();
+    else initialize = new Nil();
 
     consume(SEMI, "Expect semi-colon after variable declaration");
     return new VarDecl(name, initialize);
