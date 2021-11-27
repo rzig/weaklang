@@ -46,6 +46,23 @@ void Environment::execute_stmt(Stmt* stmt) {
 	if (to_print.is_bool()) std::cout << (std::get<bool>(to_print.value) ? "True" : "False") << std::endl;
 	else if (to_print.is_double()) std::cout << std::get<double>(to_print.value) << std::endl;
 	else if (to_print.is_string()) std::cout << std::get<std::string>(to_print.value) << std::endl;
+	else if (to_print.is_ndarray()) {
+	    auto pair = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(to_print.value);
+	    std::cout << '[';
+	    for (size_t i = 0; i < pair.first.size(); i++) {
+		std::cout << pair.first.at(i);
+		if (i < pair.first.size() - 1) std::cout << ", ";
+	    }
+	    std::cout << "] sa [";
+	    for (size_t i = 0; i < pair.second.size(); i++) {
+		std::cout << pair.second.at(i);
+		if (i < pair.second.size() - 1) std::cout << ", ";
+	    }
+	    std::cout << ']' << std::endl;
+	}
+    }
+    else if (CAN_MAKE(VarDecl*, varDecl)_FROM(stmt)) {
+	add_var(varDecl->name.lexeme, evaluate_expr(varDecl->expr));
     }
 }
 

@@ -1,3 +1,6 @@
 p "Hello, World!";
-
+a x = [1, 2, 3, 4, 5, 6];
+p x;
+x = x + 1;
+p x;
 
