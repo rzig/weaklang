@@ -140,6 +140,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	}
 	case EQUALS_EQUALS: {
 	    runtime_assert(left_var.value.index() == right_var.value.index(), binary->op, "Left and right expressions differ in type");
+	    if (left_var.is_nil()) return false;
 	    return left_var.value == right_var.value;
 	}
 	case EXCLA_EQUALS: {
