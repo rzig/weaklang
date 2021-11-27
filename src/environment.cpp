@@ -176,9 +176,11 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	    size_t r = extract_left.second.at(0);
 	    size_t m = extract_left.second.at(1);
 	    size_t c = extract_right.second.at(1);
+	    double *out = (double*) malloc(sizeof(double) * r * c);
+	    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, r, c, m, 1., extract_left.first.data(), m, extract_right.first.data(), c, 0., out, c);
 	    std::vector<double> result;
 	    result.reserve(r * c);
-	    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, r, c, m, 1., extract_left.first.data(), m, extract_right.first.data(), c, 0., result.data(), c);
+	    for (size_t i = 0; i < r * c; i++) result.push_back(out[i]);
 	    return Variable(std::pair<std::vector<double>, std::vector<size_t>>(result, {r, c}));
 	}
 	case AS_SHAPE: {
