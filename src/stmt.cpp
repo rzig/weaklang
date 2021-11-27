@@ -95,7 +95,7 @@ std::pair<std::string, std::string> VarDecl::to_string() {
     return make_string("Declare variable " + name.lexeme, expr);
 }
 
-While::While(Expr* cond, std::vector<Stmt*> stmts): cond(cond), stmts(stmts) {}
+While::While(Token keyword, Expr* cond, std::vector<Stmt*> stmts): keyword(keyword), cond(cond), stmts(stmts) {}
 
 std::pair<std::string, std::string> While::to_string() {
     return make_string("While Statement", stmts);

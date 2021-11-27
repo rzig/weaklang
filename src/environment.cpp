@@ -23,6 +23,7 @@ Variable Environment::get_return_val() {
 }
 
 void Environment::execute_stmt(Stmt* stmt) {
+    if (hit_return) return;
     if (CAN_MAKE(ExprStmt*, exprStmt)_FROM(stmt)) {
 	evaluate_expr(exprStmt->expr);
     }
@@ -61,8 +62,22 @@ void Environment::execute_stmt(Stmt* stmt) {
 	    std::cout << ']' << std::endl;
 	}
     }
+    else if (CAN_MAKE(Return*, returnStmt)_FROM(stmt)) {
+	hit_return = true;
+	return_val = evaluate_expr(returnStmt->expr);
+    }
     else if (CAN_MAKE(VarDecl*, varDecl)_FROM(stmt)) {
 	add_var(varDecl->name.lexeme, evaluate_expr(varDecl->expr));
+    }
+    else if (CAN_MAKE(While*, whileStmt)_FROM(stmt)) {
+	Variable cond = evaluate_expr(whileStmt->cond);
+	runtime_assert(cond.is_bool(), whileStmt->keyword, "While statement expected a boolean condition");
+	while (std::get<bool>(cond.value)) {
+	    for (Stmt* stmtInWhile : whileStmt->stmts) {
+		execute_stmt(stmtInWhile);
+	    }
+	    cond = evaluate_expr(whileStmt->cond);
+	}
     }
 }
 

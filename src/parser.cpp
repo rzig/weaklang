@@ -175,13 +175,14 @@ Stmt* Parser::printStatement() {
 }
 
 Stmt* Parser::whileStatement() {
+    Token whileToken = tokens.at(cur_index - 1);
     consume(LEFT_PAREN, "Expected '(' before condition");
     Expr* condition = expression();
     consume(RIGHT_PAREN, "Expected ')' after condition");
 
     consume(LEFT_BRACE, "Expected '{' before contents of while loop");
     std::vector<Stmt*> body = block();
-    return new While(condition, body);
+    return new While(whileToken, condition, body);
 }
 
 Stmt* Parser::returnStatement() {

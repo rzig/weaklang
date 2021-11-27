@@ -87,9 +87,10 @@ public:
 
 class While : public Stmt {
 public:
-    While(Expr* cond, std::vector<Stmt*> stmts);
+    While(Token keyword, Expr* cond, std::vector<Stmt*> stmts);
     ~While();
     std::pair<std::string, std::string> to_string();
+    Token keyword;
     Expr* cond;
     std::vector<Stmt*> stmts;
 };
