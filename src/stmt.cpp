@@ -65,7 +65,7 @@ std::pair<std::string, std::string> FuncDecl::to_string() {
     return make_string("Declare Function " + name.lexeme, stmts);
 }
 
-If::If(Expr* cond, std::vector<Stmt*> stmts): cond(cond), stmts(stmts) {}
+If::If(Token keyword, Expr* cond, std::vector<Stmt*> stmts): keyword(keyword), cond(cond), stmts(stmts) {}
 
 std::pair<std::string, std::string> If::to_string() {
     return make_string("If Statement ", stmts);

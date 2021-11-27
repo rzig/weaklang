@@ -23,7 +23,30 @@ Variable Environment::get_return_val() {
 }
 
 void Environment::execute_stmt(Stmt* stmt) {
-
+    if (CAN_MAKE(ExprStmt*, exprStmt)_FROM(stmt)) {
+	evaluate_expr(exprStmt->expr);
+    }
+    else if (CAN_MAKE(FuncDecl*, funcDecl)_FROM(stmt)) {
+	add_func(funcDecl->name.lexeme, funcDecl);
+    }
+    else if (CAN_MAKE(If*, ifStmt)_FROM(stmt)) {
+	Variable cond = evaluate_expr(ifStmt->cond);
+	runtime_assert(cond.is_bool(), ifStmt->keyword, "If statement expected a boolean condition");
+	if (std::get<bool>(cond.value)) {
+	    for (Stmt* stmtInIf : ifStmt->stmts) {
+		execute_stmt(stmtInIf);
+	    }
+	}
+    }
+    else if (CAN_MAKE(OpDecl*, opDecl)_FROM(stmt)) {
+	add_op(opDecl->name.lexeme, opDecl);
+    }
+    else if (CAN_MAKE(Print*, print)_FROM(stmt)) {
+	Variable to_print = evaluate_expr(print->expr);
+	if (to_print.is_bool()) std::cout << (std::get<bool>(to_print.value) ? "True" : "False") << std::endl;
+	else if (to_print.is_double()) std::cout << std::get<double>(to_print.value) << std::endl;
+	else if (to_print.is_string()) std::cout << std::get<std::string>(to_print.value) << std::endl;
+    }
 }
 
 Variable Environment::evaluate_expr(Expr* expr) {
@@ -49,13 +72,13 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	}
 	return Variable(arr.first.at(flat_index));
     }
-    if (CAN_MAKE(Assign*, assign)_FROM(expr)) {
+    else if (CAN_MAKE(Assign*, assign)_FROM(expr)) {
 	runtime_assert(VAR_EXISTS(assign->name.lexeme), assign->name, "Identifier doesn't correspond to a declared variable name");
 	Variable var = evaluate_expr(assign->value);
 	var_symbol_table.at(assign->name.lexeme) = var;
 	return var;
     }
-    if (CAN_MAKE(Binary*, binary)_FROM(expr)) {
+    else if (CAN_MAKE(Binary*, binary)_FROM(expr)) {
 	Variable left_var = evaluate_expr(binary->left);
 	Variable right_var = evaluate_expr(binary->right);
 	switch (binary->op.type) {
@@ -171,7 +194,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	default: runtime_assert(false, binary->op, "Invalid binary operator");
 	}
     }
-    if (CAN_MAKE(Func*, func)_FROM(expr)) {
+    else if (CAN_MAKE(Func*, func)_FROM(expr)) {
 	runtime_assert(FUNC_EXISTS(func->func.lexeme), func->func, "Identifier doesn't correspond to a defined function name");
 	FuncDecl* funcDecl = func_symbol_table.at(func->func.lexeme);
 	Environment env;
@@ -186,7 +209,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	}
 	return env.get_return_val();
     }
-    if (CAN_MAKE(Literal*, literal)_FROM(expr)) {
+    else if (CAN_MAKE(Literal*, literal)_FROM(expr)) {
 	switch (literal->literal_type) {
 	case LITERAL_STRING: return Variable(literal->string_val);
 	case LITERAL_DOUBLE: return Variable(literal->double_val);
@@ -202,7 +225,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	}
 	}
     }
-    if (CAN_MAKE(Unary*, unary)_FROM(expr)) {
+    else if (CAN_MAKE(Unary*, unary)_FROM(expr)) {
 	Variable val = evaluate_expr(unary->right);
 	switch(unary->op.type) {
 	case EXCLA: {
@@ -224,13 +247,14 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	default: runtime_assert(false, unary->op, "Invalid unary operator");
 	}
     }
-    if (CAN_MAKE(Var*, var)_FROM(expr)) {
+    else if (CAN_MAKE(Var*, var)_FROM(expr)) {
 	runtime_assert(VAR_EXISTS(var->name.lexeme), var->name, "Identifier doesn't correspond to a declared variable name");
 	return var_symbol_table.at(var->name.lexeme);
     }
-    if (CAN_MAKE(Nil*, nil)_FROM(expr)) {
+    else if (CAN_MAKE(Nil*, nil)_FROM(expr)) {
 	return Variable();
     }
+    throw std::runtime_error("Couldn't evaluate expression (evaluation for expression type might not be implemented?)");
 }
 
 void Environment::runtime_assert(bool cond, Token loc, std::string error_msg) {

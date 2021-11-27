@@ -3,6 +3,7 @@
 
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "environment.hpp"
 
 int main(int argc, char* argv[]) {
   if (argc == 1) {
@@ -19,6 +20,10 @@ int main(int argc, char* argv[]) {
       Parser p(tokens);
       std::vector<Stmt*> program = p.parse();
       //std::cout << p.as_dot() << std::endl;
+      Environment env;
+      for (Stmt* stmt : program) {
+	  env.execute_stmt(stmt);
+      }
     } else {
       std::cout << "Couldn't open file " << argv[i] << ". Quitting."
                 << std::endl;

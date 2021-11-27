@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <stdexcept>
+#include <iostream>
 #include <cblas.h>
 #include <string>
 #include <math.h>

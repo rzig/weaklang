@@ -158,13 +158,14 @@ Stmt* Parser::exprStatement() {
 }
 
 Stmt* Parser::ifStatement() {
+    Token ifToken = tokens.at(cur_index - 1);
     consume(LEFT_PAREN, "Expected '(' before condition");
     Expr* condition = expression();
     consume(RIGHT_PAREN, "Expected ')' after condition");
 
     consume(LEFT_BRACE, "Expected '{' before contents of if statement");
     std::vector<Stmt*> body = block();
-    return new If(condition, body);
+    return new If(ifToken, condition, body);
 }
 
 Stmt* Parser::printStatement() {

@@ -39,9 +39,10 @@ public:
 
 class If : public Stmt {
 public:
-    If(Expr* cond, std::vector<Stmt*> stmts);
+    If(Token keyword, Expr* cond, std::vector<Stmt*> stmts);
     ~If();
     std::pair<std::string, std::string> to_string();
+    Token keyword;
     Expr* cond;
     std::vector<Stmt*> stmts;
 };
