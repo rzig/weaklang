@@ -25,12 +25,8 @@ int main(int argc, char* argv[]) {
       std::vector<Stmt*> program = p.parse();
       //std::cout << p.as_dot() << std::endl;
       Environment env;
-      for (Stmt* stmt : program) {
-	  env.execute_stmt(stmt);
-      }
-      for (auto stmt : program) {
-	  delete stmt;
-      }
+      for (Stmt* stmt : program) env.execute_stmt(stmt);
+      for (auto stmt : program) delete stmt;
     } else {
       std::cout << "Couldn't open file " << argv[i] << ". Quitting."
                 << std::endl;
