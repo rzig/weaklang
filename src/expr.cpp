@@ -136,7 +136,9 @@ Func::~Func() {
     }
 }
 
-Literal::~Literal() {}
+Literal::~Literal() {
+    for (auto expr : array_vals) delete expr;
+}
 
 Nil::~Nil() {}
 

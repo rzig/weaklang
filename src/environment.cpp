@@ -183,6 +183,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
 	    std::vector<double> result;
 	    result.reserve(r * c);
 	    for (size_t i = 0; i < r * c; i++) result.push_back(out[i]);
+	    free(out);
 	    return Variable(std::pair<std::vector<double>, std::vector<size_t>>(result, {r, c}));
 	}
 	case AS_SHAPE: {

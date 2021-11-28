@@ -28,6 +28,15 @@ int main(int argc, char* argv[]) {
       for (Stmt* stmt : program) {
 	  env.execute_stmt(stmt);
       }
+      for (auto it = env.func_symbol_table.begin(); it != env.func_symbol_table.end(); it++) {
+	  delete it->second;
+      }
+      for (auto it = env.op_symbol_table.begin(); it != env.op_symbol_table.end(); it++) {
+	  delete it->second;
+      }
+      for (auto stmt : program) {
+	  delete stmt;
+      }
     } else {
       std::cout << "Couldn't open file " << argv[i] << ". Quitting."
                 << std::endl;
