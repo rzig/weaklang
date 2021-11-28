@@ -84,9 +84,8 @@ void Environment::execute_stmt(Stmt* stmt) {
 
 Variable Environment::evaluate_expr(Expr* expr) {
     if (CAN_MAKE(ArrAccess*, arrAccess)_FROM(expr)) {
-		runtime_assert(VAR_EXISTS(arrAccess->id.lexeme), arrAccess->id, "Identifier doesn't correspond to a declared variable name");
-		Variable var = var_symbol_table.at(arrAccess->id.lexeme);
-		runtime_assert(var.is_ndarray(), arrAccess->id, "Identifier in array access isn't an ndarray");
+		Variable var = evaluate_expr(arrAccess->id);
+		runtime_assert(var.is_ndarray(), arrAccess->brack, "Identifier in array access isn't an ndarray");
 		auto arr = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(var.value);
 		runtime_assert(arr.second.size() == arrAccess->idx.size(), arrAccess->brack, "Number of dimensions in array element access differs from number of dimensions in array");
 		std::vector<size_t> indices;

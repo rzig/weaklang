@@ -297,9 +297,9 @@ Expr* Parser::unary() {
 }
 
 Expr* Parser::arrAccess() {
-    if(tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index+1).type == LEFT_BRACK) {
-        Token name = consume(IDENTIFIER, "");
-        Token left_b = consume(LEFT_BRACK, "");
+    Expr* id = function();
+    if(match(LEFT_BRACK)) {
+        Token left_b = tokens.at(cur_index - 1);
         Expr* first_dim = expression();
         std::vector<Expr*> args;
         args.push_back(first_dim);
@@ -310,14 +310,13 @@ Expr* Parser::arrAccess() {
                 args.push_back(arg);
             }
             else {
-                throw std::runtime_error(create_error(name, "Too many arguments for array indexing (max " + std::to_string(MAX_ARGS) + ")"));
+                throw std::runtime_error(create_error(left_b, "Too many arguments for array indexing (max " + std::to_string(MAX_ARGS) + ")"));
             }
         }
         consume(RIGHT_BRACK, "Expected ']' after indices");
-        return new ArrAccess(name, left_b, args);
-    } else {
-        return function();
+        return new ArrAccess(id, left_b, args);
     }
+    return id;
 }
 
 Expr* Parser::function() {

@@ -17,10 +17,10 @@ public:
 
 class ArrAccess : public Expr {
 public:
-    ArrAccess(Token id, Token brack, std::vector<Expr*> idx);
+    ArrAccess(Expr* id, Token brack, std::vector<Expr*> idx);
     std::pair<std::string, std::string> to_string();
     ~ArrAccess();
-    Token id;
+    Expr* id;
     Token brack;
     std::vector<Expr*> idx;
 };

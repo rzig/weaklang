@@ -3,10 +3,8 @@ a px = N;
 a d = N;
 p x;
 p px;
-p d;
-w (px == N O d[0, 0] > 0.0001) {
+w (px == N O (px - x)[0, 0] > 0) {
   p x;
   px = x;
   x = x @ x;
-  d = px - x;
 }
