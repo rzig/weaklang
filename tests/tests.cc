@@ -10,6 +10,7 @@
 #include "lexer.hpp"
 #include "parser.hpp"
 #include "util.hpp"
+#include "environment.hpp"
 #include<iostream>
 #include<fstream>
 #include<sstream>
@@ -1165,4 +1166,52 @@ TEST_CASE("Composite", "[parser]") {
             }
         }
     }
+}
+
+TEST_CASE("Add function", "[environment]"){
+    Environment env;
+    SECTION("Function"){
+        Token token = {IDENTIFIER, "test", 1, 1}; 
+        std::vector<Token> params; 
+        std::vector<Stmt*> stmts; 
+        FuncDecl* decl = new FuncDecl(token, params, stmts);
+        env.add_func(decl->name.lexeme, decl);
+        REQUIRE(env.func_symbol_table.find("test") != env.func_symbol_table.end());
+    }
+    SECTION("Operator"){
+        Token name = {OPERATOR, "at", 1, 1}; 
+        Token left = {NUMBER, "5", 5, 5}; 
+        Token right = {NUMBER, "5", 5, 5}; 
+        std::vector<Stmt*> stmts; 
+        OpDecl* decl = new OpDecl(name, left, right, stmts);
+        env.add_op(decl->name.lexeme, decl); 
+        REQUIRE(env.op_symbol_table.find("at") != env.op_symbol_table.end()); 
+    }
+    SECTION("Variable"){
+        Variable var = new Variable(); 
+        env.add_var("test", var);
+        REQUIRE(env.var_symbol_table.find("test") != env.var_symbol_table.end()); 
+    }
+}
+
+
+
+// test entire process on files
+TEST_CASE("Simple file", "[environment][parser][lexer]") {
+    std::ifstream file_in("./tests/simple.weak");
+    std::stringstream stream;
+    stream << file_in.rdbuf();
+    file_in.close();
+    std::string file_str = stream.str();
+    no_error(file_str);
+    expect_tokens(file_str, {LET, IDENTIFIER, EQUALS, STRING, SEMI, END});    
+}
+
+TEST_CASE("Complicated file", "[environment][parser][lexer]") {
+    std::ifstream file_in("./tests/test.weak");
+    std::stringstream stream;
+    stream << file_in.rdbuf(); 
+    file_in.close(); 
+    std::string file_str = stream.str(); 
+    no_error(file_str); 
 }

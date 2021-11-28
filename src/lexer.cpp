@@ -170,6 +170,14 @@ std::vector<Error> Lexer::get_errors() {
     return errors;
 }
 
+std::string Lexer::print_errors() {
+    std::string output = ""; 
+    for(Error error : errors) {
+        output = output + error.message + " at line " + std::to_string(error.line) + " column " + std::to_string(error.column) + "\n"; 
+    }
+    return output;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //                        LEXER UTILITY FUNCTIONS                           //
 //////////////////////////////////////////////////////////////////////////////

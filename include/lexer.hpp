@@ -15,6 +15,7 @@ public:
     std::vector<Token> lex(const std::string &to_lex);
     bool has_had_error();
     std::vector<Error> get_errors();
+    std::string print_errors(); 
 private:
     std::vector<Error> errors;
     bool is_digit(char c);
