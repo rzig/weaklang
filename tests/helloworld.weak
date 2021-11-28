@@ -1,2 +1,12 @@
-a x;
+a x = [0.9, 0.5, 0.1, 0.5] sa [2, 2];
+a px = N;
+a d = N;
 p x;
+p px;
+p d;
+w (px == N O d[0, 0] > 0.0001) {
+  p x;
+  px = x;
+  x = x @ x;
+  d = px - x;
+}
