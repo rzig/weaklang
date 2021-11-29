@@ -83,7 +83,7 @@ void Environment::execute_stmt(Stmt* stmt) {
 	else if(CAN_MAKE(Assert*, assertStmt)_FROM(stmt)) {
 		Variable cond = evaluate_expr(assertStmt->cond); 
 		runtime_assert(cond.is_bool(), assertStmt->keyword, "Return statement expected a boolean condition"); 
-		runtime_assert(!std::get<bool>(cond.value), assertStmt->keyword, "Assert failed");
+		runtime_assert(std::get<bool>(cond.value), assertStmt->keyword, "Assert failed");
 	}
 }
 
