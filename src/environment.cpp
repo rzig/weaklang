@@ -80,6 +80,11 @@ void Environment::execute_stmt(Stmt* stmt) {
 			cond = evaluate_expr(whileStmt->cond);
 		}
     }
+	else if(CAN_MAKE(Assert*, assertStmt)_FROM(stmt)) {
+		Variable cond = evaluate_expr(assertStmt->cond); 
+		runtime_assert(cond.is_bool(), assertStmt->keyword, "Return statement expected a boolean condition"); 
+		runtime_assert(!std::get<bool>(cond.value), assertStmt->keyword, "Assert failed");
+	}
 }
 
 Variable Environment::evaluate_expr(Expr* expr) {
@@ -337,11 +342,3 @@ void Environment::runtime_assert(bool cond, Token loc, std::string error_msg) {
 std::string Environment::create_error(std::string error_msg, Token loc) {
     return "Runtime error: " + error_msg + ", occurred at line " + std::to_string(loc.line) + " at column " + std::to_string(loc.col);
 }
-
-/* THIS CURRENTLY WON'T WORK
-Environment::~Environment() {
-	// delete the pointers in each of the maps
-	// TODO potential issues for scope with functions
-	for(auto& it : func_symbol_table) delete it.second; 
-	for(auto& it : op_symbol_table) delete it.second; 
-	}*/

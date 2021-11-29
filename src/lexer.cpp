@@ -51,7 +51,8 @@ const std::unordered_map<std::string, TokenType> Lexer::keywords = {
     {"a", LET},
     {"w", WHILE},
     {"s", SHAPE},
-    {"sa", AS_SHAPE}
+    {"sa", AS_SHAPE},
+    {"v", ASSERT}
 };
 
 const std::unordered_map<std::string, TokenType> Lexer::operators_flow = {

@@ -45,7 +45,8 @@ enum TokenType {
     STRING,
     SHAPE,
     AS_SHAPE,
-    EMPTY
+    EMPTY,
+    ASSERT
 };
 
 struct Token {

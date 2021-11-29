@@ -52,6 +52,7 @@ std::string print_token_type(TokenType type) {
         case SHAPE: return std::string("SHAPE");
         case AS_SHAPE: return std::string("AS_SHAPE");
         case EMPTY: return std::string("EMPTY");
+        case ASSERT: return std::string("ASSERT"); 
     }
     return "";
 }

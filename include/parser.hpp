@@ -41,6 +41,7 @@ private:
     Stmt* printStatement();
     Stmt* whileStatement();
     Stmt* returnStatement();
+    Stmt* assertStatement(); 
 
     Expr* expression();
     Expr* function();

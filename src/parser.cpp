@@ -134,6 +134,7 @@ Stmt* Parser::statement() {
     if (match(PRINT)) return printStatement();
     if (match(RETURN)) return returnStatement();
     if (match(WHILE)) return whileStatement();
+    if (match(ASSERT)) return assertStatement(); 
     else return exprStatement();
 }
 
@@ -193,6 +194,13 @@ Stmt* Parser::returnStatement() {
     Stmt* stmt = new Return(tokens.at(cur_index - 1), expr);
     consume(SEMI, "Expected ';' after return statement");
     return stmt;
+}
+
+Stmt* Parser::assertStatement() {
+    Expr* expr = expression(); 
+    Stmt* stmt = new Assert(tokens.at(cur_index - 1), expr);
+    consume(SEMI, "Expected ';' after assert statement"); 
+    return stmt; 
 }
 
 Expr* Parser::expression() {

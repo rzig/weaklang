@@ -95,4 +95,13 @@ public:
     std::vector<Stmt*> stmts;
 };
 
+class Assert : public Stmt {
+    public:
+    Assert(Token keyword, Expr* cond);
+    ~Assert(); 
+    std::pair<std::string, std::string> to_string(); 
+    Token keyword; 
+    Expr* cond; 
+};
+
 #endif // STMT_H_

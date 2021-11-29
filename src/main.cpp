@@ -13,8 +13,8 @@ int main(int argc, char* argv[]) {
   for (size_t i = 1; i < (size_t)argc; i++) {
     std::ifstream input_file(argv[i]);
     if (input_file.is_open()) {
-      std::string read((std::istreambuf_iterator<char>(input_file)),
-                       (std::istreambuf_iterator<char>()));
+      std::string read = "v T;"; /* read((std::istreambuf_iterator<char>(input_file)),
+                       (std::istreambuf_iterator<char>())); */
       Lexer lexer;
       std::vector<Token> tokens = lexer.lex(read);
       if(lexer.has_had_error()) { 

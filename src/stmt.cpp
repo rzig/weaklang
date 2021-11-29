@@ -101,6 +101,12 @@ std::pair<std::string, std::string> While::to_string() {
     return make_string("While Statement", stmts);
 }
 
+Assert::Assert(Token keyword, Expr* cond): keyword(keyword), cond(cond) {} 
+
+std::pair<std::string, std::string> Assert::to_string() {
+    return make_string("Assert Statement", cond);
+}
+
 ExprStmt::~ExprStmt() {
     delete expr;
 }
@@ -133,4 +139,8 @@ VarDecl::~VarDecl() {
 While::~While() {
     delete cond;
     for(auto stmt : stmts) delete stmt;
+}
+
+Assert::~Assert() {
+    delete cond;
 }
