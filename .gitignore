@@ -1,2 +1,4 @@
 bin/*
+!bin/
 .vscode/*
+.bash_history
