@@ -1,5 +1,5 @@
 CXX=clang++
-CXXFLAGS=-std=c++20 -g -fstandalone-debug -Iinclude/ -I/usr/include -I/usr/include/x86_64-linux-gnu -Iinclude/CBLAS/include/ -Linclude/CBLAS/include/ -Linclude/CBLAS/lib/
+CXXFLAGS=-std=c++20 -g -fstandalone-debug -Iinclude/ -Iinclude/CBLAS/include/
 LFLAGS=-lcblas
 
 weak: bin/weak
