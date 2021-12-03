@@ -1,18 +1,9 @@
-f dim(list) {
-    r (s (s list))[0];
-}
+            o mult(left, right) {
+                r left * -right;
+            }
 
-f funky_multiply(list) {
-    v dim(list) == 1;
-    a len = (s list)[0];
-    a j = 0;
-    w (j < len) {
-        list[j] = len * list[j];
-        j = j + 1;
-    }
-    r list;
-}
+            o other(left, right) {
+                r (left mult right) mult right;
+            }
 
-a arr = [1, 2, 3];
-p funky_multiply(arr);
-# p arr;
+            p 5 other 10;

@@ -1482,15 +1482,33 @@ TEST_CASE("Function declaration and usage", "[environment]") {
     }
 }
 
-// TEST_CASE("Operator declaration and usage", "[environment]") {
-//     SECTION("Single custom operator") {
+TEST_CASE("Operator declaration and usage", "[environment]") {
+    SECTION("Single custom operator") {
+        auto program = R"V0G0N(
+            o double_subtract(left, right) {
+                r left - 2*right;
+            }
+            
+            p 10 double_subtract 5;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "0");
+    }
 
-//     }
+    SECTION("Custom operator used inside other custom operator") {
+        auto program = R"V0G0N(
+            o mult(left, right) {
+                r left * -right;
+            }
 
-//     SECTION("Custom operator used inside other custom operator") {
+            o other(left, right) {
+                r (left mult right) mult right;
+            }
 
-//     }
-// }
+            p 5 other 10;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "500");
+    }
+}
 
 // TEST_CASE("While usage", "[environment]") {
 //     // There's really only one unique test we can do here,

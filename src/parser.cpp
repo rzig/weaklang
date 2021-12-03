@@ -1,5 +1,4 @@
 #include "parser.hpp"
-#include<iostream>
 
 Parser::Parser(std::vector<Token> input): tokens(input) {}
 
@@ -248,7 +247,7 @@ Expr* Parser::operation() {
         Token id = tokens.at(cur_index-1);
         if (id.type == EQUALS) throw std::runtime_error(create_error(id, "Can't parse = as a binary operator"));
         Expr* right = logicOr();
-        exp = new Binary(right, id, exp);
+        exp = new Binary(exp, id, right);
     }
     return exp;
 }
