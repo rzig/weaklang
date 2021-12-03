@@ -215,6 +215,11 @@ TEST_CASE("Keywords", "[lexer]") {
         expect_tokens("a x = 3", {LET, IDENTIFIER, EQUALS, NUMBER, END});
     }
 
+    SECTION("Verify") {
+        no_error("v s m == 2");
+        expect_tokens("v s m == 2", {ASSERT, SHAPE, IDENTIFIER, EQUALS_EQUALS, NUMBER, END});
+    }
+
     SECTION("prioritizes identifiers") {
         // here we implement a few one off tests to make sure
         // that if an identifier starts with the same letter or letters
