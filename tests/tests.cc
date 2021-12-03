@@ -1307,15 +1307,21 @@ TEST_CASE("Printing simple expressions", "[environment]") {
     }
 }
 
-// TEST_CASE("Math expression evaluation - literals only", "[environment]") {
-//     SECTION("Simple arithmetic") {
+// For the following tests, we use print statements to get the results
+// of expressions, meaning these tests are dependent on print functioning
+// correctly. This is a reasonable assumption since it models the real-world
+// usage of our environment, where users would be printing out values at
+// the end of their program.
 
-//     }
+TEST_CASE("Math expression evaluation - literals only", "[environment]") {
+    SECTION("Simple arithmetic") {
+        REQUIRE_OUTPUT("p 2 + 3 * 5;", "17\n");
+    }
 
-//     SECTION("Complex arithmetic") {
-
-//     }
-// }
+    SECTION("Complex arithmetic") {
+        REQUIRE_OUTPUT("p (2+3)^(1.5 * 2);", "125\n");
+    }
+}
 
 // TEST_CASE("Logical expression evaluation - literals only", "[environment]") {
 //     SECTION("Simple conditional") {
