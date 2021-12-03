@@ -1323,15 +1323,15 @@ TEST_CASE("Math expression evaluation - literals only", "[environment]") {
     }
 }
 
-// TEST_CASE("Logical expression evaluation - literals only", "[environment]") {
-//     SECTION("Simple conditional") {
+TEST_CASE("Logical expression evaluation - literals only", "[environment]") {
+    SECTION("Simple conditional") {
+        REQUIRE_OUTPUT("p T O F;", "True\n");
+    }
 
-//     }
-
-//     SECTION("Complex conditional") {
-
-//     }
-// }
+    SECTION("Complex conditional") {
+        REQUIRE_OUTPUT("p !(!(T A F) O (!T O F));", "False\n");
+    }
+}
 
 // TEST_CASE("Variable declaration and usage", "[environment]") {
 //     SECTION("String declaration and usage") {
