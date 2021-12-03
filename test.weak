@@ -1,9 +1,38 @@
-            o mult(left, right) {
-                r left * -right;
-            }
+# DO NOT DELETE OR MODIFY THIS FILE! IT IS USED IN tests.cc
+o x (b, c) {
+  p "in operator x";
+  r b ^ (c*2);
+}
 
-            o other(left, right) {
-                r (left mult right) mult right;
-            }
+o z (b, c) {
+  p "in operator z";
+  r (s b) + (s c);
+}
 
-            p 5 other 10;
+f y (b, c, d) {
+  p "in function y";
+  a m = 0;
+  a mat = [0] sa [2, 2];
+  w (m < d) {
+    p "in while loop";
+    mat = mat x mat;
+    mat = mat @ mat;
+    m = m + 1;
+  }
+  i (mat[0, 0] < 10^3) {
+      p mat[0, 0];
+  }
+  i (mat[0, 0] != 1 O mat[1, 1] != 2) {
+    r T;
+  }
+  r F;
+}
+
+p "== First call ==";
+p y(1,2,3);
+p "== Second call ==";
+p "Hello";
+p "== Third call ==";
+p N;
+p "== Fourth call ==";
+p y(2,3,4);

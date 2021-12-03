@@ -1689,3 +1689,76 @@ TEST_CASE("Error tests", "[environment]") {
         REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Identifier doesn't correspond to a declared variable name, occurred at line 4 at column 20");
     }
 }
+
+TEST_CASE("Complete program evaluation", "[environment]") {
+    SECTION("Program evaluation") {
+        auto program = R"V0G0N(
+            # This is a comment
+            o x (b, c) {
+                p "in operator x";
+                r b ^ (c*2);
+            }
+
+            o z (b, c) {
+                p "in operator z";
+                r (s b) + (s c);
+            }
+
+            f y (b, c, d) {
+                p "in function y";
+                a m = 0;
+                a mat = [0] sa [2, 2];
+                w (m < d) {
+                    p "in while loop";
+                    mat = mat x mat;
+                    mat = mat @ mat;
+                    m = m + 1;
+                }
+                i (mat[0, 0] < 10^3) {
+                    p mat[0, 0];
+                }
+                i (mat[0, 0] != 1 O mat[1, 1] != 2) {
+                    r T;
+                }
+                r F;
+            }
+
+            p "== First call ==";
+            p y(1,2,3);
+            p "== Second call ==";
+            p "Hello";
+            p "== Third call ==";
+            p N;
+            p "== Fourth call ==";
+            p y(2,3,4);
+        )V0G0N";
+        auto output = R"V0G0N(
+            "== First call =="
+            "in function y"
+            "in while loop"
+            "in operator x"
+            "in while loop"
+            "in operator x"
+            "in while loop"
+            "in operator x"
+            512
+            True
+            "== Second call =="
+            "Hello"
+            "== Third call =="
+            Nil
+            "== Fourth call =="
+            "in function y"
+            "in while loop"
+            "in operator x"
+            "in while loop"
+            "in operator x"
+            "in while loop"
+            "in operator x"
+            "in while loop"
+            "in operator x"
+            True
+        )V0G0N";
+        REQUIRE_OUTPUT(program, output);
+    };
+}

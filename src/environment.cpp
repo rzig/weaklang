@@ -147,7 +147,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
 			Variable right_var = evaluate_expr(binary->right);
 			runtime_assert(OP_EXISTS(binary->op.lexeme), binary->op, "Identifier doesn't correspond to a defined operator name");
 			OpDecl* opDecl = op_symbol_table.at(binary->op.lexeme);
-			Environment env;
+			Environment env (out);
 			env.func_symbol_table = func_symbol_table;
 			env.op_symbol_table = op_symbol_table;
 			env.add_var(opDecl->left.lexeme, left_var);
@@ -300,7 +300,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
     else if (CAN_MAKE(Func*, func)_FROM(expr)) {
 		runtime_assert(FUNC_EXISTS(func->func.lexeme), func->func, "Identifier doesn't correspond to a defined function name");
 		FuncDecl* funcDecl = func_symbol_table.at(func->func.lexeme);
-		Environment env;
+		Environment env (out);
 		env.func_symbol_table = func_symbol_table;
 		env.op_symbol_table = op_symbol_table;
 		runtime_assert(func->args.size() == funcDecl->params.size(), func->paren, "Function called with different number of args than defined with");
