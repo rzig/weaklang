@@ -1,2 +1,2 @@
-a mat = 5;
+a mat = [0] sa [2, 2];
 p mat;

@@ -51,6 +51,7 @@
 class Environment {
 public:
     Environment();
+    Environment(std::ostream& out_override);
     //~Environment(); 
     void add_func(std::string name, FuncDecl* func);
     void add_op(std::string name, OpDecl* op);
@@ -67,6 +68,7 @@ private:
     Variable evaluate_expr(Expr* expr);
     void runtime_assert(bool cond, Token loc, std::string error_msg);
     std::string create_error(std::string error_msg, Token loc);
+    std::ostream& out;
 };
 
 #endif // ENVIRONMENT_H_

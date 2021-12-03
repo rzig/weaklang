@@ -1265,24 +1265,168 @@ TEST_CASE("Add function", "[environment]"){
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//                           Environment tests                              //
+//////////////////////////////////////////////////////////////////////////////
 
+#define REQUIRE_OUTPUT(prog, expected) REQUIRE(getOutput(prog) == expected);
+
+std::string getOutput(std::string program) {
+    Lexer lex;
+    auto lexed = lex.lex(program);
+    Parser p (lexed);
+    auto statements = p.parse();
+    std::stringstream output_stream;
+    Environment e (output_stream);
+    for(auto stmt : statements) {
+        e.execute_stmt(stmt);
+    }
+    return output_stream.str();
+}
+
+TEST_CASE("Printing simple expressions", "[environment]") {
+    SECTION("string literal") {
+        REQUIRE_OUTPUT("p \"hello\";", "\"hello\"\n");
+    }
+
+    SECTION("double") {
+        REQUIRE_OUTPUT("p 2.5;", "2.5\n");
+    }
+
+    SECTION("bool") {
+        REQUIRE_OUTPUT("p T;", "True\n");
+        REQUIRE_OUTPUT("p F;", "False\n");
+    }
+
+    SECTION("1d array") {
+        REQUIRE_OUTPUT("p [0];", "[0] sa [1]\n");
+    }
+
+    SECTION("nd array") {
+        REQUIRE_OUTPUT("p [0] sa [2, 2];", "[0] sa [2, 2]\n");
+    }
+}
+
+// TEST_CASE("Math expression evaluation - literals only", "[environment]") {
+//     SECTION("Simple arithmetic") {
+
+//     }
+
+//     SECTION("Complex arithmetic") {
+
+//     }
+// }
+
+// TEST_CASE("Logical expression evaluation - literals only", "[environment]") {
+//     SECTION("Simple conditional") {
+
+//     }
+
+//     SECTION("Complex conditional") {
+
+//     }
+// }
+
+// TEST_CASE("Variable declaration and usage", "[environment]") {
+//     SECTION("String declaration and usage") {
+
+//     }
+
+//     SECTION("Double declaration and usage") {
+
+//     }
+
+//     SECTION("1d array declaration and usage") {
+
+//     }
+
+//     SECTION("nd array declaration and usage") {
+
+//     }
+
+//     SECTION("bool declaration and usage") {
+
+//     }
+// }
+
+// TEST_CASE("Function declaration and usage", "[environment]") {
+//     SECTION("Function with no parameters") {
+
+//     }
+
+//     SECTION("Function with parameters") {
+
+//     }
+
+//     SECTION("Function called from other function") {
+
+//     }
+// }
+
+// TEST_CASE("Operator declaration and usage", "[environment]") {
+//     SECTION("Single custom operator") {
+
+//     }
+
+//     SECTION("Custom operator used inside other custom operator") {
+
+//     }
+// }
+
+// TEST_CASE("While usage", "[environment]") {
+//     // There's really only one unique test we can do here,
+//     // any other tests would be isomorphic
+//     SECTION("While loop") {
+
+//     }
+// }
+
+// TEST_CASE("If usage", "[environment]") {
+//     // Same as a while loop, we don't gain anything by testing
+//     // multiple different if statements since it just boils
+//     // down to condition evaluation which has already been tested
+//     SECTION("If statement") {
+
+//     }
+// }
+
+// TEST_CASE("Assert usage", "[environment]") {
+//     // Same as an if, only need to do one test here
+//     SECTION("Assert statement") {
+
+//     }
+// }
+
+// TEST_CASE("Printing complex expressions", "[environment]") {
+//     SECTION("function call") {
+
+//     }
+
+//     SECTION("condition") {
+
+//     }
+
+//     SECTION("variable") {
+        
+//     }
+// }
 
 // test entire process on files
-TEST_CASE("Simple file", "[environment][parser][lexer]") {
-    std::ifstream file_in("./tests/simple.weak");
-    std::stringstream stream;
-    stream << file_in.rdbuf();
-    file_in.close();
-    std::string file_str = stream.str();
-    no_error(file_str);
-    expect_tokens(file_str, {LET, IDENTIFIER, EQUALS, STRING, SEMI, END});    
-}
+// TEST_CASE("Simple file", "[environment][parser][lexer]") {
+//     std::ifstream file_in("./tests/simple.weak");
+//     std::stringstream stream;
+//     stream << file_in.rdbuf();
+//     file_in.close();
+//     std::string file_str = stream.str();
+//     no_error(file_str);
+//     expect_tokens(file_str, {LET, IDENTIFIER, EQUALS, STRING, SEMI, END});    
+// }
 
-TEST_CASE("Complicated file", "[environment][parser][lexer]") {
-    std::ifstream file_in("./tests/test.weak");
-    std::stringstream stream;
-    stream << file_in.rdbuf(); 
-    file_in.close(); 
-    std::string file_str = stream.str(); 
-    no_error(file_str); 
-}
+// TEST_CASE("Complicated file", "[environment][parser][lexer]") {
+//     std::ifstream file_in("./tests/test.weak");
+//     std::stringstream stream;
+//     stream << file_in.rdbuf(); 
+//     file_in.close(); 
+//     std::string file_str = stream.str(); 
+//     no_error(file_str); 
+// }

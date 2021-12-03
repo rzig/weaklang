@@ -1,6 +1,8 @@
 #include "environment.hpp"
 
-Environment::Environment(): return_val(), hit_return(false) {}
+Environment::Environment(): return_val(), hit_return(false), out(std::cout) {}
+
+Environment::Environment(std::ostream& out_override): return_val(), hit_return(false), out(out_override) {}
 
 void Environment::add_func(std::string name, FuncDecl* func) {
     func_symbol_table.insert(std::pair<std::string, FuncDecl*>(name, func));
@@ -44,24 +46,24 @@ void Environment::execute_stmt(Stmt* stmt) {
     }
     else if (CAN_MAKE(Print*, print)_FROM(stmt)) {
 		Variable to_print = evaluate_expr(print->expr);
-		if (to_print.is_bool()) std::cout << (std::get<bool>(to_print.value) ? "True" : "False") << std::endl;
-		else if (to_print.is_double()) std::cout << std::get<double>(to_print.value) << std::endl;
-		else if (to_print.is_string()) std::cout << std::get<std::string>(to_print.value) << std::endl;
+		if (to_print.is_bool()) out << (std::get<bool>(to_print.value) ? "True" : "False") << std::endl;
+		else if (to_print.is_double()) out << std::get<double>(to_print.value) << std::endl;
+		else if (to_print.is_string()) out << std::get<std::string>(to_print.value) << std::endl;
 		else if (to_print.is_ndarray()) {
 			auto pair = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(to_print.value);
-			std::cout << '[';
+			out << '[';
 			for (size_t i = 0; i < pair.first.size(); i++) {
-				std::cout << pair.first.at(i);
-				if (i < pair.first.size() - 1) std::cout << ", ";
+				out << pair.first.at(i);
+				if (i < pair.first.size() - 1) out << ", ";
 			}
-			std::cout << "] sa [";
+			out << "] sa [";
 			for (size_t i = 0; i < pair.second.size(); i++) {
-				std::cout << pair.second.at(i);
-				if (i < pair.second.size() - 1) std::cout << ", ";
+				out << pair.second.at(i);
+				if (i < pair.second.size() - 1) out << ", ";
 			}
-			std::cout << ']' << std::endl;
+			out << ']' << std::endl;
 		}
-		else std::cout << "Nil" << std::endl;
+		else out << "Nil" << std::endl;
     }
     else if (CAN_MAKE(Return*, returnStmt)_FROM(stmt)) {
 		hit_return = true;
