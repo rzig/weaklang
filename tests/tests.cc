@@ -899,6 +899,10 @@ TEST_CASE("Print statement", "[parser]") {
     SECTION("Error - no semicolon after print") {
         REQUIRE_THROWS_WITH(getStatements("p T"), "Expected ';' after print statement but instead found: \"\", at line 1 and column 4, this token has type END");
     }
+
+    SECTION("Error - no expression after print") {
+        REQUIRE_THROWS_WITH(getStatements("p ;"), "Expected primary but instead found: \";\", at line 1 and column 3, this token has type SEMI");
+    }
 }
 
 TEST_CASE("Assert statement", "[parser]") {
