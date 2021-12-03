@@ -1564,36 +1564,128 @@ TEST_CASE("Assert usage", "[environment]") {
     }
 }
 
-// TEST_CASE("Printing complex expressions", "[environment]") {
-//     SECTION("function call") {
+// Note that we do not test matrix multiplication above. This is because we use BLAS for
+// matrix multiplication, and it would not make sense to test something that's already
+// been tested.
 
-//     }
+TEST_CASE("Error tests", "[environment]") {
+    SECTION("If statement without boolean condition") {
+        REQUIRE_THROWS_WITH(getOutput("i (3) {}"), "Runtime error: If statement expected a boolean condition, occurred at line 0 at column 0");
+    }
 
-//     SECTION("condition") {
+    SECTION("While statement without boolean condition") {
+        REQUIRE_THROWS_WITH(getOutput("w (34) {}"), "Runtime error: While statement expected a boolean condition, occurred at line 0 at column 0");
+    }
 
-//     }
+    SECTION("Assert statement without boolean condition") {
+        REQUIRE_THROWS_WITH(getOutput("v 345;"), "Runtime error: Assert statement expected a boolean condition, occurred at line 0 at column 2");
+    }
 
-//     SECTION("variable") {
-        
-//     }
-// }
+    SECTION("Array access on non-array") {
+        auto program = R"V0G0N(
+            a mat = 3;
+            p mat[1];
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Identifier in array access isn't an ndarray, occurred at line 2 at column 18");
+    }
 
-// test entire process on files
-// TEST_CASE("Simple file", "[environment][parser][lexer]") {
-//     std::ifstream file_in("./tests/simple.weak");
-//     std::stringstream stream;
-//     stream << file_in.rdbuf();
-//     file_in.close();
-//     std::string file_str = stream.str();
-//     no_error(file_str);
-//     expect_tokens(file_str, {LET, IDENTIFIER, EQUALS, STRING, SEMI, END});    
-// }
+    SECTION("Incorrect array access dimensions") {
+        auto program = R"V0G0N(
+            a mat = [0, 1];
+            p mat[0, 0];
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Number of dimensions in array element access differs from number of dimensions in array, occurred at line 2 at column 18");
+    }
 
-// TEST_CASE("Complicated file", "[environment][parser][lexer]") {
-//     std::ifstream file_in("./tests/test.weak");
-//     std::stringstream stream;
-//     stream << file_in.rdbuf(); 
-//     file_in.close(); 
-//     std::string file_str = stream.str(); 
-//     no_error(file_str); 
-// }
+    SECTION("Nonnumeric array access index") {
+        auto program = R"V0G0N(
+            a mat = [0, 1];
+            p mat["hi"];
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: An expression used in array indexing is not a number, occurred at line 2 at column 18");
+    }
+
+    SECTION("Array access index too large") {
+        auto program = R"V0G0N(
+            a mat = [0, 1];
+            p mat[2];
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: An expression used in array indexing is larger than a dimension of the ndarray, occurred at line 2 at column 18");
+    }
+
+    SECTION("Assignment to variable that does not exist") {
+        REQUIRE_THROWS_WITH(getOutput("mat = 3;"), "Runtime error: Identifier doesn't correspond to a declared variable name, occurred at line 0 at column 0");
+    }
+
+    SECTION("Assign non-number to an array item") {
+        auto program = R"V0G0N(
+            a mat = [0, 1];
+            mat[0] = "hi";
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Can't assign a non-number to an entry in an array, occurred at line 2 at column 13");
+    }
+
+    SECTION("Using custom operator that does not exist") {
+        REQUIRE_THROWS_WITH(getOutput("p T xor F;"), "Runtime error: Identifier doesn't correspond to a defined operator name, occurred at line 0 at column 4");
+    }
+
+    SECTION("Comparison with different types") {
+        REQUIRE_THROWS_WITH(getOutput("p 2 <= \"a\";"), "Runtime error: Left and right expressions differ in type, occurred at line 0 at column 4");
+    }
+
+    SECTION("Matrix multiplication of non-matrix") {
+        auto program = R"V0G0N(
+            a mat = 3;
+            p mat @ mat;
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Left expression isn't an ndarray, occurred at line 2 at column 19");
+    }
+
+    SECTION("sa on non-matrix") {
+        auto program = R"V0G0N(
+            a non = "hello";
+            p s non;
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Expression evaluates to a non-ndarray, occurred at line 2 at column 15");
+    }
+
+    SECTION("Call to function that does not exist") {
+        REQUIRE_THROWS_WITH(getOutput("p dne();"), "Runtime error: Identifier doesn't correspond to a defined function name, occurred at line 0 at column 2");
+    }
+
+    SECTION("Call to function with incorrect number of arguments") {
+        auto program = R"V0G0N(
+            f func(arg) {
+                r arg;
+            }
+            p func(1, 2);
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Function called with different number of args than defined with, occurred at line 4 at column 19");
+    }
+
+    SECTION("Creating array with non-doubles") {
+        REQUIRE_THROWS_WITH(getOutput("a mat = [1, T];"), "Runtime error: Expression in array literal evaluates to a non-number, occurred at line 0 at column 8");
+    }
+
+    SECTION("Unary ! without bool") {
+        REQUIRE_THROWS_WITH(getOutput("p !3;"), "Runtime error: Expression evaluates to a non-bool, occurred at line 0 at column 2");
+    }
+
+    SECTION("Unary - without number") {
+        REQUIRE_THROWS_WITH(getOutput("p -T;"), "Runtime error: Expression evaluates to a non-number, occurred at line 0 at column 2");
+    }
+
+    SECTION("Unary s without array") {
+        REQUIRE_THROWS_WITH(getOutput("p s T;"), "Runtime error: Expression evaluates to a non-ndarray, occurred at line 0 at column 2");
+    }
+
+    SECTION("Function call with variables that do not exist") {
+        auto program = R"V0G0N(
+            f func(arg) {
+                r arg;
+            }
+            p func(arg);
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Identifier doesn't correspond to a declared variable name, occurred at line 4 at column 20");
+    }
+}
