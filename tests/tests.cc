@@ -215,6 +215,11 @@ TEST_CASE("Keywords", "[lexer]") {
         expect_tokens("a x = 3", {LET, IDENTIFIER, EQUALS, NUMBER, END});
     }
 
+    SECTION("Verify") {
+        no_error("v s m == 2");
+        expect_tokens("v s m == 2", {ASSERT, SHAPE, IDENTIFIER, EQUALS_EQUALS, NUMBER, END});
+    }
+
     SECTION("prioritizes identifiers") {
         // here we implement a few one off tests to make sure
         // that if an identifier starts with the same letter or letters
@@ -320,7 +325,9 @@ TEST_CASE("Operation", "[parser]") {
                     REQUIRE(f->args.size() == 0);
                 }
                 required_if(CAN_MAKE(ArrAccess*, a)_FROM(b->right)) {
-                    REQUIRE(a->id.lexeme == "arr");
+                    required_if(CAN_MAKE(Var*, v)_FROM(a->id)) {
+                        REQUIRE(v->name.lexeme == "arr");
+                    }
                     REQUIRE(a->idx.size() == 1);
                     required_if(CAN_MAKE(Literal*, l)_FROM(a->idx[0])) {
                         REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
@@ -377,11 +384,11 @@ TEST_CASE("Equality", "[parser]") {
     }
 
     SECTION("with function and variable and ==") {
-        auto statements = getStatements("v(b) == b;");
+        auto statements = getStatements("k(b) == b;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Func*, f)_FROM(b->left)) {
-                    REQUIRE(f->func.lexeme == "v");
+                    REQUIRE(f->func.lexeme == "k");
                     REQUIRE(f->args.size() == 1);
                     required_if(CAN_MAKE(Var*, v)_FROM(f->args[0])) {
                         REQUIRE(v->name.lexeme == "b");
@@ -396,11 +403,11 @@ TEST_CASE("Equality", "[parser]") {
     }
 
     SECTION("with literal and variable and !=") {
-        auto statements = getStatements("v != 10;");
+        auto statements = getStatements("k != 10;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Var*, v)_FROM(b->left)) {
-                    REQUIRE(v->name.lexeme == "v");
+                    REQUIRE(v->name.lexeme == "k");
                 }
                 required_if(CAN_MAKE(Literal*, l)_FROM(b->right)) {
                     REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
@@ -462,11 +469,11 @@ TEST_CASE("Comparison", "[parser]") {
     }
 
     SECTION("function <= literal") {
-        auto statements = getStatements("v() <= 3;");
+        auto statements = getStatements("t() <= 3;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Func*, f)_FROM(b->left)) {
-                    REQUIRE(f->func.lexeme == "v");
+                    REQUIRE(f->func.lexeme == "t");
                     REQUIRE(f->args.size() == 0);
                 }
                 required_if(CAN_MAKE(Literal*, l)_FROM(b->right)) {
@@ -483,7 +490,9 @@ TEST_CASE("Comparison", "[parser]") {
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(ArrAccess*, a)_FROM(b->left)) {
-                    REQUIRE(a->id.lexeme == "arr");
+                    required_if(CAN_MAKE(Var*, v)_FROM(a->id)) {
+                        REQUIRE(v->name.lexeme == "arr");
+                    }
                     REQUIRE(a->idx.size() == 1);
                     required_if(CAN_MAKE(Literal*, l)_FROM(a->idx[0])) {
                         REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
@@ -502,19 +511,19 @@ TEST_CASE("Comparison", "[parser]") {
     }
 
     SECTION("Error - hanging >") {
-        REQUIRE_THROWS_WITH(getStatements("v > "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
+        REQUIRE_THROWS_WITH(getStatements("q > "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
     }
 
     SECTION("Error - hanging >=") {
-        REQUIRE_THROWS_WITH(getStatements("v >= "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
+        REQUIRE_THROWS_WITH(getStatements("t >= "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
     }
 
     SECTION("Error - hanging <=") {
-        REQUIRE_THROWS_WITH(getStatements("v <= "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
+        REQUIRE_THROWS_WITH(getStatements("t <= "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
     }
 
     SECTION("Error - hanging <") {
-        REQUIRE_THROWS_WITH(getStatements("v < "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
+        REQUIRE_THROWS_WITH(getStatements("u < "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
     }
 }
 
@@ -713,7 +722,9 @@ TEST_CASE("Array access", "[parser]") {
         auto statements = getStatements("array[1];");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(ArrAccess*, a)_FROM(e->expr)) {
-                REQUIRE(a->id.lexeme == "array");
+                required_if(CAN_MAKE(Var*, v)_FROM(a->id)) {
+                    REQUIRE(v->name.lexeme == "array");
+                }
                 REQUIRE(a->idx.size() == 1);
                 required_if(CAN_MAKE(Literal*, one)_FROM(a->idx[0])) {
                     REQUIRE(one->literal_type == LiteralType::LITERAL_DOUBLE);
@@ -727,7 +738,9 @@ TEST_CASE("Array access", "[parser]") {
         auto statements = getStatements("mat[1, b];");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(ArrAccess*, a)_FROM(e->expr)) {
-                REQUIRE(a->id.lexeme == "mat");
+                required_if(CAN_MAKE(Var*, v)_FROM(a->id)) {
+                    REQUIRE(v->name.lexeme == "mat");
+                }
                 REQUIRE(a->idx.size() == 2);
                 required_if(CAN_MAKE(Literal*, one)_FROM(a->idx[0])) {
                     REQUIRE(one->literal_type == LiteralType::LITERAL_DOUBLE);
@@ -862,12 +875,12 @@ TEST_CASE("Print statement", "[parser]") {
     }
 
     SECTION("with complex expression") {
-        auto statements = getStatements("p v() + b@b;");
+        auto statements = getStatements("p l() + b@b;");
         required_if(CAN_MAKE(Print*, p)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, parent)_FROM(p->expr)) {
-                required_if(CAN_MAKE(Func*, v)_FROM(parent->left)) {
-                    REQUIRE(v->func.lexeme == "v");
-                    REQUIRE(v->args.size() == 0);
+                required_if(CAN_MAKE(Func*, l)_FROM(parent->left)) {
+                    REQUIRE(l->func.lexeme == "l");
+                    REQUIRE(l->args.size() == 0);
                 }
                 required_if(CAN_MAKE(Binary*, child)_FROM(parent->right)) {
                     required_if(CAN_MAKE(Var*, b)_FROM(child->left)) {
@@ -885,6 +898,64 @@ TEST_CASE("Print statement", "[parser]") {
 
     SECTION("Error - no semicolon after print") {
         REQUIRE_THROWS_WITH(getStatements("p T"), "Expected ';' after print statement but instead found: \"\", at line 1 and column 4, this token has type END");
+    }
+
+    SECTION("Error - no expression after print") {
+        REQUIRE_THROWS_WITH(getStatements("p ;"), "Expected primary but instead found: \";\", at line 1 and column 3, this token has type SEMI");
+    }
+}
+
+TEST_CASE("Assert statement", "[parser]") {
+    SECTION("with simple expression") {
+        auto statements = getStatements("v b == c;");
+        required_if(CAN_MAKE(Assert*, a)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(a->cond)) {
+                required_if(CAN_MAKE(Var*, left)_FROM(b->left)) {
+                    REQUIRE(left->name.lexeme == "b");
+                }
+                required_if(CAN_MAKE(Var*, right)_FROM(b->right)) {
+                    REQUIRE(right->name.lexeme == "c");
+                }
+                REQUIRE(b->op.type == EQUALS_EQUALS);
+            }
+        }
+    }
+
+    SECTION("with complex expression") {
+        auto statements = getStatements("v func() O var O array[1];");
+        required_if(CAN_MAKE(Assert*, assert_s)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, parent)_FROM(assert_s->cond)) {
+                required_if(CAN_MAKE(ArrAccess*, arr)_FROM(parent->right)) {
+                    required_if(CAN_MAKE(Var*, v)_FROM(arr->id)) {
+                        REQUIRE(v->name.lexeme == "array");
+                    }
+                    REQUIRE(arr->idx.size() == 1);
+                    required_if(CAN_MAKE(Literal*, idx)_FROM(arr->idx[0])) {
+                        REQUIRE(idx->literal_type == LITERAL_DOUBLE);
+                        REQUIRE(idx->double_val == 1);
+                    }
+                }
+                REQUIRE(parent->op.type == OR);
+                required_if(CAN_MAKE(Binary*, child)_FROM(parent->left)) {
+                    required_if(CAN_MAKE(Func*, func)_FROM(child->left)) {
+                        REQUIRE(func->args.size() == 0);
+                        REQUIRE(func->func.lexeme == "func");
+                    }
+                    REQUIRE(child->op.type == OR);
+                    required_if(CAN_MAKE(Var*, v)_FROM(child->right)) {
+                        REQUIRE(v->name.lexeme == "var");
+                    }
+                }
+            }
+        }
+    }
+
+    SECTION("Error - no semicolon after assert") {
+        REQUIRE_THROWS_WITH(getStatements("v T"), "Expected ';' after assert statement but instead found: \"\", at line 1 and column 4, this token has type END");
+    }
+
+    SECTION("Error - no condition after assert") {
+        REQUIRE_THROWS_WITH(getStatements("v ;"), "Expected primary but instead found: \";\", at line 1 and column 3, this token has type SEMI");
     }
 }
 
@@ -1194,24 +1265,174 @@ TEST_CASE("Add function", "[environment]"){
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//                           Environment tests                              //
+//////////////////////////////////////////////////////////////////////////////
 
+#define REQUIRE_OUTPUT(prog, expected) REQUIRE(getOutput(prog) == expected);
+
+std::string getOutput(std::string program) {
+    Lexer lex;
+    auto lexed = lex.lex(program);
+    Parser p (lexed);
+    auto statements = p.parse();
+    std::stringstream output_stream;
+    Environment e (output_stream);
+    for(auto stmt : statements) {
+        e.execute_stmt(stmt);
+    }
+    return output_stream.str();
+}
+
+TEST_CASE("Printing simple expressions", "[environment]") {
+    SECTION("string literal") {
+        REQUIRE_OUTPUT("p \"hello\";", "\"hello\"\n");
+    }
+
+    SECTION("double") {
+        REQUIRE_OUTPUT("p 2.5;", "2.5\n");
+    }
+
+    SECTION("bool") {
+        REQUIRE_OUTPUT("p T;", "True\n");
+        REQUIRE_OUTPUT("p F;", "False\n");
+    }
+
+    SECTION("1d array") {
+        REQUIRE_OUTPUT("p [0];", "[0] sa [1]\n");
+    }
+
+    SECTION("nd array") {
+        REQUIRE_OUTPUT("p [0] sa [2, 2];", "[0] sa [2, 2]\n");
+    }
+}
+
+// For the following tests, we use print statements to get the results
+// of expressions, meaning these tests are dependent on print functioning
+// correctly. This is a reasonable assumption since it models the real-world
+// usage of our environment, where users would be printing out values at
+// the end of their program.
+
+TEST_CASE("Math expression evaluation - literals only", "[environment]") {
+    SECTION("Simple arithmetic") {
+        REQUIRE_OUTPUT("p 2 + 3 * 5;", "17\n");
+    }
+
+    SECTION("Complex arithmetic") {
+        REQUIRE_OUTPUT("p (2+3)^(1.5 * 2);", "125\n");
+    }
+}
+
+TEST_CASE("Logical expression evaluation - literals only", "[environment]") {
+    SECTION("Simple conditional") {
+        REQUIRE_OUTPUT("p T O F;", "True\n");
+    }
+
+    SECTION("Complex conditional") {
+        REQUIRE_OUTPUT("p !(!(T A F) O (!T O F));", "False\n");
+    }
+}
+
+// TEST_CASE("Variable declaration and usage", "[environment]") {
+//     SECTION("String declaration and usage") {
+
+//     }
+
+//     SECTION("Double declaration and usage") {
+
+//     }
+
+//     SECTION("1d array declaration and usage") {
+
+//     }
+
+//     SECTION("nd array declaration and usage") {
+
+//     }
+
+//     SECTION("bool declaration and usage") {
+
+//     }
+// }
+
+// TEST_CASE("Function declaration and usage", "[environment]") {
+//     SECTION("Function with no parameters") {
+
+//     }
+
+//     SECTION("Function with parameters") {
+
+//     }
+
+//     SECTION("Function called from other function") {
+
+//     }
+// }
+
+// TEST_CASE("Operator declaration and usage", "[environment]") {
+//     SECTION("Single custom operator") {
+
+//     }
+
+//     SECTION("Custom operator used inside other custom operator") {
+
+//     }
+// }
+
+// TEST_CASE("While usage", "[environment]") {
+//     // There's really only one unique test we can do here,
+//     // any other tests would be isomorphic
+//     SECTION("While loop") {
+
+//     }
+// }
+
+// TEST_CASE("If usage", "[environment]") {
+//     // Same as a while loop, we don't gain anything by testing
+//     // multiple different if statements since it just boils
+//     // down to condition evaluation which has already been tested
+//     SECTION("If statement") {
+
+//     }
+// }
+
+// TEST_CASE("Assert usage", "[environment]") {
+//     // Same as an if, only need to do one test here
+//     SECTION("Assert statement") {
+
+//     }
+// }
+
+// TEST_CASE("Printing complex expressions", "[environment]") {
+//     SECTION("function call") {
+
+//     }
+
+//     SECTION("condition") {
+
+//     }
+
+//     SECTION("variable") {
+        
+//     }
+// }
 
 // test entire process on files
-TEST_CASE("Simple file", "[environment][parser][lexer]") {
-    std::ifstream file_in("./tests/simple.weak");
-    std::stringstream stream;
-    stream << file_in.rdbuf();
-    file_in.close();
-    std::string file_str = stream.str();
-    no_error(file_str);
-    expect_tokens(file_str, {LET, IDENTIFIER, EQUALS, STRING, SEMI, END});    
-}
+// TEST_CASE("Simple file", "[environment][parser][lexer]") {
+//     std::ifstream file_in("./tests/simple.weak");
+//     std::stringstream stream;
+//     stream << file_in.rdbuf();
+//     file_in.close();
+//     std::string file_str = stream.str();
+//     no_error(file_str);
+//     expect_tokens(file_str, {LET, IDENTIFIER, EQUALS, STRING, SEMI, END});    
+// }
 
-TEST_CASE("Complicated file", "[environment][parser][lexer]") {
-    std::ifstream file_in("./tests/test.weak");
-    std::stringstream stream;
-    stream << file_in.rdbuf(); 
-    file_in.close(); 
-    std::string file_str = stream.str(); 
-    no_error(file_str); 
-}
+// TEST_CASE("Complicated file", "[environment][parser][lexer]") {
+//     std::ifstream file_in("./tests/test.weak");
+//     std::stringstream stream;
+//     stream << file_in.rdbuf(); 
+//     file_in.close(); 
+//     std::string file_str = stream.str(); 
+//     no_error(file_str); 
+// }
