@@ -28,9 +28,11 @@ public:
 class Assign : public Expr {
 public:
     Assign(Token name, Expr* value);
+    Assign(Token name, std::vector<Expr*> idx, Expr* value);
     std::pair<std::string, std::string> to_string();
     ~Assign();
-    Token name; 
+    Token name;
+    std::vector<Expr*> idx;
     Expr* value;
 };
 

@@ -114,7 +114,30 @@ Variable Environment::evaluate_expr(Expr* expr) {
     else if (CAN_MAKE(Assign*, assign)_FROM(expr)) {
 		runtime_assert(VAR_EXISTS(assign->name.lexeme), assign->name, "Identifier doesn't correspond to a declared variable name");
 		Variable var = evaluate_expr(assign->value);
-		var_symbol_table.at(assign->name.lexeme) = var;
+		if (assign->idx.size() > 0) {
+			runtime_assert(var.is_double(), assign->name, "Can't assign a non-number to an entry in an array");
+			std::vector<size_t> indices;
+			Variable &to_modify = var_symbol_table.at(assign->name.lexeme);
+			auto &arr = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(to_modify.value);
+			runtime_assert(to_modify.is_ndarray(), assign->name, "Identifier isn't an array, so can't assign to an index of it");
+			for (size_t i = 0; i < assign->idx.size(); i++) {
+				Expr* index = assign->idx.at(i);
+				Variable index_val = evaluate_expr(index);
+				runtime_assert(index_val.is_double(), assign->name, "An expression used in array indexing is not a number");
+				size_t casted = (size_t) std::get<double>(index_val.value);
+				runtime_assert((double) casted == std::get<double>(index_val.value), assign->name, "An expression used in array indexing is not close to an integer");
+				runtime_assert(casted < arr.second.at(i), assign->name, "An expression used in array indexing is larger than a dimension of the ndarray");
+				indices.push_back(casted);
+			}
+			size_t flat_index = indices[0];
+			for (size_t i = 1; i < indices.size(); i++) {
+				flat_index = indices[i] + flat_index * arr.second[i - 1];
+			}
+			arr.first.at(flat_index) = std::get<double>(var.value);
+		}
+		else {
+			var_symbol_table.at(assign->name.lexeme) = var;
+		}
 		return var;
     }
     else if (CAN_MAKE(Binary*, binary)_FROM(expr)) {

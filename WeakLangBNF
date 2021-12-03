@@ -28,7 +28,7 @@ whileStatement := "w" "(" expression ")" block
 assertStatement := "v" expression ";"
 
 expression := assignment
-assignment := IDENTIFIER "=" assignment | operation
+assignment := IDENTIFIER ( "[" arguments "]" )? "=" assignment | operation
 operation := logicOr ( IDENTIFIER logicOr )*
 logicOr = logicAnd ( "O" logicAnd )*
 logicAnd = equality ( "A" equality )*

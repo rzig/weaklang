@@ -59,6 +59,8 @@ std::pair<std::string, std::string> ArrAccess::to_string() {
 
 Assign::Assign(Token name, Expr* value): name(name), value(value) {}
 
+Assign::Assign(Token name, std::vector<Expr*> idx, Expr* value): name(name), idx(idx), value(value) {}
+
 std::pair<std::string, std::string> Assign::to_string() {
     return make_string("Assignment of " + name.lexeme, value);
 }
@@ -124,6 +126,9 @@ ArrAccess::~ArrAccess() {
 
 Assign::~Assign() {
     delete value;
+    for (auto id : idx) {
+        delete id;
+    }
 }
 
 Binary::~Binary() {

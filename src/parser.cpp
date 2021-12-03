@@ -213,6 +213,29 @@ Expr* Parser::assignment() {
         consume(EQUALS, "Expected '=' after identifier");
         Expr* right = assignment();
         return new Assign(id, right);
+    } else if (tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index + 1).type == LEFT_BRACK) {
+        size_t dummy_index = cur_index;
+        while (dummy_index < tokens.size() && tokens.at(dummy_index).type != RIGHT_BRACK) dummy_index++;
+        if (dummy_index >= tokens.size()) return operation();
+        Token id = consume(IDENTIFIER, "Expected identifier");
+        Token left_b = consume(LEFT_BRACK, "Unreachable");
+        Expr* first_dim = expression();
+        std::vector<Expr*> args;
+        args.push_back(first_dim);
+        while(cur_index < tokens.size() && tokens.at(cur_index).type != RIGHT_BRACK) {
+            if (args.size() < MAX_ARGS) {
+                consume(COMMA, "Expected comma in array indexing");
+                Expr* arg = expression();
+                args.push_back(arg);
+            }
+            else {
+                throw std::runtime_error(create_error(left_b, "Too many arguments for array indexing (max " + std::to_string(MAX_ARGS) + ")"));
+            }
+        }
+        consume(RIGHT_BRACK, "Expected ']' after indices");
+        consume(EQUALS, "Expected '=' after identifier");
+        Expr* right = assignment();
+        return new Assign(id, args, right);
     } else {
         return operation();
     }
