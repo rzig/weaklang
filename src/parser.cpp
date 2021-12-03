@@ -216,7 +216,7 @@ Expr* Parser::assignment() {
     } else if (tokens.at(cur_index).type == IDENTIFIER && cur_index < tokens.size() - 1 && tokens.at(cur_index + 1).type == LEFT_BRACK) {
         size_t dummy_index = cur_index;
         while (dummy_index < tokens.size() && tokens.at(dummy_index).type != RIGHT_BRACK) dummy_index++;
-        if (dummy_index >= tokens.size()) return operation();
+        if (dummy_index >= tokens.size() || (dummy_index < tokens.size() - 1 && tokens.at(dummy_index + 1).type != EQUALS)) return operation();
         Token id = consume(IDENTIFIER, "Expected identifier");
         Token left_b = consume(LEFT_BRACK, "Unreachable");
         Expr* first_dim = expression();
@@ -247,7 +247,7 @@ Expr* Parser::operation() {
         Token id = tokens.at(cur_index-1);
         if (id.type == EQUALS) throw std::runtime_error(create_error(id, "Can't parse = as a binary operator"));
         Expr* right = logicOr();
-        exp = new Binary(right, id, exp);
+        exp = new Binary(exp, id, right);
     }
     return exp;
 }

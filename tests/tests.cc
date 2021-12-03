@@ -14,6 +14,7 @@
 #include<iostream>
 #include<fstream>
 #include<sstream>
+#include<algorithm>
 
 //////////////////////////////////////////////////////////////////////////////
 //                                Lexer tests                               //
@@ -1269,7 +1270,38 @@ TEST_CASE("Add function", "[environment]"){
 //                           Environment tests                              //
 //////////////////////////////////////////////////////////////////////////////
 
-#define REQUIRE_OUTPUT(prog, expected) REQUIRE(getOutput(prog) == expected);
+std::string clean_output_string(std::string str) {
+    std::vector<std::string> lines;
+    std::string current;
+    for(char c : str) {
+        if(c == '\n') {
+            if(!current.empty()) {
+                lines.push_back(current);
+            }
+            current = "";
+        } else if ((c == ' ' || c == '\t') && current.empty()) {
+            // ignore
+        } else {
+            current += c;
+        }
+    }
+    if(!current.empty()) {
+        lines.push_back(current);
+    }
+    std::string result;
+    for(auto line : lines) {
+        result += line;
+        result += '\n';
+    }
+    return result;
+}
+
+std::string clean_output_string(char* string) {
+    std::string as_string = string;
+    return clean_output_string(as_string);
+}
+
+#define REQUIRE_OUTPUT(prog, expected) REQUIRE(getOutput(prog) == clean_output_string(expected));
 
 std::string getOutput(std::string program) {
     Lexer lex;
@@ -1286,24 +1318,24 @@ std::string getOutput(std::string program) {
 
 TEST_CASE("Printing simple expressions", "[environment]") {
     SECTION("string literal") {
-        REQUIRE_OUTPUT("p \"hello\";", "\"hello\"\n");
+        REQUIRE_OUTPUT("p \"hello\";", "\"hello\"");
     }
 
     SECTION("double") {
-        REQUIRE_OUTPUT("p 2.5;", "2.5\n");
+        REQUIRE_OUTPUT("p 2.5;", "2.5");
     }
 
     SECTION("bool") {
-        REQUIRE_OUTPUT("p T;", "True\n");
-        REQUIRE_OUTPUT("p F;", "False\n");
+        REQUIRE_OUTPUT("p T;", "True");
+        REQUIRE_OUTPUT("p F;", "False");
     }
 
     SECTION("1d array") {
-        REQUIRE_OUTPUT("p [0];", "[0] sa [1]\n");
+        REQUIRE_OUTPUT("p [0];", "[0] sa [1]");
     }
 
     SECTION("nd array") {
-        REQUIRE_OUTPUT("p [0] sa [2, 2];", "[0] sa [2, 2]\n");
+        REQUIRE_OUTPUT("p [0] sa [2, 2];", "[0] sa [2, 2]");
     }
 }
 
@@ -1315,124 +1347,418 @@ TEST_CASE("Printing simple expressions", "[environment]") {
 
 TEST_CASE("Math expression evaluation - literals only", "[environment]") {
     SECTION("Simple arithmetic") {
-        REQUIRE_OUTPUT("p 2 + 3 * 5;", "17\n");
+        REQUIRE_OUTPUT("p 2 + 3 * 5;", "17");
     }
 
     SECTION("Complex arithmetic") {
-        REQUIRE_OUTPUT("p (2+3)^(1.5 * 2);", "125\n");
+        REQUIRE_OUTPUT("p (2+3)^(1.5 * 2);", "125");
     }
 }
 
 TEST_CASE("Logical expression evaluation - literals only", "[environment]") {
     SECTION("Simple conditional") {
-        REQUIRE_OUTPUT("p T O F;", "True\n");
+        REQUIRE_OUTPUT("p T O F;", "True");
     }
 
     SECTION("Complex conditional") {
-        REQUIRE_OUTPUT("p !(!(T A F) O (!T O F));", "False\n");
+        REQUIRE_OUTPUT("p !(!(T A F) O (!T O F));", "False");
     }
 }
 
-// TEST_CASE("Variable declaration and usage", "[environment]") {
-//     SECTION("String declaration and usage") {
+TEST_CASE("Variable declaration and usage", "[environment]") {
+    SECTION("String declaration and usage") {
+        auto program = R"V0G0N(
+            a s_a = "cs";
+            a s_b = s_a;
+            p s_a;
+            p s_b;
+            s_a = "128";
+            p s_b;
+            p s_a;
+        )V0G0N";
+        auto result = R"V0G0N(
+            "cs"
+            "cs"
+            "cs"
+            "128"
+        )V0G0N";
+        REQUIRE_OUTPUT(program, result);
+    }
 
-//     }
+    SECTION("Double declaration and usage") {
+        auto program = R"V0G0N(
+            a var = 1.5;
+            a var_b = 4;
+            a var_c = var_b ^ 2 * var;
+            p var_c;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "24");
+    }
 
-//     SECTION("Double declaration and usage") {
+    SECTION("1d array declaration and usage") {
+        auto program = R"V0G0N(
+            a arr = [0] sa [4];
+            arr = arr + 2;
+            p arr;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "[2] sa [4]");
+    }
 
-//     }
+    SECTION("nd array declaration and usage") {
+        auto program = R"V0G0N(
+            a arr = [0] sa [4, 4];
+            arr = arr + 2;
+            arr = arr * 3;
+            p arr;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "[6] sa [4, 4]");
+    }
 
-//     SECTION("1d array declaration and usage") {
+    SECTION("bool declaration and usage") {
+        auto program = R"V0G0N(
+            a boolean = T;
+            a boolean_ = !boolean;
+            p boolean;
+            p boolean_;
+        )V0G0N";
+        auto output = R"V0G0N(
+            True
+            False
+        )V0G0N";
+        REQUIRE_OUTPUT(program, output);
+    }
+}
 
-//     }
+TEST_CASE("Function declaration and usage", "[environment]") {
+    SECTION("Function with no parameters") {
+        auto program = R"V0G0N(
+            f func() {
+                r 2 + 2;
+            }
 
-//     SECTION("nd array declaration and usage") {
+            a var = func() * 3 + 1;
+            p var;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "13");
+    }
 
-//     }
+    SECTION("Function with parameters") {
+        auto program = R"V0G0N(
+            f func(param_a, param_b, param_c) {
+                r param_a + param_b + (param_c * 2);
+            }
 
-//     SECTION("bool declaration and usage") {
+            p func(1, 2, 3);
+            p func(2, 3, 4);
+        )V0G0N";
+        auto output= R"V0G0N(
+            9
+            13
+        )V0G0N";
+        REQUIRE_OUTPUT(program, output);
+    }
 
-//     }
-// }
+    SECTION("Function called from other function") {
+        auto program = R"V0G0N(
+            f dim(list) {
+                r (s (s list))[0];
+            }
 
-// TEST_CASE("Function declaration and usage", "[environment]") {
-//     SECTION("Function with no parameters") {
+            f funky_multiply(list) {
+                v dim(list) == 1;
+                a len = (s list)[0];
+                a j = 0;
+                w (j < len) {
+                    list[j] = len * list[j];
+                    j = j + 1;
+                }
+                r list;
+            }
 
-//     }
+            a arr = [1, 2, 3];
+            p funky_multiply(arr);
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "[3, 6, 9] sa [3]");
+    }
+}
 
-//     SECTION("Function with parameters") {
+TEST_CASE("Operator declaration and usage", "[environment]") {
+    SECTION("Single custom operator") {
+        auto program = R"V0G0N(
+            o double_subtract(left, right) {
+                r left - 2*right;
+            }
+            
+            p 10 double_subtract 5;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "0");
+    }
 
-//     }
+    SECTION("Custom operator used inside other custom operator") {
+        auto program = R"V0G0N(
+            o mult(left, right) {
+                r left * -right;
+            }
 
-//     SECTION("Function called from other function") {
+            o other(left, right) {
+                r (left mult right) mult right;
+            }
 
-//     }
-// }
+            p 5 other 10;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "500");
+    }
+}
 
-// TEST_CASE("Operator declaration and usage", "[environment]") {
-//     SECTION("Single custom operator") {
+TEST_CASE("While usage", "[environment]") {
+    // There's really only one unique test we can do here,
+    // any other tests would be isomorphic
+    SECTION("While loop") {
+        auto program = R"V0G0N(
+            f inc(amount) {
+                a j = 0;
+                w (j < amount) {
+                    j = j + 1;
+                }
+                r j;
+            }
+            p inc(10);
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "10");
+    }
+}
 
-//     }
+TEST_CASE("If usage", "[environment]") {
+    // Same as a while loop, we don't gain anything by testing
+    // multiple different if statements since it just boils
+    // down to condition evaluation which has already been tested
+    SECTION("If statement") {
+        auto program = R"V0G0N(
+            a var = 10;
+            i (var > 10) {
+                p "Hello";
+            }
+            i (var <= 10) {
+                p "World";
+            }
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "\"World\"");
+    }
+}
 
-//     SECTION("Custom operator used inside other custom operator") {
+TEST_CASE("Assert usage", "[environment]") {
+    // Same as an if, only need to do two tests here
+    SECTION("Assert statement passes") {
+        auto program = R"V0G0N(
+            v 1 == 1;
+            # If we get to this point the assert passed!
+            p 1;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "1");
+    }
+    SECTION("Assert statement fails") {
+        auto program = R"V0G0N(
+            v 2 == 1;
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Assert failed, occurred at line 1 at column 20");
+    }
+}
 
-//     }
-// }
+// Note that we do not test matrix multiplication above. This is because we use BLAS for
+// matrix multiplication, and it would not make sense to test something that's already
+// been tested.
 
-// TEST_CASE("While usage", "[environment]") {
-//     // There's really only one unique test we can do here,
-//     // any other tests would be isomorphic
-//     SECTION("While loop") {
+TEST_CASE("Error tests", "[environment]") {
+    SECTION("If statement without boolean condition") {
+        REQUIRE_THROWS_WITH(getOutput("i (3) {}"), "Runtime error: If statement expected a boolean condition, occurred at line 0 at column 0");
+    }
 
-//     }
-// }
+    SECTION("While statement without boolean condition") {
+        REQUIRE_THROWS_WITH(getOutput("w (34) {}"), "Runtime error: While statement expected a boolean condition, occurred at line 0 at column 0");
+    }
 
-// TEST_CASE("If usage", "[environment]") {
-//     // Same as a while loop, we don't gain anything by testing
-//     // multiple different if statements since it just boils
-//     // down to condition evaluation which has already been tested
-//     SECTION("If statement") {
+    SECTION("Assert statement without boolean condition") {
+        REQUIRE_THROWS_WITH(getOutput("v 345;"), "Runtime error: Assert statement expected a boolean condition, occurred at line 0 at column 2");
+    }
 
-//     }
-// }
+    SECTION("Array access on non-array") {
+        auto program = R"V0G0N(
+            a mat = 3;
+            p mat[1];
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Identifier in array access isn't an ndarray, occurred at line 2 at column 18");
+    }
 
-// TEST_CASE("Assert usage", "[environment]") {
-//     // Same as an if, only need to do one test here
-//     SECTION("Assert statement") {
+    SECTION("Incorrect array access dimensions") {
+        auto program = R"V0G0N(
+            a mat = [0, 1];
+            p mat[0, 0];
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Number of dimensions in array element access differs from number of dimensions in array, occurred at line 2 at column 18");
+    }
 
-//     }
-// }
+    SECTION("Nonnumeric array access index") {
+        auto program = R"V0G0N(
+            a mat = [0, 1];
+            p mat["hi"];
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: An expression used in array indexing is not a number, occurred at line 2 at column 18");
+    }
 
-// TEST_CASE("Printing complex expressions", "[environment]") {
-//     SECTION("function call") {
+    SECTION("Array access index too large") {
+        auto program = R"V0G0N(
+            a mat = [0, 1];
+            p mat[2];
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: An expression used in array indexing is larger than a dimension of the ndarray, occurred at line 2 at column 18");
+    }
 
-//     }
+    SECTION("Assignment to variable that does not exist") {
+        REQUIRE_THROWS_WITH(getOutput("mat = 3;"), "Runtime error: Identifier doesn't correspond to a declared variable name, occurred at line 0 at column 0");
+    }
 
-//     SECTION("condition") {
+    SECTION("Assign non-number to an array item") {
+        auto program = R"V0G0N(
+            a mat = [0, 1];
+            mat[0] = "hi";
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Can't assign a non-number to an entry in an array, occurred at line 2 at column 13");
+    }
 
-//     }
+    SECTION("Using custom operator that does not exist") {
+        REQUIRE_THROWS_WITH(getOutput("p T xor F;"), "Runtime error: Identifier doesn't correspond to a defined operator name, occurred at line 0 at column 4");
+    }
 
-//     SECTION("variable") {
-        
-//     }
-// }
+    SECTION("Comparison with different types") {
+        REQUIRE_THROWS_WITH(getOutput("p 2 <= \"a\";"), "Runtime error: Left and right expressions differ in type, occurred at line 0 at column 4");
+    }
 
-// test entire process on files
-// TEST_CASE("Simple file", "[environment][parser][lexer]") {
-//     std::ifstream file_in("./tests/simple.weak");
-//     std::stringstream stream;
-//     stream << file_in.rdbuf();
-//     file_in.close();
-//     std::string file_str = stream.str();
-//     no_error(file_str);
-//     expect_tokens(file_str, {LET, IDENTIFIER, EQUALS, STRING, SEMI, END});    
-// }
+    SECTION("Matrix multiplication of non-matrix") {
+        auto program = R"V0G0N(
+            a mat = 3;
+            p mat @ mat;
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Left expression isn't an ndarray, occurred at line 2 at column 19");
+    }
 
-// TEST_CASE("Complicated file", "[environment][parser][lexer]") {
-//     std::ifstream file_in("./tests/test.weak");
-//     std::stringstream stream;
-//     stream << file_in.rdbuf(); 
-//     file_in.close(); 
-//     std::string file_str = stream.str(); 
-//     no_error(file_str); 
-// }
+    SECTION("sa on non-matrix") {
+        auto program = R"V0G0N(
+            a non = "hello";
+            p s non;
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Expression evaluates to a non-ndarray, occurred at line 2 at column 15");
+    }
+
+    SECTION("Call to function that does not exist") {
+        REQUIRE_THROWS_WITH(getOutput("p dne();"), "Runtime error: Identifier doesn't correspond to a defined function name, occurred at line 0 at column 2");
+    }
+
+    SECTION("Call to function with incorrect number of arguments") {
+        auto program = R"V0G0N(
+            f func(arg) {
+                r arg;
+            }
+            p func(1, 2);
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Function called with different number of args than defined with, occurred at line 4 at column 19");
+    }
+
+    SECTION("Creating array with non-doubles") {
+        REQUIRE_THROWS_WITH(getOutput("a mat = [1, T];"), "Runtime error: Expression in array literal evaluates to a non-number, occurred at line 0 at column 8");
+    }
+
+    SECTION("Unary ! without bool") {
+        REQUIRE_THROWS_WITH(getOutput("p !3;"), "Runtime error: Expression evaluates to a non-bool, occurred at line 0 at column 2");
+    }
+
+    SECTION("Unary - without number") {
+        REQUIRE_THROWS_WITH(getOutput("p -T;"), "Runtime error: Expression evaluates to a non-number, occurred at line 0 at column 2");
+    }
+
+    SECTION("Unary s without array") {
+        REQUIRE_THROWS_WITH(getOutput("p s T;"), "Runtime error: Expression evaluates to a non-ndarray, occurred at line 0 at column 2");
+    }
+
+    SECTION("Function call with variables that do not exist") {
+        auto program = R"V0G0N(
+            f func(arg) {
+                r arg;
+            }
+            p func(arg);
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Identifier doesn't correspond to a declared variable name, occurred at line 4 at column 20");
+    }
+}
+
+TEST_CASE("Complete program evaluation", "[environment]") {
+    SECTION("Program evaluation") {
+        auto program = R"V0G0N(
+            # This is a comment
+            o x (b, c) {
+                p "in operator x";
+                r b ^ (c*2);
+            }
+
+            o z (b, c) {
+                p "in operator z";
+                r (s b) + (s c);
+            }
+
+            f y (b, c, d) {
+                p "in function y";
+                a m = 0;
+                a mat = [0] sa [2, 2];
+                w (m < d) {
+                    p "in while loop";
+                    mat = mat x mat;
+                    mat = mat @ mat;
+                    m = m + 1;
+                }
+                i (mat[0, 0] < 10^3) {
+                    p mat[0, 0];
+                }
+                i (mat[0, 0] != 1 O mat[1, 1] != 2) {
+                    r T;
+                }
+                r F;
+            }
+
+            p "== First call ==";
+            p y(1,2,3);
+            p "== Second call ==";
+            p "Hello";
+            p "== Third call ==";
+            p N;
+            p "== Fourth call ==";
+            p y(2,3,4);
+        )V0G0N";
+        auto output = R"V0G0N(
+            "== First call =="
+            "in function y"
+            "in while loop"
+            "in operator x"
+            "in while loop"
+            "in operator x"
+            "in while loop"
+            "in operator x"
+            512
+            True
+            "== Second call =="
+            "Hello"
+            "== Third call =="
+            Nil
+            "== Fourth call =="
+            "in function y"
+            "in while loop"
+            "in operator x"
+            "in while loop"
+            "in operator x"
+            "in while loop"
+            "in operator x"
+            "in while loop"
+            "in operator x"
+            True
+        )V0G0N";
+        REQUIRE_OUTPUT(program, output);
+    };
+}
