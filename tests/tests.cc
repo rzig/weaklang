@@ -901,6 +901,60 @@ TEST_CASE("Print statement", "[parser]") {
     }
 }
 
+TEST_CASE("Assert statement", "[parser]") {
+    SECTION("with simple expression") {
+        auto statements = getStatements("v b == c;");
+        required_if(CAN_MAKE(Assert*, a)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, b)_FROM(a->cond)) {
+                required_if(CAN_MAKE(Var*, left)_FROM(b->left)) {
+                    REQUIRE(left->name.lexeme == "b");
+                }
+                required_if(CAN_MAKE(Var*, right)_FROM(b->right)) {
+                    REQUIRE(right->name.lexeme == "c");
+                }
+                REQUIRE(b->op.type == EQUALS_EQUALS);
+            }
+        }
+    }
+
+    SECTION("with complex expression") {
+        auto statements = getStatements("v func() O var O array[1];");
+        required_if(CAN_MAKE(Assert*, assert_s)_FROM(statements[0])) {
+            required_if(CAN_MAKE(Binary*, parent)_FROM(assert_s->cond)) {
+                required_if(CAN_MAKE(ArrAccess*, arr)_FROM(parent->right)) {
+                    required_if(CAN_MAKE(Var*, v)_FROM(arr->id)) {
+                        REQUIRE(v->name.lexeme == "array");
+                    }
+                    REQUIRE(arr->idx.size() == 1);
+                    required_if(CAN_MAKE(Literal*, idx)_FROM(arr->idx[0])) {
+                        REQUIRE(idx->literal_type == LITERAL_DOUBLE);
+                        REQUIRE(idx->double_val == 1);
+                    }
+                }
+                REQUIRE(parent->op.type == OR);
+                required_if(CAN_MAKE(Binary*, child)_FROM(parent->left)) {
+                    required_if(CAN_MAKE(Func*, func)_FROM(child->left)) {
+                        REQUIRE(func->args.size() == 0);
+                        REQUIRE(func->func.lexeme == "func");
+                    }
+                    REQUIRE(child->op.type == OR);
+                    required_if(CAN_MAKE(Var*, v)_FROM(child->right)) {
+                        REQUIRE(v->name.lexeme == "var");
+                    }
+                }
+            }
+        }
+    }
+
+    SECTION("Error - no semicolon after assert") {
+        REQUIRE_THROWS_WITH(getStatements("v T"), "Expected ';' after assert statement but instead found: \"\", at line 1 and column 4, this token has type END");
+    }
+
+    SECTION("Error - no condition after assert") {
+        REQUIRE_THROWS_WITH(getStatements("v ;"), "Expected primary but instead found: \";\", at line 1 and column 3, this token has type SEMI");
+    }
+}
+
 TEST_CASE("If statement", "[parser]") {
     SECTION("with simple expression") {
         auto statements = getStatements("i (T) {}");
