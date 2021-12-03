@@ -1,1 +1,2 @@
-mat = mat x mat;
+a mat = 5;
+p mat;

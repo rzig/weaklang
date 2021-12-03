@@ -320,7 +320,9 @@ TEST_CASE("Operation", "[parser]") {
                     REQUIRE(f->args.size() == 0);
                 }
                 required_if(CAN_MAKE(ArrAccess*, a)_FROM(b->right)) {
-                    REQUIRE(a->id.lexeme == "arr");
+                    required_if(CAN_MAKE(Var*, v)_FROM(a->id)) {
+                        REQUIRE(v->name.lexeme == "arr");
+                    }
                     REQUIRE(a->idx.size() == 1);
                     required_if(CAN_MAKE(Literal*, l)_FROM(a->idx[0])) {
                         REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
@@ -377,11 +379,11 @@ TEST_CASE("Equality", "[parser]") {
     }
 
     SECTION("with function and variable and ==") {
-        auto statements = getStatements("v(b) == b;");
+        auto statements = getStatements("k(b) == b;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Func*, f)_FROM(b->left)) {
-                    REQUIRE(f->func.lexeme == "v");
+                    REQUIRE(f->func.lexeme == "k");
                     REQUIRE(f->args.size() == 1);
                     required_if(CAN_MAKE(Var*, v)_FROM(f->args[0])) {
                         REQUIRE(v->name.lexeme == "b");
@@ -396,11 +398,11 @@ TEST_CASE("Equality", "[parser]") {
     }
 
     SECTION("with literal and variable and !=") {
-        auto statements = getStatements("v != 10;");
+        auto statements = getStatements("k != 10;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Var*, v)_FROM(b->left)) {
-                    REQUIRE(v->name.lexeme == "v");
+                    REQUIRE(v->name.lexeme == "k");
                 }
                 required_if(CAN_MAKE(Literal*, l)_FROM(b->right)) {
                     REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
@@ -462,11 +464,11 @@ TEST_CASE("Comparison", "[parser]") {
     }
 
     SECTION("function <= literal") {
-        auto statements = getStatements("v() <= 3;");
+        auto statements = getStatements("t() <= 3;");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(Func*, f)_FROM(b->left)) {
-                    REQUIRE(f->func.lexeme == "v");
+                    REQUIRE(f->func.lexeme == "t");
                     REQUIRE(f->args.size() == 0);
                 }
                 required_if(CAN_MAKE(Literal*, l)_FROM(b->right)) {
@@ -483,7 +485,9 @@ TEST_CASE("Comparison", "[parser]") {
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, b)_FROM(e->expr)) {
                 required_if(CAN_MAKE(ArrAccess*, a)_FROM(b->left)) {
-                    REQUIRE(a->id.lexeme == "arr");
+                    required_if(CAN_MAKE(Var*, v)_FROM(a->id)) {
+                        REQUIRE(v->name.lexeme == "arr");
+                    }
                     REQUIRE(a->idx.size() == 1);
                     required_if(CAN_MAKE(Literal*, l)_FROM(a->idx[0])) {
                         REQUIRE(l->literal_type == LiteralType::LITERAL_DOUBLE);
@@ -502,19 +506,19 @@ TEST_CASE("Comparison", "[parser]") {
     }
 
     SECTION("Error - hanging >") {
-        REQUIRE_THROWS_WITH(getStatements("v > "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
+        REQUIRE_THROWS_WITH(getStatements("q > "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
     }
 
     SECTION("Error - hanging >=") {
-        REQUIRE_THROWS_WITH(getStatements("v >= "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
+        REQUIRE_THROWS_WITH(getStatements("t >= "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
     }
 
     SECTION("Error - hanging <=") {
-        REQUIRE_THROWS_WITH(getStatements("v <= "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
+        REQUIRE_THROWS_WITH(getStatements("t <= "), "Expected primary but instead found: \"\", at line 1 and column 6, this token has type END");
     }
 
     SECTION("Error - hanging <") {
-        REQUIRE_THROWS_WITH(getStatements("v < "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
+        REQUIRE_THROWS_WITH(getStatements("u < "), "Expected primary but instead found: \"\", at line 1 and column 5, this token has type END");
     }
 }
 
@@ -713,7 +717,9 @@ TEST_CASE("Array access", "[parser]") {
         auto statements = getStatements("array[1];");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(ArrAccess*, a)_FROM(e->expr)) {
-                REQUIRE(a->id.lexeme == "array");
+                required_if(CAN_MAKE(Var*, v)_FROM(a->id)) {
+                    REQUIRE(v->name.lexeme == "array");
+                }
                 REQUIRE(a->idx.size() == 1);
                 required_if(CAN_MAKE(Literal*, one)_FROM(a->idx[0])) {
                     REQUIRE(one->literal_type == LiteralType::LITERAL_DOUBLE);
@@ -727,7 +733,9 @@ TEST_CASE("Array access", "[parser]") {
         auto statements = getStatements("mat[1, b];");
         required_if(CAN_MAKE(ExprStmt*, e)_FROM(statements[0])) {
             required_if(CAN_MAKE(ArrAccess*, a)_FROM(e->expr)) {
-                REQUIRE(a->id.lexeme == "mat");
+                required_if(CAN_MAKE(Var*, v)_FROM(a->id)) {
+                    REQUIRE(v->name.lexeme == "mat");
+                }
                 REQUIRE(a->idx.size() == 2);
                 required_if(CAN_MAKE(Literal*, one)_FROM(a->idx[0])) {
                     REQUIRE(one->literal_type == LiteralType::LITERAL_DOUBLE);
@@ -862,12 +870,12 @@ TEST_CASE("Print statement", "[parser]") {
     }
 
     SECTION("with complex expression") {
-        auto statements = getStatements("p v() + b@b;");
+        auto statements = getStatements("p l() + b@b;");
         required_if(CAN_MAKE(Print*, p)_FROM(statements[0])) {
             required_if(CAN_MAKE(Binary*, parent)_FROM(p->expr)) {
-                required_if(CAN_MAKE(Func*, v)_FROM(parent->left)) {
-                    REQUIRE(v->func.lexeme == "v");
-                    REQUIRE(v->args.size() == 0);
+                required_if(CAN_MAKE(Func*, l)_FROM(parent->left)) {
+                    REQUIRE(l->func.lexeme == "l");
+                    REQUIRE(l->args.size() == 0);
                 }
                 required_if(CAN_MAKE(Binary*, child)_FROM(parent->right)) {
                     required_if(CAN_MAKE(Var*, b)_FROM(child->left)) {
