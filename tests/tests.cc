@@ -1429,19 +1429,61 @@ TEST_CASE("Variable declaration and usage", "[environment]") {
     }
 }
 
-// TEST_CASE("Function declaration and usage", "[environment]") {
-//     SECTION("Function with no parameters") {
+TEST_CASE("Function declaration and usage", "[environment]") {
+    SECTION("Function with no parameters") {
+        auto program = R"V0G0N(
+            f func() {
+                r 2 + 2;
+            }
 
-//     }
+            a var = func() * 3 + 1;
+            p var;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "13");
+    }
 
-//     SECTION("Function with parameters") {
+    SECTION("Function with parameters") {
+        auto program = R"V0G0N(
+            f func(param_a, param_b, param_c) {
+                r param_a + param_b + (param_c * 2);
+            }
 
-//     }
+            p func(1, 2, 3);
+            p func(2, 3, 4);
+        )V0G0N";
+        auto output= R"V0G0N(
+            9
+            13
+        )V0G0N";
+        REQUIRE_OUTPUT(program, output);
+    }
 
-//     SECTION("Function called from other function") {
+    SECTION("Function called from other function") {
+        auto program = R"V0G0N(
+            f reduce(list, func) {
+                a len = (s list)[0];
+                i = 0;
+                a new_arr = [0] sa (s list);
+                w (i < len) {
+                    new_arr[i] = func(list[i]);
+                    i = i + 1;
+                }
+                r new_arr;
+            }
 
-//     }
-// }
+            f times_two(x) {
+                r x * 2;
+            }
+
+            f double(array) {
+                r reduce(array, times_two);
+            }
+
+            a arr = [1, 2, 3];
+            p double(arr);
+        )V0G0N";
+    }
+}
 
 // TEST_CASE("Operator declaration and usage", "[environment]") {
 //     SECTION("Single custom operator") {

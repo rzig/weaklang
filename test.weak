@@ -1,3 +1,21 @@
-            a boolean = T;
-            a boolean_ = !boolean;
-            p boolean_;
+            f reduce(list, func) {
+                a len = (s list)[0];
+                a j = 0;
+                a new_arr = [0] sa (s list);
+                w (j < len) {
+                    new_arr[j] = func(list[j]);
+                    j = j + 1;
+                }
+                r new_arr;
+            }
+
+            f times_two(x) {
+                r x * 2;
+            }
+
+            f double(array) {
+                r reduce(array, times_two);
+            }
+
+            a arr = [1, 2, 3];
+            p double(arr);
