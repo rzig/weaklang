@@ -1460,28 +1460,25 @@ TEST_CASE("Function declaration and usage", "[environment]") {
 
     SECTION("Function called from other function") {
         auto program = R"V0G0N(
-            f reduce(list, func) {
+            f dim(list) {
+                r (s (s list))[0];
+            }
+
+            f funky_multiply(list) {
+                v dim(list) == 1;
                 a len = (s list)[0];
-                i = 0;
-                a new_arr = [0] sa (s list);
-                w (i < len) {
-                    new_arr[i] = func(list[i]);
-                    i = i + 1;
+                a j = 0;
+                w (j < len) {
+                    list[j] = len * list[j];
+                    j = j + 1;
                 }
-                r new_arr;
-            }
-
-            f times_two(x) {
-                r x * 2;
-            }
-
-            f double(array) {
-                r reduce(array, times_two);
+                r list;
             }
 
             a arr = [1, 2, 3];
-            p double(arr);
+            p funky_multiply(arr);
         )V0G0N";
+        REQUIRE_OUTPUT(program, "[3, 6, 9] sa [3]");
     }
 }
 
