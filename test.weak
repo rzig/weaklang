@@ -1,2 +1,3 @@
-a mat = [0] sa [2, 2];
-p mat;
+            a boolean = T;
+            a boolean_ = !boolean;
+            p boolean_;

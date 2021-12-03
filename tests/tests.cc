@@ -14,6 +14,7 @@
 #include<iostream>
 #include<fstream>
 #include<sstream>
+#include<algorithm>
 
 //////////////////////////////////////////////////////////////////////////////
 //                                Lexer tests                               //
@@ -1269,7 +1270,38 @@ TEST_CASE("Add function", "[environment]"){
 //                           Environment tests                              //
 //////////////////////////////////////////////////////////////////////////////
 
-#define REQUIRE_OUTPUT(prog, expected) REQUIRE(getOutput(prog) == expected);
+std::string clean_output_string(std::string str) {
+    std::vector<std::string> lines;
+    std::string current;
+    for(char c : str) {
+        if(c == '\n') {
+            if(!current.empty()) {
+                lines.push_back(current);
+            }
+            current = "";
+        } else if ((c == ' ' || c == '\t') && current.empty()) {
+            // ignore
+        } else {
+            current += c;
+        }
+    }
+    if(!current.empty()) {
+        lines.push_back(current);
+    }
+    std::string result;
+    for(auto line : lines) {
+        result += line;
+        result += '\n';
+    }
+    return result;
+}
+
+std::string clean_output_string(char* string) {
+    std::string as_string = string;
+    return clean_output_string(as_string);
+}
+
+#define REQUIRE_OUTPUT(prog, expected) REQUIRE(getOutput(prog) == clean_output_string(expected));
 
 std::string getOutput(std::string program) {
     Lexer lex;
@@ -1286,24 +1318,24 @@ std::string getOutput(std::string program) {
 
 TEST_CASE("Printing simple expressions", "[environment]") {
     SECTION("string literal") {
-        REQUIRE_OUTPUT("p \"hello\";", "\"hello\"\n");
+        REQUIRE_OUTPUT("p \"hello\";", "\"hello\"");
     }
 
     SECTION("double") {
-        REQUIRE_OUTPUT("p 2.5;", "2.5\n");
+        REQUIRE_OUTPUT("p 2.5;", "2.5");
     }
 
     SECTION("bool") {
-        REQUIRE_OUTPUT("p T;", "True\n");
-        REQUIRE_OUTPUT("p F;", "False\n");
+        REQUIRE_OUTPUT("p T;", "True");
+        REQUIRE_OUTPUT("p F;", "False");
     }
 
     SECTION("1d array") {
-        REQUIRE_OUTPUT("p [0];", "[0] sa [1]\n");
+        REQUIRE_OUTPUT("p [0];", "[0] sa [1]");
     }
 
     SECTION("nd array") {
-        REQUIRE_OUTPUT("p [0] sa [2, 2];", "[0] sa [2, 2]\n");
+        REQUIRE_OUTPUT("p [0] sa [2, 2];", "[0] sa [2, 2]");
     }
 }
 
@@ -1315,45 +1347,87 @@ TEST_CASE("Printing simple expressions", "[environment]") {
 
 TEST_CASE("Math expression evaluation - literals only", "[environment]") {
     SECTION("Simple arithmetic") {
-        REQUIRE_OUTPUT("p 2 + 3 * 5;", "17\n");
+        REQUIRE_OUTPUT("p 2 + 3 * 5;", "17");
     }
 
     SECTION("Complex arithmetic") {
-        REQUIRE_OUTPUT("p (2+3)^(1.5 * 2);", "125\n");
+        REQUIRE_OUTPUT("p (2+3)^(1.5 * 2);", "125");
     }
 }
 
 TEST_CASE("Logical expression evaluation - literals only", "[environment]") {
     SECTION("Simple conditional") {
-        REQUIRE_OUTPUT("p T O F;", "True\n");
+        REQUIRE_OUTPUT("p T O F;", "True");
     }
 
     SECTION("Complex conditional") {
-        REQUIRE_OUTPUT("p !(!(T A F) O (!T O F));", "False\n");
+        REQUIRE_OUTPUT("p !(!(T A F) O (!T O F));", "False");
     }
 }
 
-// TEST_CASE("Variable declaration and usage", "[environment]") {
-//     SECTION("String declaration and usage") {
+TEST_CASE("Variable declaration and usage", "[environment]") {
+    SECTION("String declaration and usage") {
+        auto program = R"V0G0N(
+            a s_a = "cs";
+            a s_b = s_a;
+            p s_a;
+            p s_b;
+            s_a = "128";
+            p s_b;
+            p s_a;
+        )V0G0N";
+        auto result = R"V0G0N(
+            "cs"
+            "cs"
+            "cs"
+            "128"
+        )V0G0N";
+        REQUIRE_OUTPUT(program, result);
+    }
 
-//     }
+    SECTION("Double declaration and usage") {
+        auto program = R"V0G0N(
+            a var = 1.5;
+            a var_b = 4;
+            a var_c = var_b ^ 2 * var;
+            p var_c;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "24");
+    }
 
-//     SECTION("Double declaration and usage") {
+    SECTION("1d array declaration and usage") {
+        auto program = R"V0G0N(
+            a arr = [0] sa [4];
+            arr = arr + 2;
+            p arr;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "[2] sa [4]");
+    }
 
-//     }
+    SECTION("nd array declaration and usage") {
+        auto program = R"V0G0N(
+            a arr = [0] sa [4, 4];
+            arr = arr + 2;
+            arr = arr * 3;
+            p arr;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "[6] sa [4, 4]");
+    }
 
-//     SECTION("1d array declaration and usage") {
-
-//     }
-
-//     SECTION("nd array declaration and usage") {
-
-//     }
-
-//     SECTION("bool declaration and usage") {
-
-//     }
-// }
+    SECTION("bool declaration and usage") {
+        auto program = R"V0G0N(
+            a boolean = T;
+            a boolean_ = !boolean;
+            p boolean;
+            p boolean_;
+        )V0G0N";
+        auto output = R"V0G0N(
+            True
+            False
+        )V0G0N";
+        REQUIRE_OUTPUT(program, output);
+    }
+}
 
 // TEST_CASE("Function declaration and usage", "[environment]") {
 //     SECTION("Function with no parameters") {
