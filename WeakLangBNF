@@ -25,6 +25,7 @@ ifStatement := "i" "(" expression ")" block
 printStatement := "p" expression ";"
 returnStatement := "r" expression? ";"
 whileStatement := "w" "(" expression ")" block
+assertStatement := "v" expression ";"
 
 expression := assignment
 assignment := IDENTIFIER "=" assignment | operation
