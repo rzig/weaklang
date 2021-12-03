@@ -1510,29 +1510,59 @@ TEST_CASE("Operator declaration and usage", "[environment]") {
     }
 }
 
-// TEST_CASE("While usage", "[environment]") {
-//     // There's really only one unique test we can do here,
-//     // any other tests would be isomorphic
-//     SECTION("While loop") {
+TEST_CASE("While usage", "[environment]") {
+    // There's really only one unique test we can do here,
+    // any other tests would be isomorphic
+    SECTION("While loop") {
+        auto program = R"V0G0N(
+            f inc(amount) {
+                a j = 0;
+                w (j < amount) {
+                    j = j + 1;
+                }
+                r j;
+            }
+            p inc(10);
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "10");
+    }
+}
 
-//     }
-// }
+TEST_CASE("If usage", "[environment]") {
+    // Same as a while loop, we don't gain anything by testing
+    // multiple different if statements since it just boils
+    // down to condition evaluation which has already been tested
+    SECTION("If statement") {
+        auto program = R"V0G0N(
+            a var = 10;
+            i (var > 10) {
+                p "Hello";
+            }
+            i (var <= 10) {
+                p "World";
+            }
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "\"World\"");
+    }
+}
 
-// TEST_CASE("If usage", "[environment]") {
-//     // Same as a while loop, we don't gain anything by testing
-//     // multiple different if statements since it just boils
-//     // down to condition evaluation which has already been tested
-//     SECTION("If statement") {
-
-//     }
-// }
-
-// TEST_CASE("Assert usage", "[environment]") {
-//     // Same as an if, only need to do one test here
-//     SECTION("Assert statement") {
-
-//     }
-// }
+TEST_CASE("Assert usage", "[environment]") {
+    // Same as an if, only need to do two tests here
+    SECTION("Assert statement passes") {
+        auto program = R"V0G0N(
+            v 1 == 1;
+            # If we get to this point the assert passed!
+            p 1;
+        )V0G0N";
+        REQUIRE_OUTPUT(program, "1");
+    }
+    SECTION("Assert statement fails") {
+        auto program = R"V0G0N(
+            v 2 == 1;
+        )V0G0N";
+        REQUIRE_THROWS_WITH(getOutput(program), "Runtime error: Assert failed, occurred at line 1 at column 20");
+    }
+}
 
 // TEST_CASE("Printing complex expressions", "[environment]") {
 //     SECTION("function call") {
