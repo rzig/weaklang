@@ -144,12 +144,12 @@ i (F A (T O F)) {
 ```
 
 #### Unary Operations
-Weak supports the standard `!` and `-` unary operators, which take the negation of a boolean expression and the negative of a double or matrix, respectively. For example:
+Weak supports the standard `!` and `-` unary operators, which take the negation of a boolean expression and the negative of a double, respectively. For example:
 ```
 p !(T O F); # prints False
-a mat = [1] sa [2];
-p -mat; # prints [-1, -1] sa [2];
+p !F; # prints True
 p -(3 + 2); # prints -5
+p -(-5); # prints 5
 ```
 As discussed previously, Weak also supports the `s` operator which returns a 1D array containing the length of each dimension of an nd-array, for example:
 ```
