@@ -58,7 +58,7 @@ A double is created as you would expect:
 ```
 a double = 2.5;
 double = 2;
-p double; # prints 2.0
+p double; # prints 2
 ```
 
 #### nd-arrays
