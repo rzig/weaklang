@@ -1335,7 +1335,7 @@ TEST_CASE("Printing simple expressions", "[environment]") {
     }
 
     SECTION("nd array") {
-        REQUIRE_OUTPUT("p [0] sa [2, 2];", "[0, 0, 0, 0] sa [2, 2]");
+        REQUIRE_OUTPUT("p [1, 2] sa [2, 2];", "[1, 2, 1, 2] sa [2, 2]");
     }
 }
 
