@@ -1,6 +1,6 @@
 # WeakLang
 
-WeakLang is the programming language that makes you a more productive data scientist. Who needs to spend excess energy typing "function" or "print" or "while" when you can just type "f", "p" or "w"?! And that's not all. You can define your _own_ infix operators (pending), using the handy "o" keyword. Combine this with first-class matrix support powered by BLAS, and you've got the most productive (and dead simple) scientific computing language out there.
+WeakLang is the programming language that makes you a more productive data scientist. Who needs to spend excess energy typing "function" or "print" or "while" when you can just type "f", "p" or "w"?! And that's not all. You can define your _own_ infix operators, using the handy "o" keyword. Combine this with first-class matrix support powered by BLAS, and you've got the most productive (and dead simple) scientific computing language out there.
 
 ## Installing Weak
 ### Docker Installation
