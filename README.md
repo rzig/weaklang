@@ -61,7 +61,7 @@ double = 2;
 p double; # prints 2.0
 ```
 
-### nd-arrays
+#### nd-arrays
 An nd-array is an n-dimensional array, and may contain only double values (or other variables which are doubles). You can declare one like this:
 ```
 a zeroes = [0] sa [3, 3, 3];
@@ -109,7 +109,7 @@ mat = mat * mat;
 p mat; # prints [4, 4, 4, 4] sa [2, 2]
 ```
 ##### Matrix Operators
-We can use the `@` operator to perform multiplication on two nd-arrays:
+We can use the `@` operator to perform multiplication on two *2D* arrays:
 ```
 a mat_a = [1, 2, 3, 4] sa [2, 2];
 a mat_b = 4 * mat_a + 1;
