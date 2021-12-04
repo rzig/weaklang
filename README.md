@@ -67,14 +67,14 @@ An nd-array is an n-dimensional array, and may contain only double values (or ot
 a zeroes = [0] sa [3, 3, 3];
 ```
 
-The above code creates a 3x3x3 array of all zeroes. You can access and modify the contents of nd-arrays using the array access operation:
+The above code creates a 3x3x3 array of all zeroes. You can access and modify the contents of nd-arrays using the nd-array access operation:
 
 ```
 zeroes[1, 2, 0] = 4;
 p zeroes[1, 2, 0]; # prints 4
 ```
 
-*You must provide one index for each dimension of the nd-array. We do not support range access*. The `sa` operator you saw above is what takes a 1D array and converts it into n dimensions. It does so by repeating the sequence of items in the list until they fill up the array. So, for example,
+*You must provide one index for each dimension of the nd-array. We do not support range access*. The `sa` operator you saw above is what takes a 1D array and converts it into n dimensions. It does so by repeating the sequence of items in the list until they fill up the nd-array. So, for example,
 
 ```
 a not_zeroes = [1, 2] sa [2, 2];
@@ -84,7 +84,7 @@ Will create the 2D array `[[1, 2], [1, 2]]`. If you only wish to create a 1D arr
 ```
 a repeating = [1, 2] sa [4]; # [1, 2, 1, 2];
 ```
-To find the shape, or dimensions, of an array, you can use the `s` operator:
+To find the shape, or dimensions, of an nd-array, you can use the `s` operator:
 ```
 a zeroes = [0] sa [2, 2];
 p s zeroes; # prints [2, 2]
@@ -93,7 +93,7 @@ Thus, to calculate the dimension of an arbitrary nd-array, we can run:
 ```
 (s (s array))[0]
 ```
-`(s array)` will return something like `[1, 2, 3]`, which means that `(s (s array))` will return `[3]`, and then we use array access to return the double value of `3`.
+`(s array)` will return something like `[1, 2, 3]`, which means that `(s (s array))` will return `[3]`, and then we use nd-array access to return the double value of `3`.
 #### Binary Operations
 ##### Arithmetic Operators
 Weak supports standard binary operators you've seen before: `+`, `-`, `*`, and `/`. When used on two doubles, they compute the arithmetic as in any other programming language. For example:
@@ -151,7 +151,7 @@ a mat = [1] sa [2];
 p -mat; # prints [-1, -1] sa [2];
 p -(3 + 2); # prints -5
 ```
-As discussed previously, Weak also supports the `s` operator which returns a 1D array containing the length of each dimension of an array, for example:
+As discussed previously, Weak also supports the `s` operator which returns a 1D array containing the length of each dimension of an nd-array, for example:
 ```
 a mat = [2, 2] sa [3, 3];
 p s mat; # prints [3, 3] sa [2];
