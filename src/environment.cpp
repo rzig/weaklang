@@ -260,7 +260,25 @@ Variable Environment::evaluate_expr(Expr* expr) {
 				runtime_assert((double) casted == new_size_double.at(i), binary->op, "An expression used in array size is not close to an integer");
 				new_size.push_back(casted);
 			}
-			return Variable(std::pair<std::vector<double>, std::vector<size_t>>(std::get<std::pair<std::vector<double>, std::vector<size_t>>>(left_var.value).first, new_size));
+			auto values_to_fill_with = std::get<std::pair<std::vector<double>, std::vector<size_t>>>(left_var.value).first;
+			size_t full_length = new_size_double[0];
+			auto it = new_size_double.begin();
+			it++;
+			while(it != new_size_double.end()) {
+				full_length *= *it;
+				it++;
+			}
+			size_t original_idx = 0;
+			// Preallocate to avoid size doubling
+			std::vector<double> new_values (full_length);
+			for(size_t i = 0; i < full_length; ++i) {
+				new_values[i] = values_to_fill_with[original_idx];
+				original_idx++;
+				if(original_idx == values_to_fill_with.size()) {
+					original_idx = 0;
+				}
+			}
+			return Variable(std::pair<std::vector<double>, std::vector<size_t>>(new_values, new_size));
 		}
 		case EXP: {
 			Variable left_var = evaluate_expr(binary->left);
