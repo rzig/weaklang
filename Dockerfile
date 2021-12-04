@@ -9,4 +9,5 @@ RUN apt-get install -y make
 RUN apt-get install -y gfortran
 RUN adduser --gecos "" --disabled-password weak
 USER weak
-RUN cd /home/weak
+WORKDIR /home/weak
+RUN mkdir /home/weak/bin
