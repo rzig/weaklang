@@ -1335,7 +1335,7 @@ TEST_CASE("Printing simple expressions", "[environment]") {
     }
 
     SECTION("nd array") {
-        REQUIRE_OUTPUT("p [0] sa [2, 2];", "[0] sa [2, 2]");
+        REQUIRE_OUTPUT("p [0] sa [2, 2];", "[0, 0, 0, 0] sa [2, 2]");
     }
 }
 
@@ -1401,17 +1401,17 @@ TEST_CASE("Variable declaration and usage", "[environment]") {
             arr = arr + 2;
             p arr;
         )V0G0N";
-        REQUIRE_OUTPUT(program, "[2] sa [4]");
+        REQUIRE_OUTPUT(program, "[2, 2, 2, 2] sa [4]");
     }
 
     SECTION("nd array declaration and usage") {
         auto program = R"V0G0N(
-            a arr = [0] sa [4, 4];
+            a arr = [0] sa [2, 2];
             arr = arr + 2;
             arr = arr * 3;
             p arr;
         )V0G0N";
-        REQUIRE_OUTPUT(program, "[6] sa [4, 4]");
+        REQUIRE_OUTPUT(program, "[6, 6, 6, 6] sa [2, 2]");
     }
 
     SECTION("bool declaration and usage") {
@@ -1741,7 +1741,6 @@ TEST_CASE("Complete program evaluation", "[environment]") {
             "in operator x"
             "in while loop"
             "in operator x"
-            512
             True
             "== Second call =="
             "Hello"
