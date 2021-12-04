@@ -144,7 +144,7 @@ std::vector<Token> Lexer::lex(const std::string &to_lex) {
             }
             token_type = NUMBER;
         } else if (is_alpha(first_character)) {
-            while(current_index < to_lex.size() && is_alpha(to_lex.at(current_index)) && (not is_whitespace(to_lex.at(current_index)))) current_index++;
+            while(current_index < to_lex.size() && (is_alpha(to_lex.at(current_index))||is_digit(to_lex.at(current_index))) && (not is_whitespace(to_lex.at(current_index)))) current_index++;
             std::string lexeme_check = to_lex.substr(start_index, current_index-start_index);
             if(is_keyword(lexeme_check)) {
                 token_type = keywords.at(lexeme_check);

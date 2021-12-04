@@ -161,6 +161,12 @@ TEST_CASE("Identifiers", "[lexer]") {
         expect_tokens("abc_def = 1", {IDENTIFIER, EQUALS, NUMBER, END});
         REQUIRE(getTokens("abc_def = 1")[0].lexeme == "abc_def");
     }
+
+    SECTION("Accepts numbers after first letter in identifiers") {
+        no_error("abc1 = 1");
+        expect_tokens("abc1 = 1", {IDENTIFIER, EQUALS, NUMBER, END});
+        REQUIRE(getTokens("abc1 = 1")[0].lexeme == "abc1");
+    }
 }
 
 TEST_CASE("Keywords", "[lexer]") {
@@ -216,7 +222,7 @@ TEST_CASE("Keywords", "[lexer]") {
         expect_tokens("a x = 3", {LET, IDENTIFIER, EQUALS, NUMBER, END});
     }
 
-    SECTION("Verify") {
+    SECTION("Assert") {
         no_error("v s m == 2");
         expect_tokens("v s m == 2", {ASSERT, SHAPE, IDENTIFIER, EQUALS_EQUALS, NUMBER, END});
     }
