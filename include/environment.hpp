@@ -4,7 +4,9 @@
 #include <unordered_map>
 #include <stdexcept>
 #include <iostream>
-#include <cblas.h>
+#ifndef WEB_TARGET
+    #include <cblas.h>
+#endif
 #include <string>
 #include <math.h>
 

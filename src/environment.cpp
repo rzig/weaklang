@@ -240,13 +240,36 @@ Variable Environment::evaluate_expr(Expr* expr) {
 			size_t r = extract_left.second.at(0);
 			size_t m = extract_left.second.at(1);
 			size_t c = extract_right.second.at(1);
-			double *out = (double*) malloc(sizeof(double) * r * c);
-			cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, r, c, m, 1., extract_left.first.data(), m, extract_right.first.data(), c, 0., out, c);
-			std::vector<double> result;
-			result.reserve(r * c);
-			for (size_t i = 0; i < r * c; i++) result.push_back(out[i]);
-			free(out);
-			return Variable(std::pair<std::vector<double>, std::vector<size_t>>(result, {r, c}));
+			#ifndef WEB_TARGET
+				double *out = (double*) malloc(sizeof(double) * r * c);
+				cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, r, c, m, 1., extract_left.first.data(), m, extract_right.first.data(), c, 0., out, c);
+				std::vector<double> result;
+				result.reserve(r * c);
+				for (size_t i = 0; i < r * c; i++) result.push_back(out[i]);
+				free(out);
+				return Variable(std::pair<std::vector<double>, std::vector<size_t>>(result, {r, c}));
+			#else
+				double *out = (double*) calloc(r * c, sizeof(double));
+				double *a = extract_left.first.data();
+				double *b = extract_right.first.data();
+				size_t ic = 0, im = 0, kc = 0;
+				for (size_t i = 0; i < r; i++) {
+				    for (size_t k = 0; k < m; k++) {
+					for (size_t j = 0; j < c; j++) {
+					    out[ic + j] += a[im + k] * b[kc + j];
+					}
+					kc += c;
+				    }
+				    kc = 0;
+				    ic += c;
+				    im += m;
+				}
+				std::vector<double> result;
+				result.reserve(r * c);
+				for (size_t i = 0; i < r * c; i++) result.push_back(out[i]);
+				free(out);
+				return Variable(std::pair<std::vector<double>, std::vector<size_t>>(result, {r, c}));
+			#endif
 		}
 		case AS_SHAPE: {
 			Variable left_var = evaluate_expr(binary->left);

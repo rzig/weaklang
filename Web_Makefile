@@ -1,0 +1,40 @@
+CXX=emcc
+CXXFLAGS=-std=c++20 -g -fstandalone-debug -Iinclude/ -Iinclude/CBLAS/include/ -DWEB_TARGET -fexceptions
+
+weak: web_bin/weak
+tests: web_bin/tests
+
+web_bin/weak: web_bin/main.o web_bin/lexer.o web_bin/error.o web_bin/stmt.o web_bin/token.o web_bin/expr.o web_bin/parser.o web_bin/environment.o web_bin/variable.o
+	$(CXX) $(CXXFLAGS) $^ -o $@.js -s EXPORTED_FUNCTIONS='["_execute_program", "_main", "_free"]' -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap", "intArrayFromString", "UTF8ToString", "ExceptionInfo"]' -s ENVIRONMENT=web -s WASM=0 -s NO_DISABLE_EXCEPTION_CATCHING
+web_bin/main.o: src/main.cpp include/lexer.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+web_bin/lexer.o: src/lexer.cpp include/lexer.hpp include/token.hpp include/error.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+web_bin/error.o: src/error.cpp include/error.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+web_bin/util.o: src/util.cpp include/util.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+web_bin/token.o: src/token.cpp include/token.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+web_bin/stmt.o: src/stmt.cpp include/stmt.hpp include/token.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+web_bin/expr.o: src/expr.cpp include/expr.hpp include/token.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+web_bin/parser.o: src/parser.cpp include/parser.hpp include/token.hpp include/stmt.hpp include/expr.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+web_bin/environment.o: src/environment.cpp include/environment.hpp include/variable.hpp include/parser.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+web_bin/variable.o: src/variable.cpp include/variable.hpp
+	$(CXX) $(CXXFLAGS) $< -c -o $@
+
+web_bin/tests: web_bin/catch.o tests/tests.cc src/lexer.cpp src/token.cpp src/error.cpp src/stmt.cpp src/expr.cpp src/parser.cpp src/util.cpp src/environment.cpp src/variable.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LFLAGS)
+
+web_bin/catch.o: tests/catch.cc
+	$(CXX) $(CXXFLAGS) -c $^ -o $@
+
+.DEFAULT_GOAL := weak
+.PHONY: clean weak
+
+clean:
+	rm -rf web_bin/*
