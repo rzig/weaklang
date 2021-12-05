@@ -1,0 +1,15 @@
+f dim(mat) {
+    r (s (s mat))[0];
+}
+
+o mul(left, right) {
+    v dim(left) == 2 A dim(right) == 2;
+    # left is m x n, right must be an n x k
+    v (s left)[1] == (s right)[0];
+    # Implement matrix multiplication here
+    r left @ right;
+}
+
+a one = [3] sa [4,4];
+a two = [5] sa [2,2];
+p one mul two;
