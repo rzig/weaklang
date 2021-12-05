@@ -1,9 +1,40 @@
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <cstring>
 
 #include "lexer.hpp"
 #include "parser.hpp"
 #include "environment.hpp"
+
+// We wrap this in an "extern" so that we can access it from
+// JavaScript
+
+extern "C" {
+  inline char* as_c_string(const std::string& str) {
+    char* buf = new char[str.length() + 1];
+    buf[str.length()] = '\0';
+    memcpy(buf, str.data(), str.length());
+    return buf;
+  }
+
+  char* execute_program(char* input) {
+    std::string read (input);
+    Lexer lexer;
+    std::vector<Token> tokens = lexer.lex(read);
+    if(lexer.has_had_error()) { 
+      return as_c_string(lexer.print_errors());  
+    }
+    Parser p(tokens);
+    std::vector<Stmt*> program = p.parse();
+    std::stringstream out;
+    Environment env {out};
+    for (Stmt* stmt : program) env.execute_stmt(stmt);
+    for (auto stmt : program) delete stmt;
+    char* ptr = as_c_string(out.str());
+    return ptr;
+  }
+}
 
 int main(int argc, char* argv[]) {
   if (argc == 1) {
