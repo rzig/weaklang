@@ -256,7 +256,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
 				for (size_t i = 0; i < r; i++) {
 				    for (size_t k = 0; k < m; k++) {
 					for (size_t j = 0; j < c; j++) {
-					    out[ic + j] += a[im + k] * b[kc + j]
+					    out[ic + j] += a[im + k] * b[kc + j];
 					}
 					kc += c;
 				    }
