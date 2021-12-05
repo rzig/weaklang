@@ -249,7 +249,7 @@ Variable Environment::evaluate_expr(Expr* expr) {
 				free(out);
 				return Variable(std::pair<std::vector<double>, std::vector<size_t>>(result, {r, c}));
 			#else
-				double *out = (double*) calloc(sizeof(double) * r * c);
+				double *out = (double*) calloc(r * c, sizeof(double));
 				double *a = extract_left.first.data();
 				double *b = extract_right.first.data();
 				size_t ic = 0, im = 0, kc = 0;
