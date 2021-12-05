@@ -21,18 +21,32 @@ extern "C" {
   char* execute_program(char* input) {
     std::string read (input);
     Lexer lexer;
-    std::vector<Token> tokens = lexer.lex(read);
+    std::vector<Token> tokens;
+    try {
+      tokens = lexer.lex(read);
+    } catch(const std::exception& e) {
+      return as_c_string(e.what());
+    }
     if(lexer.has_had_error()) { 
       return as_c_string(lexer.print_errors());  
     }
     Parser p(tokens);
-    std::vector<Stmt*> program = p.parse();
+    std::vector<Stmt*> program;
+    try {
+      program = p.parse();
+    } catch(const std::exception& e) {
+      return as_c_string(e.what());
+    }
     std::stringstream out;
     Environment env {out};
-    for (Stmt* stmt : program) env.execute_stmt(stmt);
-    for (auto stmt : program) delete stmt;
-    char* ptr = as_c_string(out.str());
-    return ptr;
+    try {
+      for (Stmt* stmt : program) env.execute_stmt(stmt);
+      for (auto stmt : program) delete stmt;
+      char* ptr = as_c_string(out.str());
+      return ptr;
+    } catch(const std::exception& e) {
+      return as_c_string(e.what());
+    }
   }
 }
 

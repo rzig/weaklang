@@ -12,16 +12,21 @@ function App() {
   }, []);
 
   const run = () => {
-    console.log("editor.current is " + editor.current);
     const program = editor.current.getValue();
     // @ts-ignore
     let ptr = allocate(intArrayFromString(program), ALLOC_NORMAL);
-    // @ts-ignore
-    let ret = Module._execute_program(ptr);
+    let ret;
+    try {
+      // @ts-ignore
+      ret = Module._execute_program(ptr); 
+    } catch (error) {
+      // @ts-ignore
+      console.log(Module.ExceptionInfo(error));
+    }
     // @ts-ignore
     let res = UTF8ToString(ret);
-    console.log("Program output: ");
-    console.log(res);
+    // @ts-ignore
+    _free(ptr);
     setOutput(res);
   };
 
