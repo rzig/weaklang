@@ -3,6 +3,7 @@
 WeakLang is the programming language that makes you a more productive data scientist. Who needs to spend excess energy typing "function" or "print" or "while" when you can just type "f", "p" or "w"?! And that's not all. You can define your _own_ infix operators, using the handy "o" keyword. Combine this with first-class matrix support powered by BLAS, and you've got the most productive (and dead simple) scientific computing language out there.
 
 ## Installing Weak
+Don't want to install Weak? You can try out our in-browser playground at [weaklang.xyz](weaklang.xyz). It runs completely in your browser and supports all of Weak's features!
 ### Docker Installation
 The officially supported way to run WeakLang is inside a Docker container where we've installed CBLAS, a linear algebra library, for you. If you want to do this yourself, you can find instructions specific to your flavor of UNIX online. To get started and run with Docker:
 
@@ -25,6 +26,14 @@ This is not recommended due to additional complexity and varying environments. H
 You can build and run tests regardless of how you installed Weak.
 1. In the directory of Weak (which contains `start-docker.sh`, run `make tests`. If you installed using Docker, run this command after you've entered the Docker container's shell using `sh ./start-docker.sh`.
 2. To execute the tests, run `./bin/tests`.
+
+### Building for Web
+Using Emscripten, you can compile Weak into a JavaScript library so you can run Weak anywhere! 
+It is recommended to complete these steps inside the docker image. Emscripten can be a tricky
+to get working properly, so if you have issues please let us know!
+1. Download and install [Emscripten](https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install).
+2. In the project directory, run `emmake make -f Web_Makefile`.
+3. Now, you can use the `weak.js` file inside `web_bin` anywhere you want to use Weak in JS. To see an example of how to use the functions exported by this file, check out our interactive playground in the `playground/` folder. If you want to run the playground locally, `cd` into the playground folder, and type `yarn install` and then `yarn start`. You'll need [yarn](https://yarnpkg.com/) installed to do this.
 
 ## Learn to code in Weak
 
