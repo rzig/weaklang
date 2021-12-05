@@ -248,6 +248,27 @@ Variable Environment::evaluate_expr(Expr* expr) {
 				for (size_t i = 0; i < r * c; i++) result.push_back(out[i]);
 				free(out);
 				return Variable(std::pair<std::vector<double>, std::vector<size_t>>(result, {r, c}));
+			#else
+				double *out = (double*) calloc(sizeof(double) * r * c);
+				double *a = extract_left.first.data();
+				double *b = extract_right.first.data();
+				size_t ic = 0, im = 0, kc = 0;
+				for (size_t i = 0; i < r; i++) {
+				    for (size_t k = 0; k < m; k++) {
+					for (size_t j = 0; j < c; j++) {
+					    out[ic + j] += a[im + k] * b[kc + j]
+					}
+					kc += c;
+				    }
+				    kc = 0;
+				    ic += c;
+				    im += m;
+				}
+				std::vector<double> result;
+				result.reserve(r * c);
+				for (size_t i = 0; i < r * c; i++) result.push_back(out[i]);
+				free(out);
+				return Variable(std::pair<std::vector<double>, std::vector<size_t>>(result, {r, c}));
 			#endif
 		}
 		case AS_SHAPE: {
