@@ -5,7 +5,7 @@ weak: web_bin/weak
 tests: web_bin/tests
 
 web_bin/weak: web_bin/main.o web_bin/lexer.o web_bin/error.o web_bin/stmt.o web_bin/token.o web_bin/expr.o web_bin/parser.o web_bin/environment.o web_bin/variable.o
-	$(CXX) $(CXXFLAGS) $^ -o $@.html -s EXPORTED_FUNCTIONS='["_execute_program", "_main"]' -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap"]'
+	$(CXX) $(CXXFLAGS) $^ -o $@.js -s EXPORTED_FUNCTIONS='["_execute_program", "_main"]' -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap", "intArrayFromString", "UTF8ToString"]' -s ENVIRONMENT=web -s WASM=0
 web_bin/main.o: src/main.cpp include/lexer.hpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 web_bin/lexer.o: src/lexer.cpp include/lexer.hpp include/token.hpp include/error.hpp
