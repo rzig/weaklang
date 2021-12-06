@@ -3,7 +3,7 @@
 WeakLang is the programming language that makes you a more productive data scientist. Who needs to spend excess energy typing "function" or "print" or "while" when you can just type "f", "p" or "w"?! And that's not all. You can define your _own_ infix operators, using the handy "o" keyword. Combine this with first-class matrix support powered by BLAS, and you've got the most productive (and dead simple) scientific computing language out there.
 
 ## Installing Weak
-Don't want to install Weak? You can try out our in-browser playground at [weaklang.xyz](weaklang.xyz). It runs completely in your browser and supports all of Weak's features!
+Don't want to install Weak? You can try out our in-browser playground at [weaklang.xyz](https://weaklang.xyz). It runs completely in your browser and supports all of Weak's features!
 ### Docker Installation
 The officially supported way to run WeakLang is inside a Docker container where we've installed CBLAS, a linear algebra library, for you. If you want to do this yourself, you can find instructions specific to your flavor of UNIX online. To get started and run with Docker:
 
@@ -242,3 +242,12 @@ f myMatrixMultiply(matrixa, matrixb) {
 
 ## Example Weak Programs
 For your convenience, we've provided a few example programs in Weak inside the `examples/` directory. Feel free to modify them and get a feel for how Weak works. We're happy to answer any questions you have, and hope you enjoy writing in Weak!
+
+## How it works
+WeakLang is divided into three parts which run in sequence to generate the output for a program.
+### Lexer
+The Lexer's job is to take a string and convert it into a series of tokens, such as `LESSER_EQUALS`, `IDENTIFIER`, `FUNCTION`, and so on, based on the keywords we've defined for Weak in our BNF grammar (see the file `WeakLangBNF`). The lexer moves character by character, and if it sees a character that might start an operator or keyword, looks ahead until it can determine the type of token that character starts. It then consumes until the most specific token has been created (for example, creating `<=` when it sees "<=" and not `<` and `=` separately). This process is completed for the entire file.
+### Parser
+The Parser takes a series of tokens and converts them into an AST, or Abstract Syntax Tree. It does so by following the recursive rules defined in our BNF: it first checks for a function declaration, then an operator declaration, then a variable declaration, and finally a statement. To parse a statement, it checks for a print, a return, and so on. It continues this process until it reaches the rule furthest down in the BNF which it can apply to the current token and subsequent tokens, and generates a component of the tree containing these tokens. An example of this would be creating a `Binary` with two `Literal` tokens on the left and the right, which would be generated from `2 + 2`. The parser also implements a handy `as_dot()` method which generates a string representation that you can turn into an AST visualization using Graphviz. You can uncomment the `as_dot()` line in `main.cc` to try this out.
+### Environment
+Environment is the abstraction used by Weak to manage scope. Once the parser has generated an AST for the program, we create an Environment instance for the program. This keeps track of what variables, functions, and operators have been defined in the program. We feed it each statement in the AST, and it determines whether that statement is just adding a function, operator, or variable, or an expression that utilizes those things. In the latter case, the environment determines the type of expression, such as a function call, and evaluates it. In the case of custom operator usage and function calls, the Environment instance creates a new Environment instance with the variables being parameters, and executes the contents of this function inside the sub-environment, which ensures proper scope. The result of this environment's execution is then used as the result of evaluating the function or operator. For other more simple operations, such as matrix multiplication, the environment checks to make sure the variables are compatible and if so computes the appropriate result.
